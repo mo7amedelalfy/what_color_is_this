@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<application xmlns="http://ns.adobe.com/air/application/3.6">
+
+	<id>com.nicotroia.whatcoloristhis.debug</id>
+	<versionNumber>0.1</versionNumber>
+	<supportedProfiles>mobileDevice</supportedProfiles>
+	<filename>what_color_is_this</filename>
+	
+	<name>what_color_is_this</name>
+	<description></description>
+	<copyright></copyright>
+
+	<initialWindow>
+		<content>what_color_is_this.swf</content>
+		<autoOrients>true</autoOrients>
+        <fullScreen>false</fullScreen>
+        <visible>true</visible>
+        <renderMode>direct</renderMode>
+	</initialWindow>
+	<!-- 
+	<icon>
+		<image48x48>icons/android/icons/icon_48.png</image48x48>
+		<image57x57>icons/android/icons/icon_57.png</image57x57>
+		<image72x72>icons/android/icons/icon_72.png</image72x72>
+		<image114x114>icons/android/icons/icon_114.png</image114x114>
+		<image512x512>icons/android/icons/icon_512.png</image512x512>
+	</icon>
+ 	-->
+	<android> 
+    	<manifestAdditions> 
+        	<![CDATA[ 
+	            <manifest> 
+	            	<uses-sdk android:minSdkVersion="8"/>
+	                <uses-permission android:name="android.permission.SET_DEBUG_APP"></uses-permission>
+	                <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" /> 
+	                <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" /> 
+	                <uses-permission android:name="android.permission.CAMERA" /> 
+	                <uses-permission android:name="android.permission.DISABLE_KEYGUARD" /> 
+	                <uses-permission android:name="android.permission.INTERNET" /> 
+	                <uses-feature android:required="true" android:name="android.hardware.touchscreen.multitouch"/>
+	            </manifest> 
+        	]]> 
+    	</manifestAdditions> 
+	</android>
+
+</application>
