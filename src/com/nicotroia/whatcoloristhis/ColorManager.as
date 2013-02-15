@@ -1,12 +1,19 @@
 package com.nicotroia.whatcoloristhis
 {
+	import com.nicotroia.whatcoloristhis.controller.events.ImageEvent;
+	
+	import flash.display.Bitmap;
+	import flash.display.BitmapData;
 	import flash.display.Loader;
 	import flash.events.ErrorEvent;
 	import flash.events.Event;
+	import flash.events.EventDispatcher;
 	import flash.events.IEventDispatcher;
 	import flash.events.IOErrorEvent;
 	import flash.events.MediaEvent;
 	import flash.events.ProgressEvent;
+	import flash.filters.BlurFilter;
+	import flash.geom.Point;
 	import flash.media.CameraRoll;
 	import flash.media.CameraRollBrowseOptions;
 	import flash.media.CameraUI;
@@ -17,6 +24,8 @@ package com.nicotroia.whatcoloristhis
 
 	public class ColorManager
 	{
+		public var eventDispatcher:EventDispatcher;
+		
 		protected var _cameraUI:CameraUI;
 		protected var _cameraRoll:CameraRoll;
 		protected var _imageLoader:Loader;
@@ -26,7 +35,7 @@ package com.nicotroia.whatcoloristhis
 		
 		public function ColorManager()
 		{
-			
+			eventDispatcher = new EventDispatcher();
 		}
 		
 		public function initCamera():void
@@ -142,7 +151,7 @@ package com.nicotroia.whatcoloristhis
 				trace("Synchronous media promise." );
 				_imageLoader.loadFilePromise( promise );
 				//this.addChild( loader );
-				handleLoadedFile( _imageLoader );
+				handleLoadedBitmap( _imageLoader.contentLoaderInfo.content as Bitmap );
 			}
 		}
 		
@@ -161,12 +170,25 @@ package com.nicotroia.whatcoloristhis
 			
 			trace("load complete.");
 			
-			handleLoadedFile( event.target as Loader );
+			handleLoadedBitmap( event.target.content );
 		}
 		
-		private function handleLoadedFile(loader:Loader):void
+		private function handleLoadedBitmap(bitmap:Bitmap):void
 		{
-			trace(loader.content);
+			trace(bitmap);
+			var bmd:BitmapData = bitmap.bitmapData;
+			
+			for( var x:uint = 0; x < bmd.width; x++ ) { 
+				for( var y:uint = 0; y < bmd.height; y++ ) { 
+					//trace("("+ x +","+ y + ") 0x" + bmd.getPixel(x,y).toString(16));
+				}
+			}
+			
+			trace("iteration complete");
+			
+			bmd.applyFilter(bmd, bmd.rect, new Point(), new BlurFilter(16,16,3));
+			
+			eventDispatcher.dispatchEvent(new ImageEvent(ImageEvent.CAMERA_ROLL_IMAGE_SELECTED, bitmap));
 		}
 	}
 }

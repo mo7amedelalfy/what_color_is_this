@@ -1,28 +1,28 @@
 package
 {
-	import com.bit101.components.PushButton;
-	import com.nicotroia.whatcoloristhis.ColorManager;
+	import com.nicotroia.whatcoloristhis.ColorContext;
 	
-	import flash.display.SimpleButton;
 	import flash.display.Sprite;
 	import flash.display.StageAlign;
 	import flash.display.StageScaleMode;
-	import flash.events.KeyboardEvent;
-	import flash.events.MouseEvent;
-	import flash.ui.Keyboard;
 	
 	[SWF(width="480", height="300", frameRate="24")]
 	public class what_color_is_this extends Sprite
 	{
-		private var _colorManager:ColorManager;
+		private var _context:ColorContext;
+		//private var _colorManager:ColorManager;
 		
 		public function what_color_is_this()
 		{
 			stage.align = StageAlign.TOP_LEFT;
 			stage.scaleMode = StageScaleMode.NO_SCALE;
+			stage.frameRate = 30;
 			
 			trace("hello world");
 			
+			_context = new ColorContext(this);
+			
+			/*			
 			_colorManager = new ColorManager();
 			
 			var cameraOption:PushButton = new PushButton(this, 50, 50, "Camera", cameraOptionClickHandler);
@@ -30,8 +30,9 @@ package
 			
 			addChild(cameraOption);
 			addChild(cameraRollOption);
+			*/
 		}
-		
+		/*
 		private function cameraOptionClickHandler(event:MouseEvent):void
 		{
 			_colorManager.initCamera();
@@ -39,8 +40,15 @@ package
 		
 		private function cameraRollOptionClickHandler(event:MouseEvent):void
 		{
+			_colorManager.eventDispatcher.addEventListener(ImageEvent.CAMERA_ROLL_IMAGE_SELECTED, cameraRollImageSelectedHandler);
 			_colorManager.initCameraRoll();
 		}
 		
+		protected function cameraRollImageSelectedHandler(event:ImageEvent):void
+		{
+			trace(event.bitmap);
+			addChild(event.bitmap);
+		}
+		*/
 	}
 }

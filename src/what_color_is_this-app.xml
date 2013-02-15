@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8" ?> 
-<application xmlns="http://ns.adobe.com/air/application/3.6">
+<application xmlns="http://ns.adobe.com/air/application/3.2">
 
 	<id>com.nicotroia.whatcoloristhis.debug</id>
 	<versionNumber>0.1</versionNumber>
 	<supportedProfiles>mobileDevice</supportedProfiles>
-	<filename>What Color Is This</filename>
+	<filename>what_color_is_this</filename>
 	
-	<name>what_color_is_this</name>
+	<name>What Color Is This</name>
 	<description></description>
-	<copyright></copyright>
+	<copyright>nicotroia</copyright>
 
 	<initialWindow>
 		<content>what_color_is_this.swf</content>
