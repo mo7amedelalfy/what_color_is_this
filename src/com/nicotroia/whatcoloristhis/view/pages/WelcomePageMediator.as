@@ -1,5 +1,7 @@
 package com.nicotroia.whatcoloristhis.view.pages
 {
+	import com.nicotroia.whatcoloristhis.controller.events.NotificationEvent;
+
 	public class WelcomePageMediator extends PageBaseMediator
 	{
 		[Inject]
@@ -9,18 +11,14 @@ package com.nicotroia.whatcoloristhis.view.pages
 		{
 			super.onRegister();
 			
-			rearrange();
+			appResizedHandler(null);
 			
+			eventDispatcher.dispatchEvent(new NotificationEvent(NotificationEvent.CHANGE_TOP_NAV_BAR_TITLE, "What Color <i>Is</i> This?"));
 		}
 		
-		private function rearrange():void
+		override protected function appResizedHandler(event:NotificationEvent):void
 		{
-			trace(welcomePage.topNavBar);
-			trace(welcomePage.topNavBar);
-			//welcomePage.topNavBar.width = contextView.stage.stageWidth;
-			//welcomePage.topNavBar.height = 50;
 			
-			//welcomePage.topNavBar.text = "Welcome!!!!";
 		}
 	}
 }

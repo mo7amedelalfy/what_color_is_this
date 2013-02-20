@@ -5,10 +5,10 @@ package com.nicotroia.whatcoloristhis.view.buttons
 	
 	import flash.events.MouseEvent;
 
-	public class TestPageButtonMediator extends ButtonBaseMediator
+	public class AboutPageButtonMediator extends ButtonBaseMediator
 	{
 		[Inject]
-		public var testPageButton:TestPageButton;
+		public var testPageButton:AboutPageButton;
 		
 		override public function onRegister():void
 		{
@@ -19,7 +19,7 @@ package com.nicotroia.whatcoloristhis.view.buttons
 		
 		private function testPageButtonClickHandler(event:MouseEvent):void
 		{
-			eventDispatcher.dispatchEvent(new NavigationEvent(NavigationEvent.NAVIGATE_TO_PAGE, SequenceModel.PAGE_Test));
+			eventDispatcher.dispatchEvent(new NavigationEvent(NavigationEvent.NAVIGATE_TO_PAGE, SequenceModel.PAGE_About));
 		}
 	}
 }
