@@ -15,10 +15,11 @@ package com.nicotroia.whatcoloristhis.model
 		public var isTransitioning:Boolean = false;
 		
 		//PAGE Constants
-		//public static const PAGE_Login:Class = LoginPage;
+		public static const PAGE_Welcome:Class = WelcomePage;
+		public static const PAGE_Test:Class = TestPage;
 		
 		//ASSET Constants
-		//public static const ASSET_Background:Class = BackgroundAsset;
+		public static const ASSET_TOP_NAV_BAR:Class = TopNavBar;
 		
 		private var _pageList:Vector.<Class>;
 		private var _assetList:Vector.<Class>;
@@ -37,14 +38,14 @@ package com.nicotroia.whatcoloristhis.model
 			assets = new Dictionary();
 			assetWaitingList = new Dictionary();
 			
-			//ARRAY OF PAGES AND ASSETS THAT GET INITIALIZED FURTHER DOWN
-			_pageList = new <Class>[]; // PAGE_Login, PAGE_PresentationSelection, PAGE_PresentationManager, PAGE_PreviewPresentation, PAGE_PresentPresentation ]; 
-			_assetList = new <Class>[]; // ASSET_Background ]; 
+			//PAGES AND ASSETS THAT WILL GET INITIALIZED 
+			_pageList = new <Class>[PAGE_Welcome, PAGE_Test];
+			_assetList = new <Class>[ASSET_TOP_NAV_BAR]; 
 			
-			//ARRAY OF PAGES THAT EACH ASSET WILL BE ADDED TO
-			//assetWaitingList[ASSET_Background] = new <Class>[ PAGE_Login, PAGE_PresentationSelection, PAGE_PresentationManager, PAGE_PreviewPresentation, PAGE_PresentPresentation ];
+			//EACH ASSET WILL BE ADDED TO THE FOLLOWING ARRAY OF PAGES
+			assetWaitingList[ASSET_TOP_NAV_BAR] = new <Class>[ PAGE_Welcome, PAGE_Test ];
 			
-			//preallocate pages
+			//Preallocate pages
 			for each( var PageConstant:Class in _pageList ) { 
 				trace("preallocating page " + PageConstant );
 				pages[PageConstant] = new PageConstant(); 

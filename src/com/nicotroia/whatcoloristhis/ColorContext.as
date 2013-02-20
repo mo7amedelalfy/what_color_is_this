@@ -4,11 +4,15 @@ package com.nicotroia.whatcoloristhis
 	import com.nicotroia.whatcoloristhis.controller.commands.ResizeAppCommand;
 	import com.nicotroia.whatcoloristhis.controller.commands.StartupAnimationCommand;
 	import com.nicotroia.whatcoloristhis.controller.events.NavigationEvent;
+	import com.nicotroia.whatcoloristhis.model.CameraModel;
 	import com.nicotroia.whatcoloristhis.model.SequenceModel;
 	import com.nicotroia.whatcoloristhis.view.buttons.ButtonBase;
 	import com.nicotroia.whatcoloristhis.view.buttons.ButtonBaseMediator;
+	import com.nicotroia.whatcoloristhis.view.buttons.TestPageButtonMediator;
+	import com.nicotroia.whatcoloristhis.view.buttons.WelcomePageButtonMediator;
 	import com.nicotroia.whatcoloristhis.view.pages.PageBase;
 	import com.nicotroia.whatcoloristhis.view.pages.PageBaseMediator;
+	import com.nicotroia.whatcoloristhis.view.pages.WelcomePageMediator;
 	
 	import flash.display.DisplayObjectContainer;
 	import flash.display.Sprite;
@@ -32,6 +36,7 @@ package com.nicotroia.whatcoloristhis
 		{
 			//models
 			injector.mapSingleton(SequenceModel);
+			injector.mapSingleton(CameraModel);
 			
 			
 			//graphics
@@ -44,6 +49,7 @@ package com.nicotroia.whatcoloristhis
 			backgroundSprite = new Sprite();
 			injector.mapValue(Sprite, backgroundSprite, "backgroundSprite");
 			
+			
 			//startup chain
 			commandMap.mapEvent(ContextEvent.STARTUP_COMPLETE, StartupAnimationCommand, ContextEvent);
 			
@@ -54,20 +60,24 @@ package com.nicotroia.whatcoloristhis
 			
 			//pages
 			mediatorMap.mapView(PageBase, PageBaseMediator);
+			mediatorMap.mapView(WelcomePage, WelcomePageMediator, [PageBase, WelcomePage]);
+			mediatorMap.mapView(TestPage, PageBaseMediator, [PageBase]);
 			
 			
 			//buttons
 			mediatorMap.mapView(ButtonBase, ButtonBaseMediator);
+			mediatorMap.mapView(WelcomePageButton, WelcomePageButtonMediator, [ButtonBase, WelcomePageButton]);
+			mediatorMap.mapView(TestPageButton, TestPageButtonMediator, [ButtonBase, TestPageButton]);
 			
 			
-			contextView.stage.addEventListener(Event.RESIZE, appResizeHandler);
+			//contextView.stage.addEventListener(Event.RESIZE, appResizeHandler);
 			
 			super.startup();
 		}
 		
 		protected function appResizeHandler(event:Event):void
 		{
-			commandMap.execute(ResizeAppCommand, event, Event);
+			//commandMap.execute(ResizeAppCommand, event, Event);
 		}
 	}
 }

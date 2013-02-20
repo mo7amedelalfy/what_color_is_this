@@ -18,14 +18,14 @@ package com.nicotroia.whatcoloristhis.view.pages
 		
 		public function show(durationSec:Number = 0.5, delaySec:Number = 0, callBack:Function = null):void
 		{
-			//this.x = 24;
+			this.x = 24;
 			TweenLite.to(this, durationSec, {alpha:1.0, x:0, delay:delaySec, ease:Circ.easeInOut, onComplete:callBack });
 		}
 		
 		public function hide(durationSec:Number = 0.5, delaySec:Number = 0, callBack:Function = null):void
 		{
 			//x:-50,
-			TweenLite.to(this, durationSec, {alpha:0.0, delay:delaySec, ease:Circ.easeInOut, onComplete:callBack });			
+			TweenLite.to(this, durationSec, {alpha:0.0, x:-50, delay:delaySec, ease:Circ.easeInOut, onComplete:callBack });			
 		}
 	}
 }

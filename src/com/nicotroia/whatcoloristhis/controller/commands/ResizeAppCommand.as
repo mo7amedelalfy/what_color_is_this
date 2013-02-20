@@ -17,6 +17,8 @@ package com.nicotroia.whatcoloristhis.controller.commands
 		{
 			//trace("ResizeAppCommand via " + event.type);
 			
+			trace(contextView.stage.orientation);
+			
 			backgroundSprite.graphics.clear();
 			backgroundSprite.graphics.beginFill(Math.random() * 0xffffff, 1.0);
 			backgroundSprite.graphics.drawRect(0,0,contextView.stage.stageWidth, contextView.stage.stageHeight);

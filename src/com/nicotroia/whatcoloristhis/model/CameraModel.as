@@ -1,4 +1,4 @@
-package com.nicotroia.whatcoloristhis
+package com.nicotroia.whatcoloristhis.model
 {
 	import com.nicotroia.whatcoloristhis.controller.events.ImageEvent;
 	
@@ -7,7 +7,6 @@ package com.nicotroia.whatcoloristhis
 	import flash.display.Loader;
 	import flash.events.ErrorEvent;
 	import flash.events.Event;
-	import flash.events.EventDispatcher;
 	import flash.events.IEventDispatcher;
 	import flash.events.IOErrorEvent;
 	import flash.events.MediaEvent;
@@ -21,11 +20,11 @@ package com.nicotroia.whatcoloristhis
 	import flash.media.MediaType;
 	import flash.utils.ByteArray;
 	import flash.utils.IDataInput;
+	
+	import org.robotlegs.mvcs.Actor;
 
-	public class ColorManager
+	public class CameraModel extends Actor
 	{
-		public var eventDispatcher:EventDispatcher;
-		
 		protected var _cameraUI:CameraUI;
 		protected var _cameraRoll:CameraRoll;
 		protected var _imageLoader:Loader;
@@ -33,9 +32,9 @@ package com.nicotroia.whatcoloristhis
 		
 		private var _cameraMode:Boolean;
 		
-		public function ColorManager()
+		public function CameraModel()
 		{
-			eventDispatcher = new EventDispatcher();
+			
 		}
 		
 		public function initCamera():void

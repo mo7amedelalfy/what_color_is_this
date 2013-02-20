@@ -1,5 +1,8 @@
 package com.nicotroia.whatcoloristhis.controller.commands
 {
+	import com.nicotroia.whatcoloristhis.controller.events.NavigationEvent;
+	import com.nicotroia.whatcoloristhis.model.SequenceModel;
+	
 	import flash.display.Sprite;
 	import flash.events.Event;
 	
@@ -27,6 +30,8 @@ package com.nicotroia.whatcoloristhis.controller.commands
 			contextView.addChild( overlayContainer );
 			
 			pageContainer.addChild(backgroundSprite);
+			
+			eventDispatcher.dispatchEvent(new NavigationEvent(NavigationEvent.NAVIGATE_TO_PAGE, SequenceModel.PAGE_Welcome));
 		}
 	}
 }
