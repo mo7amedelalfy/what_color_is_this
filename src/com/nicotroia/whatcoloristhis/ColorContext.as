@@ -1,19 +1,20 @@
 package com.nicotroia.whatcoloristhis
 {
 	import com.nicotroia.whatcoloristhis.controller.commands.GotoPageCommand;
+	import com.nicotroia.whatcoloristhis.controller.commands.LayoutPageCommand;
 	import com.nicotroia.whatcoloristhis.controller.commands.ResizeAppCommand;
 	import com.nicotroia.whatcoloristhis.controller.commands.StartupAnimationCommand;
 	import com.nicotroia.whatcoloristhis.controller.events.NavigationEvent;
-	import com.nicotroia.whatcoloristhis.controller.events.NotificationEvent;
 	import com.nicotroia.whatcoloristhis.model.CameraModel;
+	import com.nicotroia.whatcoloristhis.model.LayoutModel;
 	import com.nicotroia.whatcoloristhis.model.SequenceModel;
+	import com.nicotroia.whatcoloristhis.view.buttons.AboutPageButtonMediator;
+	import com.nicotroia.whatcoloristhis.view.buttons.BackButtonMediator;
 	import com.nicotroia.whatcoloristhis.view.buttons.ButtonBase;
 	import com.nicotroia.whatcoloristhis.view.buttons.ButtonBaseMediator;
-	import com.nicotroia.whatcoloristhis.view.buttons.ChooseExistingButtonMediator;
+	import com.nicotroia.whatcoloristhis.view.buttons.NavBarMediator;
 	import com.nicotroia.whatcoloristhis.view.buttons.TakePhotoButtonMediator;
-	import com.nicotroia.whatcoloristhis.view.buttons.AboutPageButtonMediator;
-	import com.nicotroia.whatcoloristhis.view.buttons.TopNavBarMediator;
-	import com.nicotroia.whatcoloristhis.view.buttons.WelcomePageButtonMediator;
+	import com.nicotroia.whatcoloristhis.view.pages.AboutPageMediator;
 	import com.nicotroia.whatcoloristhis.view.pages.PageBase;
 	import com.nicotroia.whatcoloristhis.view.pages.PageBaseMediator;
 	import com.nicotroia.whatcoloristhis.view.pages.WelcomePageMediator;
@@ -41,6 +42,8 @@ package com.nicotroia.whatcoloristhis
 			//models
 			injector.mapSingleton(SequenceModel);
 			injector.mapSingleton(CameraModel);
+			injector.mapSingleton(LayoutModel);
+			injector.mapValue(DisplayObjectContainer, contextView, "contextView");
 			
 			
 			//graphics
@@ -60,20 +63,20 @@ package com.nicotroia.whatcoloristhis
 			
 			//events
 			commandMap.mapEvent(NavigationEvent.NAVIGATE_TO_PAGE, GotoPageCommand, NavigationEvent);
+			commandMap.mapEvent(Event.RESIZE, LayoutPageCommand);
 			
 			
 			//pages
 			mediatorMap.mapView(PageBase, PageBaseMediator);
 			mediatorMap.mapView(WelcomePage, WelcomePageMediator, [PageBase, WelcomePage]);
-			mediatorMap.mapView(AboutPage, PageBaseMediator, [PageBase]);
+			mediatorMap.mapView(AboutPage, AboutPageMediator, [PageBase, AboutPage]);
 			
 			
 			//buttons
 			mediatorMap.mapView(ButtonBase, ButtonBaseMediator);
-			mediatorMap.mapView(TopNavBar, TopNavBarMediator, [ButtonBase, TopNavBar]);
-			mediatorMap.mapView(WelcomePageButton, WelcomePageButtonMediator, [ButtonBase, WelcomePageButton]);
+			mediatorMap.mapView(NavBar, NavBarMediator, [ButtonBase, NavBar]);
+			mediatorMap.mapView(BackButton, BackButtonMediator, [ButtonBase, BackButton]);
 			mediatorMap.mapView(TakePhotoButton, TakePhotoButtonMediator, [ButtonBase, TakePhotoButton]);
-			mediatorMap.mapView(ChooseExistingButton, ChooseExistingButtonMediator, [ButtonBase, ChooseExistingButton]);
 			mediatorMap.mapView(AboutPageButton, AboutPageButtonMediator, [ButtonBase, AboutPageButton]);
 			
 			
@@ -86,8 +89,8 @@ package com.nicotroia.whatcoloristhis
 		{
 			//trace("resize. " + contextView.stage.stageWidth, contextView.stage.stageHeight);
 			
-			//commandMap.execute(ResizeAppCommand, event, Event);
-			eventDispatcher.dispatchEvent(new NotificationEvent(NotificationEvent.APP_RESIZED));
+			eventDispatcher.dispatchEvent(event);
+			//eventDispatcher.dispatchEvent(new NotificationEvent(NotificationEvent.APP_RESIZED));
 		}
 	}
 }

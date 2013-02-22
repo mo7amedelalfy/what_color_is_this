@@ -1,6 +1,7 @@
 package com.nicotroia.whatcoloristhis.controller.commands
 {
 	import com.nicotroia.whatcoloristhis.controller.events.NavigationEvent;
+	import com.nicotroia.whatcoloristhis.model.LayoutModel;
 	import com.nicotroia.whatcoloristhis.model.SequenceModel;
 	
 	import flash.display.Sprite;
@@ -21,6 +22,9 @@ package com.nicotroia.whatcoloristhis.controller.commands
 		
 		[Inject(name="backgroundSprite")]
 		public var backgroundSprite:Sprite;
+		
+		[Inject]
+		public var layoutModel:LayoutModel;
 		
 		override public function execute():void
 		{

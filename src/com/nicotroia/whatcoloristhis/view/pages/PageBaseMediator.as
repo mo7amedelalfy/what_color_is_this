@@ -1,6 +1,8 @@
 package com.nicotroia.whatcoloristhis.view.pages
 {
-	import com.nicotroia.whatcoloristhis.controller.events.NotificationEvent;
+	import com.nicotroia.whatcoloristhis.controller.events.LayoutEvent;
+	
+	import flash.events.Event;
 	
 	import org.robotlegs.mvcs.Mediator;
 
@@ -11,10 +13,12 @@ package com.nicotroia.whatcoloristhis.view.pages
 		
 		override public function onRegister():void
 		{
-			eventDispatcher.addEventListener(NotificationEvent.APP_RESIZED, appResizedHandler);
+			appResizedHandler(null);
+			
+			eventDispatcher.addEventListener(LayoutEvent.UPDATE_LAYOUT, appResizedHandler);
 		}
 		
-		protected function appResizedHandler(event:NotificationEvent):void
+		protected function appResizedHandler(event:LayoutEvent):void
 		{
 			//override 
 		}

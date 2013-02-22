@@ -4,7 +4,6 @@ package com.nicotroia.whatcoloristhis.controller.events
 
 	public class NotificationEvent extends Event
 	{
-		public static const APP_RESIZED:String = "AppResized";
 		public static const CHANGE_TOP_NAV_BAR_TITLE:String = "ChangeTopNavBarTitle";
 		
 		public var text:String;
