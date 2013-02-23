@@ -6,7 +6,7 @@ goto init
 	set FILENAME=what_color_is_this
 	set ANDROID_SDK=C:\Development\Android SDK
 	set AIR_SDK=C:\Development\AIR SDK
-	set PROJECT_PATH=D:\FlashBuilder\%FILENAME%
+	set PROJECT_PATH=F:\actionscript\%FILENAME%
 	set SRC_PATH=%PROJECT_PATH%\src
 	set ASSETS_PATH=%SRC_PATH%\assets
 	

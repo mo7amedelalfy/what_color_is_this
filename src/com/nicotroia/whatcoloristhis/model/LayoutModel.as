@@ -8,7 +8,7 @@ package com.nicotroia.whatcoloristhis.model
 
 	public class LayoutModel extends Actor
 	{
-		//public var navBarHeight:Number = 55;
+		public var navBarHeight:Number = 64;
 		//public var actionBarHeight:Number = 55;
 		
 		private var _orientation:String;
