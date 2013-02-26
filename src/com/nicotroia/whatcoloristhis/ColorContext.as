@@ -17,6 +17,7 @@ package com.nicotroia.whatcoloristhis
 	import com.nicotroia.whatcoloristhis.view.pages.AboutPageMediator;
 	import com.nicotroia.whatcoloristhis.view.pages.PageBase;
 	import com.nicotroia.whatcoloristhis.view.pages.PageBaseMediator;
+	import com.nicotroia.whatcoloristhis.view.pages.ResultPageMediator;
 	import com.nicotroia.whatcoloristhis.view.pages.WelcomePageMediator;
 	
 	import flash.display.DisplayObjectContainer;
@@ -70,6 +71,7 @@ package com.nicotroia.whatcoloristhis
 			mediatorMap.mapView(PageBase, PageBaseMediator);
 			mediatorMap.mapView(WelcomePage, WelcomePageMediator, [PageBase, WelcomePage]);
 			mediatorMap.mapView(AboutPage, AboutPageMediator, [PageBase, AboutPage]);
+			mediatorMap.mapView(ResultPage, ResultPageMediator, [PageBase, ResultPage]);
 			
 			
 			//buttons

@@ -25,6 +25,8 @@ package com.nicotroia.whatcoloristhis.model
 
 	public class CameraModel extends Actor
 	{
+		public var winner:String;
+		
 		protected var _cameraUI:CameraUI;
 		protected var _cameraRoll:CameraRoll;
 		protected var _imageLoader:Loader;
@@ -100,6 +102,17 @@ package com.nicotroia.whatcoloristhis.model
 		/*
 		CAMERA ROLL
 		*/
+		
+		public function saveImage(bmd:BitmapData):void
+		{
+			if( CameraRoll.supportsAddBitmapData ) { 
+				trace("saving image to camera roll.");
+				
+				if( ! _cameraRoll ) _cameraRoll = new CameraRoll();
+				
+				_cameraRoll.addBitmapData(bmd);
+			}
+		}
 		
 		public function initCameraRoll():void
 		{

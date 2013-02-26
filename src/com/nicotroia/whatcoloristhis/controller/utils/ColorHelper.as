@@ -62,11 +62,39 @@ package com.nicotroia.whatcoloristhis.controller.utils
 			return rgb;
 		}
 		
+		public static function getARGB(color:uint):Dictionary
+		{
+			rgb["a"] = (color & 0xFF000000) >> 24;
+			rgb["r"] = (color & 0x00FF0000) >> 16;
+			rgb["g"] = (color & 0x0000FF00) >> 8;
+			rgb["b"] = (color & 0x000000FF);
+			
+			return rgb;
+		}
+		
+		public static function colorToHexString(color:uint):String
+		{
+			var r:String = getRed(color).toString(16).toUpperCase();
+			var g:String = getGreen(color).toString(16).toUpperCase();
+			var b:String = getBlue(color).toString(16).toUpperCase();
+			var zero:String = "0";
+			
+			if( r.length == 1 ) r = zero.concat(r);
+			if( g.length == 1 ) g = zero.concat(g);
+			if( b.length == 1 ) b = zero.concat(b);
+			
+			return r+g+b;
+		}
+		
 		private static function checkBounds(color:int):uint
 		{
 			if(color > 255) return 255;
 			if(color < 0) return 0;
 			return color;
 		}
+		
+		private static function getRed(c:uint):uint { return (( c >> 16 ) & 0xFF); }
+		private static function getGreen(c:uint):uint { return ( (c >> 8) & 0xFF ); }
+		private static function getBlue(c:uint):uint { return ( c & 0xFF ); }
 	}
 }

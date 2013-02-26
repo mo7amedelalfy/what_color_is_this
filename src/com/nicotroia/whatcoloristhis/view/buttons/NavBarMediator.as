@@ -53,22 +53,19 @@ package com.nicotroia.whatcoloristhis.view.buttons
 					hideNavBar();
 				}
 				else { 
-					navBar.graphic.height = layoutModel.navBarHeight; //54;
-					navBar.titleTF.y = 11;
-					
 					_textFormat.size = 21;
 				}
 			}
 			else { 
 				showNavBar();
 				
-				navBar.graphic.height = layoutModel.navBarHeight;
-				navBar.titleTF.y = 16;
-				
 				_textFormat.size = 24;
 			}
 			
+			navBar.graphic.height = layoutModel.navBarHeight; 
+			
 			navBar.titleTF.width = navBar.graphic.width - 14;
+			navBar.titleTF.y = (layoutModel.navBarHeight * 0.5) - (navBar.titleTF.height * 0.5);
 			
 			navBar.titleTF.setTextFormat(_textFormat);
 		}

@@ -1,8 +1,12 @@
 package com.nicotroia.whatcoloristhis.view.pages
 {
 	import com.nicotroia.whatcoloristhis.controller.events.LayoutEvent;
+	import com.nicotroia.whatcoloristhis.controller.events.NavigationEvent;
 	import com.nicotroia.whatcoloristhis.controller.events.NotificationEvent;
+	import com.nicotroia.whatcoloristhis.controller.utils.ColorHelper;
+	import com.nicotroia.whatcoloristhis.model.CameraModel;
 	import com.nicotroia.whatcoloristhis.model.LayoutModel;
+	import com.nicotroia.whatcoloristhis.model.SequenceModel;
 	
 	import flash.display.BitmapData;
 	import flash.display.Sprite;
@@ -31,9 +35,13 @@ package com.nicotroia.whatcoloristhis.view.pages
 		[Inject]
 		public var layoutModel:LayoutModel;
 		
+		[Inject]
+		public var cameraModel:CameraModel;
+		
 		private var _camera:Camera;
 		private var _cameraView:Video;
 		private var _cameraRect:Rectangle;
+		private var _capturedPixels:Object;
 		private var _stageVideo:StageVideo;
 		private var _stageVideoAvailable:Boolean;
 		private var _timer:Timer = new Timer(1000);
@@ -43,10 +51,9 @@ package com.nicotroia.whatcoloristhis.view.pages
 		{
 			super.onRegister();
 			
-			//setupCamera();
-			
 			eventMap.mapListener(welcomePage.takePhotoButton, MouseEvent.CLICK, takePhotoButtonClickHandler);
-			contextView.stage.addEventListener(StageVideoAvailabilityEvent.STAGE_VIDEO_AVAILABILITY, stageVideoAvailabilityHandler);
+			
+			contextView.stage.addEventListener(StageVideoAvailabilityEvent.STAGE_VIDEO_AVAILABILITY, stageVideoAvailabilityHandler, false, 0, true);
 			
 			eventDispatcher.dispatchEvent(new NotificationEvent(NotificationEvent.CHANGE_TOP_NAV_BAR_TITLE, "What Color <i>Is</i> This?"));
 		}
@@ -54,6 +61,7 @@ package com.nicotroia.whatcoloristhis.view.pages
 		protected function stageVideoAvailabilityHandler(event:StageVideoAvailabilityEvent):void
 		{
 			trace("STAGE VIDEO " + event.availability);
+			
 			if( event.availability == StageVideoAvailability.AVAILABLE ) { 
 				_stageVideo = contextView.stage.stageVideos[0];
 				_stageVideoAvailable = true;
@@ -126,15 +134,56 @@ package com.nicotroia.whatcoloristhis.view.pages
 						//bmd.draw(_stageVideo);
 					}
 					else { 
-						bmd = new BitmapData(_cameraView.width, _cameraView.height);
+						bmd = new BitmapData(_cameraView.width, _cameraView.height, false, 0);
 						
 						bmd.draw(_cameraView);
 						
-						trace( welcomePage.target.getBounds());
-						trace( welcomePage.target.getRect());
+						var r:Rectangle = welcomePage.target.getBounds(contextView.stage);
+						var x:uint = r.x;
+						var y:uint = r.y;
+						var toX:uint = x + Math.floor( welcomePage.target.width );
+						var toY:uint = y + Math.floor( welcomePage.target.height );
+						var color:uint;
+						var hex:String;
+						
+						_capturedPixels = new Object();
+						
+						for( x; x < toX; x++ ) { 
+							for( y; y < toY; y++ ) { 
+								color = bmd.getPixel(x,y);
+								hex = ColorHelper.colorToHexString(color);
+								
+								if( _capturedPixels[hex] ) { 
+									_capturedPixels[hex]++;
+								}
+								else { 
+									_capturedPixels[hex] = 1;
+								}
+								
+								trace(hex, _capturedPixels[hex]);
+								//trace("x: " + x, "y: "+ y + " color: 0x" + ColorHelper.colorToHexString(color) );
+							}
+						}
+						
+						var winner:String;
+						var currentScore:uint;
+						
+						for( var key:String in _capturedPixels ) { 
+							currentScore = _capturedPixels[key];
+							
+							if( ! winner ) winner = key; 
+							
+							if( currentScore > _capturedPixels[winner] ) { 
+								winner = key;
+							}
+						}
+						
+						trace("most used color: 0x" + winner + " with " + _capturedPixels[winner]);
+						
+						cameraModel.winner = winner;
+						
+						eventDispatcher.dispatchEvent(new NavigationEvent(NavigationEvent.NAVIGATE_TO_PAGE, SequenceModel.PAGE_Result));
 					}
-					
-					trace("0x"+ bmd.getPixel(0,0).toString(16));
 				}
 			}
 		}
@@ -157,8 +206,6 @@ package com.nicotroia.whatcoloristhis.view.pages
 				_cameraRect = new Rectangle(0, layoutModel.navBarHeight, contextView.stage.stageHeight, contextView.stage.stageWidth);
 			}
 			
-			_camera.setMode(_cameraRect.width, _cameraRect.height, 24); 
-			
 			if( _stageVideoAvailable ) { 
 				trace("using stageVideo!");
 				_stageVideo.addEventListener(StageVideoEvent.RENDER_STATE, onRenderState);
@@ -166,16 +213,26 @@ package com.nicotroia.whatcoloristhis.view.pages
 			}
 			else { 
 				trace("using regular video");
-				_cameraView = new Video(_camera.width, _camera.height); //_cameraRect.width, _cameraRect.height);
+				_cameraView = new Video(_cameraRect.width, _cameraRect.height);
 				_cameraView.x = _cameraRect.x;
 				_cameraView.y = _cameraRect.y;			
 				
 				_cameraView.attachCamera(_camera);
 				
+				_cameraView.addEventListener(MouseEvent.CLICK, cameraViewClickHandler, false, 0, true);
+				
 				welcomePage.addChildAt(_cameraView, 0);
 			}
 			
+			_camera.setMode(_cameraRect.width, _cameraRect.height, 15); 
+			
 			_timer.start();
+		}
+		
+		protected function cameraViewClickHandler(event:MouseEvent):void
+		{
+			trace("focusing.");
+			_camera.setMode(_cameraRect.width, _cameraRect.height, 15); 
 		}
 		
 		private function onRenderState(e:StageVideoEvent):void {
@@ -247,19 +304,23 @@ package com.nicotroia.whatcoloristhis.view.pages
 					_cameraView.y = layoutModel.navBarHeight;
 				}
 			}
+			
+			//trace(targetSize);
 		}
 		
 		override public function onRemove():void
 		{
 			super.onRemove();
 			
-			_timer.stop();
+			trace("welcome page removing.");
+			
+			contextView.stage.removeEventListener(StageVideoAvailabilityEvent.STAGE_VIDEO_AVAILABILITY, stageVideoAvailabilityHandler);
 			_timer.removeEventListener(TimerEvent.TIMER, timerHandler);
 			
-			welcomePage.addChild(_tf);
+			if( welcomePage.contains(_tf) ) welcomePage.removeChild(_tf);
 			
-			if( _stageVideoAvailable && _stageVideo ) { 
-				_stageVideo.attachCamera(null);
+			if( _stageVideoAvailable ) { 
+				if( _stageVideo ) _stageVideo.attachCamera(null);
 			}
 			else if( _cameraView ) { 
 				_cameraView.attachCamera(null);
