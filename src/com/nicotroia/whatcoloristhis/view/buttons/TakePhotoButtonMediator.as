@@ -16,7 +16,7 @@ package com.nicotroia.whatcoloristhis.view.buttons
 		
 		private function takePhotoButtonClickHandler(event:MouseEvent):void
 		{
-			trace("snap.");
+			
 		}
 	}
 }

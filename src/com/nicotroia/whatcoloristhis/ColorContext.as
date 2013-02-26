@@ -87,6 +87,8 @@ package com.nicotroia.whatcoloristhis
 		
 		protected function appResizeHandler(event:Event):void
 		{
+			event.preventDefault();
+			
 			//trace("resize. " + contextView.stage.stageWidth, contextView.stage.stageHeight);
 			
 			eventDispatcher.dispatchEvent(event);

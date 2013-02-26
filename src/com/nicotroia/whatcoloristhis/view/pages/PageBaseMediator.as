@@ -15,12 +15,17 @@ package com.nicotroia.whatcoloristhis.view.pages
 		{
 			appResizedHandler(null);
 			
-			eventDispatcher.addEventListener(LayoutEvent.UPDATE_LAYOUT, appResizedHandler);
+			eventDispatcher.addEventListener(LayoutEvent.UPDATE_LAYOUT, appResizedHandler, false, 0, true);
 		}
 		
 		protected function appResizedHandler(event:LayoutEvent):void
 		{
 			//override 
+		}
+		
+		override public function onRemove():void
+		{
+			eventDispatcher.removeEventListener(LayoutEvent.UPDATE_LAYOUT, appResizedHandler);
 		}
 	}
 }

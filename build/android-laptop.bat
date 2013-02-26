@@ -78,7 +78,7 @@ goto end
 	::-r reinstall 
 	::-t allow test apks
 	::call adb -s HT06BHJ02332 install -r %FILENAME%.apk
-	call adb -e install -r %FILENAME%.apk
+	call adb -d install -r %FILENAME%.apk
 	
 	if errorlevel 1 ( 
 		echo install failed :(

@@ -36,7 +36,7 @@ package com.nicotroia.whatcoloristhis.view.buttons
 		
 		private function appResizedHandler(event:LayoutEvent):void
 		{
-			trace("navBar resizing");
+			trace("navBar resizing. height= " + layoutModel.navBarHeight);
 			
 			navBar.graphic.width = contextView.stage.stageWidth + 1;
 			navBar.graphic.x = 0;
@@ -53,7 +53,7 @@ package com.nicotroia.whatcoloristhis.view.buttons
 					hideNavBar();
 				}
 				else { 
-					navBar.graphic.height = 54;
+					navBar.graphic.height = layoutModel.navBarHeight; //54;
 					navBar.titleTF.y = 11;
 					
 					_textFormat.size = 21;

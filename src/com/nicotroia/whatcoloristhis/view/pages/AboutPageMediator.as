@@ -23,7 +23,10 @@ package com.nicotroia.whatcoloristhis.view.pages
 		{
 			trace("aboutPage resized");
 			
-			trace(aboutPage.backButton);
+			aboutPage.backButton.height = layoutModel.navBarHeight * 0.70;
+			aboutPage.backButton.scaleX = aboutPage.backButton.scaleY;
+			aboutPage.backButton.x = 14;
+			aboutPage.backButton.y = (layoutModel.navBarHeight - aboutPage.backButton.height) * 0.5;
 		}
 	}
 }
