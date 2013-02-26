@@ -53,7 +53,7 @@ package com.nicotroia.whatcoloristhis.view.pages
 		
 		protected function stageVideoAvailabilityHandler(event:StageVideoAvailabilityEvent):void
 		{
-			trace("stage video available: " + event.availability);
+			trace("STAGE VIDEO " + event.availability);
 			if( event.availability == StageVideoAvailability.AVAILABLE ) { 
 				_stageVideo = contextView.stage.stageVideos[0];
 				_stageVideoAvailable = true;
@@ -107,29 +107,35 @@ package com.nicotroia.whatcoloristhis.view.pages
 		
 		private function takePhotoButtonClickHandler(event:MouseEvent):void
 		{
-			if( _camera.muted ) { 
-				//display application permissions dialog
-				Security.showSettings(SecurityPanel.PRIVACY);
-				
-				_camera.addEventListener(StatusEvent.STATUS, permissionStatusHandler);
-			}
-			else { 
-				var bmd:BitmapData;
-				
-				trace("snap.");
-				
-				if( _stageVideoAvailable ) { 
-					bmd = new BitmapData(_cameraRect.width, _cameraRect.height);
+			if( _camera ) { 
+				if( _camera.muted ) { 
+					//display application permissions dialog
+					Security.showSettings(SecurityPanel.PRIVACY);
 					
-					bmd.draw(_stageVideo);
+					_camera.addEventListener(StatusEvent.STATUS, permissionStatusHandler);
 				}
 				else { 
-					bmd = new BitmapData(_cameraView.width, _cameraView.height);
+					var bmd:BitmapData;
 					
-					bmd.draw(_cameraView);
+					trace("snap.");
+					
+					if( _stageVideoAvailable ) { 
+						bmd = new BitmapData(_cameraRect.width, _cameraRect.height);
+						
+						//?
+						//bmd.draw(_stageVideo);
+					}
+					else { 
+						bmd = new BitmapData(_cameraView.width, _cameraView.height);
+						
+						bmd.draw(_cameraView);
+						
+						trace( welcomePage.target.getBounds());
+						trace( welcomePage.target.getRect());
+					}
+					
+					trace("0x"+ bmd.getPixel(0,0).toString(16));
 				}
-				
-				trace("0x"+ bmd.getPixel(0,0).toString(16));
 			}
 		}
 		
@@ -252,10 +258,10 @@ package com.nicotroia.whatcoloristhis.view.pages
 			
 			welcomePage.addChild(_tf);
 			
-			if( _stageVideoAvailable ) { 
+			if( _stageVideoAvailable && _stageVideo ) { 
 				_stageVideo.attachCamera(null);
 			}
-			else { 
+			else if( _cameraView ) { 
 				_cameraView.attachCamera(null);
 				welcomePage.removeChild(_cameraView);
 			}
