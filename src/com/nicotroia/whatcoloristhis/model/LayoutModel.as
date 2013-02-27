@@ -51,6 +51,7 @@ package com.nicotroia.whatcoloristhis.model
 				
 				eventDispatcher.dispatchEvent(new LayoutEvent(LayoutEvent.UPDATE_LAYOUT));
 			}
+			
 		}
 	}
 }

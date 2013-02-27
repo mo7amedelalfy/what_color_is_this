@@ -1,5 +1,6 @@
 package com.nicotroia.whatcoloristhis.controller.commands
 {
+	import com.nicotroia.whatcoloristhis.controller.events.LayoutEvent;
 	import com.nicotroia.whatcoloristhis.controller.events.NavigationEvent;
 	import com.nicotroia.whatcoloristhis.model.LayoutModel;
 	import com.nicotroia.whatcoloristhis.model.SequenceModel;
@@ -34,6 +35,15 @@ package com.nicotroia.whatcoloristhis.controller.commands
 			contextView.addChild( overlayContainer );
 			
 			pageContainer.addChild(backgroundSprite);
+			
+			eventDispatcher.addEventListener(LayoutEvent.UPDATE_LAYOUT, appResizedHandler);
+		}
+		
+		private function appResizedHandler(event:LayoutEvent):void
+		{
+			eventDispatcher.removeEventListener(LayoutEvent.UPDATE_LAYOUT, appResizedHandler);
+			
+			//Wait for initial app resize before navigating.
 			
 			eventDispatcher.dispatchEvent(new NavigationEvent(NavigationEvent.NAVIGATE_TO_PAGE, SequenceModel.PAGE_Welcome));
 		}

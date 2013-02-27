@@ -17,6 +17,7 @@ package com.nicotroia.whatcoloristhis.model
 		//PAGE Constants
 		public static const PAGE_Welcome:Class = WelcomePage;
 		public static const PAGE_About:Class = AboutPage;
+		public static const PAGE_AreaSelect:Class = AreaSelectPage;
 		public static const PAGE_Result:Class = ResultPage;
 		
 		//ASSET Constants
@@ -40,11 +41,11 @@ package com.nicotroia.whatcoloristhis.model
 			assetWaitingList = new Dictionary();
 			
 			//PAGES AND ASSETS THAT WILL GET INITIALIZED 
-			_pageList = new <Class>[PAGE_Welcome, PAGE_About, PAGE_Result];
+			_pageList = new <Class>[PAGE_Welcome, PAGE_About, PAGE_AreaSelect, PAGE_Result];
 			_assetList = new <Class>[ASSET_BACKGROUND]; 
 			
 			//EACH ASSET WILL BE ADDED TO THE FOLLOWING ARRAY OF PAGES
-			assetWaitingList[ASSET_BACKGROUND] = new <Class>[ PAGE_Welcome, PAGE_About, PAGE_Result ];
+			assetWaitingList[ASSET_BACKGROUND] = new <Class>[ PAGE_Welcome, PAGE_About, PAGE_AreaSelect, PAGE_Result ];
 			
 			//Preallocate pages
 			for each( var PageConstant:Class in _pageList ) { 

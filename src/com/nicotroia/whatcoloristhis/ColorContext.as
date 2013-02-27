@@ -1,9 +1,12 @@
 package com.nicotroia.whatcoloristhis
 {
 	import com.nicotroia.whatcoloristhis.controller.commands.GotoPageCommand;
+	import com.nicotroia.whatcoloristhis.controller.commands.ImageSelectFailedCommand;
+	import com.nicotroia.whatcoloristhis.controller.commands.ImageSelectedCommand;
 	import com.nicotroia.whatcoloristhis.controller.commands.LayoutPageCommand;
 	import com.nicotroia.whatcoloristhis.controller.commands.ResizeAppCommand;
 	import com.nicotroia.whatcoloristhis.controller.commands.StartupAnimationCommand;
+	import com.nicotroia.whatcoloristhis.controller.events.CameraEvent;
 	import com.nicotroia.whatcoloristhis.controller.events.NavigationEvent;
 	import com.nicotroia.whatcoloristhis.model.CameraModel;
 	import com.nicotroia.whatcoloristhis.model.LayoutModel;
@@ -15,6 +18,7 @@ package com.nicotroia.whatcoloristhis
 	import com.nicotroia.whatcoloristhis.view.buttons.NavBarMediator;
 	import com.nicotroia.whatcoloristhis.view.buttons.TakePhotoButtonMediator;
 	import com.nicotroia.whatcoloristhis.view.pages.AboutPageMediator;
+	import com.nicotroia.whatcoloristhis.view.pages.AreaSelectPageMediator;
 	import com.nicotroia.whatcoloristhis.view.pages.PageBase;
 	import com.nicotroia.whatcoloristhis.view.pages.PageBaseMediator;
 	import com.nicotroia.whatcoloristhis.view.pages.ResultPageMediator;
@@ -63,14 +67,19 @@ package com.nicotroia.whatcoloristhis
 			
 			
 			//events
+			commandMap.mapEvent(Event.RESIZE, LayoutPageCommand, Event);
 			commandMap.mapEvent(NavigationEvent.NAVIGATE_TO_PAGE, GotoPageCommand, NavigationEvent);
-			commandMap.mapEvent(Event.RESIZE, LayoutPageCommand);
+			commandMap.mapEvent(CameraEvent.CAMERA_IMAGE_TAKEN, ImageSelectedCommand, CameraEvent);
+			commandMap.mapEvent(CameraEvent.CAMERA_ROLL_IMAGE_SELECTED, ImageSelectedCommand, CameraEvent);
+			commandMap.mapEvent(CameraEvent.CAMERA_IMAGE_FAILED, ImageSelectFailedCommand, CameraEvent);
+			commandMap.mapEvent(CameraEvent.CAMERA_ROLL_IMAGE_FAILED, ImageSelectedCommand, CameraEvent);
 			
 			
 			//pages
 			mediatorMap.mapView(PageBase, PageBaseMediator);
 			mediatorMap.mapView(WelcomePage, WelcomePageMediator, [PageBase, WelcomePage]);
 			mediatorMap.mapView(AboutPage, AboutPageMediator, [PageBase, AboutPage]);
+			mediatorMap.mapView(AreaSelectPage, AreaSelectPageMediator, [PageBase, AreaSelectPage]);
 			mediatorMap.mapView(ResultPage, ResultPageMediator, [PageBase, ResultPage]);
 			
 			

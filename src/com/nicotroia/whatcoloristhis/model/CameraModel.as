@@ -1,10 +1,11 @@
 package com.nicotroia.whatcoloristhis.model
 {
-	import com.nicotroia.whatcoloristhis.controller.events.ImageEvent;
+	import com.nicotroia.whatcoloristhis.controller.events.CameraEvent;
 	
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
 	import flash.display.Loader;
+	import flash.display.LoaderInfo;
 	import flash.events.ErrorEvent;
 	import flash.events.Event;
 	import flash.events.IEventDispatcher;
@@ -26,13 +27,13 @@ package com.nicotroia.whatcoloristhis.model
 	public class CameraModel extends Actor
 	{
 		public var winner:String;
+		public var photoData:BitmapData;
+		public var targetCopy:BitmapData;
 		
 		protected var _cameraUI:CameraUI;
 		protected var _cameraRoll:CameraRoll;
 		protected var _imageLoader:Loader;
 		protected var _dataSource:IDataInput;
-		
-		private var _cameraMode:Boolean;
 		
 		public function CameraModel()
 		{
@@ -40,9 +41,7 @@ package com.nicotroia.whatcoloristhis.model
 		}
 		
 		public function initCamera():void
-		{
-			_cameraMode = true;
-			
+		{	
 			trace("init camera.");
 			
 			if( CameraUI.isSupported ) { 
@@ -61,29 +60,74 @@ package com.nicotroia.whatcoloristhis.model
 		
 		protected function cameraErrorHandler(event:ErrorEvent):void
 		{
-			trace("Camera error. Error" + event.errorID);
+			_cameraUI.removeEventListener(MediaEvent.COMPLETE, cameraPhotoCompleteHandler); 
+			_cameraUI.removeEventListener(Event.CANCEL, mediaCancelHandler); 
+			_cameraUI.removeEventListener(ErrorEvent.ERROR, cameraErrorHandler); 
+			
+			trace("Camera Error. " + event.errorID);
 		}
 		
 		protected function cameraPhotoCompleteHandler(event:MediaEvent):void
 		{
-			var promise:MediaPromise = event.data;
-			_dataSource = promise.open();
+			_cameraUI.removeEventListener(MediaEvent.COMPLETE, cameraPhotoCompleteHandler); 
+			_cameraUI.removeEventListener(Event.CANCEL, mediaCancelHandler); 
+			_cameraUI.removeEventListener(ErrorEvent.ERROR, cameraErrorHandler); 
 			
-			if( promise.isAsync ) { 
+			var promise:MediaPromise = event.data;
+			
+			trace(promise.file.name, promise.file.url);
+			
+			var loader:Loader = new Loader();
+			loader.contentLoaderInfo.addEventListener(Event.COMPLETE, filePromiseLoadedHandler);
+			loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, filePromiseLoadErrorHandler);
+			
+			loader.loadFilePromise(promise);
+			
+			/*
+			_dataSource = _promise.open();
+			
+			if( _promise.isAsync ) { 
 				var eventSource:IEventDispatcher = _dataSource as IEventDispatcher;
 				
-				eventSource.addEventListener(Event.COMPLETE, cameraMediaLoadCompleteHandler);
+				eventSource.addEventListener(Event.COMPLETE, promiseLoadCompleteHandler);
 			}
 			else { 
 				readMediaData();
-			}
+			}*/
 		}
 		
-		private function cameraMediaLoadCompleteHandler(event:Event):void
+		protected function filePromiseLoadErrorHandler(event:IOErrorEvent):void
 		{
-			IEventDispatcher(_dataSource).removeEventListener(Event.COMPLETE, cameraMediaLoadCompleteHandler);
+			var loaderInfo:LoaderInfo = event.target as LoaderInfo;
 			
-			trace("camera load complete");
+			loaderInfo.removeEventListener(Event.COMPLETE, filePromiseLoadedHandler);
+			loaderInfo.removeEventListener(IOErrorEvent.IO_ERROR, filePromiseLoadErrorHandler);
+			
+			trace("IOError! " + event.errorID );
+			
+			eventDispatcher.dispatchEvent(new CameraEvent(CameraEvent.CAMERA_IMAGE_FAILED));
+		}
+		
+		protected function filePromiseLoadedHandler(event:Event):void
+		{
+			var loaderInfo:LoaderInfo = event.target as LoaderInfo;
+			
+			loaderInfo.removeEventListener(Event.COMPLETE, filePromiseLoadedHandler);
+			loaderInfo.removeEventListener(IOErrorEvent.IO_ERROR, filePromiseLoadErrorHandler);
+			
+			trace("yay");
+			
+			photoData = Bitmap(event.target.content).bitmapData;
+			
+			eventDispatcher.dispatchEvent(new CameraEvent(CameraEvent.CAMERA_IMAGE_TAKEN));
+		}
+		
+		/*
+		private function promiseLoadCompleteHandler(event:Event):void
+		{
+			IEventDispatcher(_dataSource).removeEventListener(Event.COMPLETE, promiseLoadCompleteHandler);
+			
+			trace("promise load complete");
 			
 			readMediaData();
 		}
@@ -96,9 +140,9 @@ package com.nicotroia.whatcoloristhis.model
 			
 			_dataSource.readBytes( imageBytes );
 			
-			trace(imageBytes);
+			trace(_promise.file.name, _promise.file.url);
 		}
-		
+		*/
 		/*
 		CAMERA ROLL
 		*/
@@ -116,8 +160,6 @@ package com.nicotroia.whatcoloristhis.model
 		
 		public function initCameraRoll():void
 		{
-			_cameraMode = false;
-			
 			trace("init camera roll.");
 			
 			if( CameraRoll.supportsBrowseForImage ) { 
@@ -200,7 +242,9 @@ package com.nicotroia.whatcoloristhis.model
 			
 			bmd.applyFilter(bmd, bmd.rect, new Point(), new BlurFilter(16,16,3));
 			
-			eventDispatcher.dispatchEvent(new ImageEvent(ImageEvent.CAMERA_ROLL_IMAGE_SELECTED, bitmap));
+			photoData = bmd;
+			
+			eventDispatcher.dispatchEvent(new CameraEvent(CameraEvent.CAMERA_ROLL_IMAGE_SELECTED));
 		}
 	}
 }

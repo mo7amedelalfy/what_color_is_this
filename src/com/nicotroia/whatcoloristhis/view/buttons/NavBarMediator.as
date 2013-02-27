@@ -32,6 +32,8 @@ package com.nicotroia.whatcoloristhis.view.buttons
 			eventDispatcher.addEventListener(LayoutEvent.UPDATE_LAYOUT, appResizedHandler);
 			eventDispatcher.addEventListener(NavigationEvent.NAVIGATE_TO_PAGE, pageChangeHandler); 
 			eventDispatcher.addEventListener(NotificationEvent.CHANGE_TOP_NAV_BAR_TITLE, changeNavBarTitleHandler);
+			
+			appResizedHandler(null);
 		}
 		
 		private function appResizedHandler(event:LayoutEvent):void

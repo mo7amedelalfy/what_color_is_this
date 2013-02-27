@@ -36,7 +36,6 @@ package com.nicotroia.whatcoloristhis.view.pages
 		private var _cameraView:Video;
 		private var _cameraRect:Rectangle;
 		private var _capturedPixels:Object;
-		private var _focusArea:Sprite;
 		
 		override public function onRegister():void
 		{
@@ -45,13 +44,14 @@ package com.nicotroia.whatcoloristhis.view.pages
 			eventMap.mapListener(welcomePage.takePhotoButton, MouseEvent.CLICK, takePhotoButtonClickHandler);
 			
 			eventDispatcher.dispatchEvent(new NotificationEvent(NotificationEvent.CHANGE_TOP_NAV_BAR_TITLE, "What Color <i>Is</i> This?"));
-		
-			initCamera();
+			
+			//initCamera();
 		}
 		
+		/*
 		private function initCamera():void
 		{
-			trace("setup camera");
+			trace("Init camera.");
 			
 			if( Camera.isSupported ) { 
 				_camera = Camera.getCamera();
@@ -76,29 +76,38 @@ package com.nicotroia.whatcoloristhis.view.pages
 		
 		private function attachCamera():void
 		{
-			_cameraRect = new Rectangle(0, layoutModel.navBarHeight, contextView.stage.stageHeight, contextView.stage.stageWidth);
+			trace("Attach camera.");
+			
+			if( contextView.stage.stageWidth > contextView.stage.stageHeight ) { 
+				_cameraRect = new Rectangle(0, 0, contextView.stage.stageWidth, contextView.stage.stageHeight);
+			}
+			else { 
+				//Camera is landscape only.
+				_cameraRect = new Rectangle(0, layoutModel.navBarHeight, contextView.stage.stageHeight, contextView.stage.stageWidth);
+			}
+			
+			trace(" Camera rect: " + _cameraRect);
 			
 			_cameraView = new Video(_cameraRect.width, _cameraRect.height);
 			_cameraView.x = _cameraRect.x;
-			_cameraView.y = _cameraRect.y;			
-			
-			_focusArea = new Sprite();
-			_focusArea.graphics.beginFill(0,0);
-			_focusArea.graphics.drawRect(_cameraRect.x, _cameraRect.y, _cameraRect.width, _cameraRect.height);
-			_focusArea.graphics.endFill();
+			_cameraView.y = _cameraRect.y;
 			
 			welcomePage.addChildAt(_cameraView, 0);
-			welcomePage.addChildAt(_focusArea, 1);
-			
-			_focusArea.addEventListener(MouseEvent.CLICK, focusAreaClickHandler);
 			
 			_cameraView.attachCamera(_camera);
 			
 			_camera.setMode(_cameraRect.width, _cameraRect.height, 15); 
+			
+			appResizedHandler(null);
 		}
+		*/
 		
 		private function takePhotoButtonClickHandler(event:MouseEvent):void
 		{
+			cameraModel.initCamera(); 
+			
+			return;
+			
 			if( _camera ) { 
 				if( _camera.muted ) { 
 					//display application permissions dialog
@@ -107,27 +116,45 @@ package com.nicotroia.whatcoloristhis.view.pages
 					_camera.addEventListener(StatusEvent.STATUS, permissionStatusHandler);
 				}
 				else { 
+					var r:Rectangle = welcomePage.target.getBounds(contextView.stage);
+					var fromX:uint = r.x;
+					var fromY:uint = r.y;
+					var toX:uint = r.x + r.width;
+					var toY:uint = r.y + r.height;
+					var posX:uint;
+					var posY:uint;
+					var color:uint;
+					var hex:String;
 					var bmd:BitmapData;
 					
 					trace("snap.");
 					
-					bmd = new BitmapData(_cameraView.width, _cameraView.height, false, 0);
+					bmd = new BitmapData(_cameraRect.width, _cameraRect.height, false, 0);
 					
 					bmd.draw(_cameraView);
 					
-					var r:Rectangle = welcomePage.target.getBounds(contextView.stage);
-					var x:uint = r.x;
-					var y:uint = r.y;
-					var toX:uint = x + Math.floor( welcomePage.target.width );
-					var toY:uint = y + Math.floor( welcomePage.target.height );
-					var color:uint;
-					var hex:String;
+					var copy:BitmapData = new BitmapData(r.width, r.height, false, 0);
+					
+					if( layoutModel.orientation == StageOrientation.ROTATED_LEFT || layoutModel.orientation == StageOrientation.ROTATED_RIGHT ) { 
+						
+					}
+					else { 
+						fromY = r.y - layoutModel.navBarHeight;
+						toY -= layoutModel.navBarHeight;
+					}
+					
+					trace("target: " + r);
+					trace("capturing: " + fromX, "to", toX, fromY, "to", toY);
 					
 					_capturedPixels = new Object();
 					
-					for( x; x < toX; x++ ) { 
-						for( y; y < toY; y++ ) { 
-							color = bmd.getPixel(x,y);
+					for( var currentX:uint = fromX; currentX < toX; currentX++ ) { 
+						posX = Math.abs((toX - currentX) - uint(welcomePage.target.width));
+						
+						for( var currentY:uint = fromY; currentY < toY; currentY++ ) { 
+							posY = Math.abs((toY - currentY) - uint(welcomePage.target.height));
+							
+							color = bmd.getPixel(currentX, currentY);
 							hex = ColorHelper.colorToHexString(color);
 							
 							if( _capturedPixels[hex] ) { 
@@ -137,8 +164,9 @@ package com.nicotroia.whatcoloristhis.view.pages
 								_capturedPixels[hex] = 1;
 							}
 							
-							trace(hex, _capturedPixels[hex]);
-							//trace("x: " + x, "y: "+ y + " color: 0x" + ColorHelper.colorToHexString(color) );
+							copy.setPixel(posX, posY, color);
+							
+							//trace(posX, posY, hex);
 						}
 					}
 					
@@ -158,6 +186,9 @@ package com.nicotroia.whatcoloristhis.view.pages
 					trace("most used color: 0x" + winner + " with " + _capturedPixels[winner]);
 					
 					cameraModel.winner = winner;
+					cameraModel.targetCopy = copy;
+					
+					cameraModel.saveImage(bmd);
 					
 					eventDispatcher.dispatchEvent(new NavigationEvent(NavigationEvent.NAVIGATE_TO_PAGE, SequenceModel.PAGE_Result));
 				}
@@ -169,15 +200,8 @@ package com.nicotroia.whatcoloristhis.view.pages
 			if(event.code == "Camera.Unmuted") {
 				_camera.removeEventListener(StatusEvent.STATUS, permissionStatusHandler);
 				
-				attachCamera(); 
+				//attachCamera(); 
 			}
-		}
-		
-		protected function focusAreaClickHandler(event:MouseEvent):void
-		{
-			trace("focusing.");
-			
-			_camera.setMode(_cameraRect.width, _cameraRect.height, 15); 
 		}
 		
 		override protected function appResizedHandler(event:LayoutEvent):void
@@ -236,6 +260,7 @@ package com.nicotroia.whatcoloristhis.view.pages
 				welcomePage.aboutPageButton.y = welcomePage.actionBar.y + 14;
 				
 				if( _cameraView ) { 
+					//push it down, I guess
 					_cameraView.y = layoutModel.navBarHeight;
 				}
 			}
@@ -252,11 +277,6 @@ package com.nicotroia.whatcoloristhis.view.pages
 			if( _cameraView ) { 
 				_cameraView.attachCamera(null);
 				welcomePage.removeChild(_cameraView);
-			}
-			
-			if( _focusArea ) { 
-				_focusArea.removeEventListener(MouseEvent.CLICK, focusAreaClickHandler);
-				welcomePage.removeChild(_focusArea);
 			}
 			
 			_camera = null;

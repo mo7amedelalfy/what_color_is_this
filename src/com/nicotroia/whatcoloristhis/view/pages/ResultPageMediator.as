@@ -4,6 +4,8 @@ package com.nicotroia.whatcoloristhis.view.pages
 	import com.nicotroia.whatcoloristhis.model.CameraModel;
 	import com.nicotroia.whatcoloristhis.model.LayoutModel;
 	
+	import flash.display.Bitmap;
+	import flash.display.BitmapData;
 	import flash.display.Shape;
 	import flash.display.StageOrientation;
 
@@ -19,6 +21,7 @@ package com.nicotroia.whatcoloristhis.view.pages
 		public var layoutModel:LayoutModel;
 		
 		private var _winningColor:Shape;
+		private var _targetCopy:Bitmap;
 		
 		override public function onRegister():void
 		{
@@ -30,7 +33,13 @@ package com.nicotroia.whatcoloristhis.view.pages
 			
 			resultPage.addChildAt(_winningColor, 0);
 			
-			appResizedHandler(null);
+			_targetCopy = new Bitmap(cameraModel.targetCopy);
+			_targetCopy.x = 100;
+			_targetCopy.y = 100;
+			
+			resultPage.addChild(_targetCopy);
+			
+			//appResizedHandler(null);
 		}
 		
 		override protected function appResizedHandler(event:LayoutEvent):void
@@ -75,6 +84,7 @@ package com.nicotroia.whatcoloristhis.view.pages
 			trace("result page removing.");
 			
 			if( resultPage.contains(_winningColor) ) resultPage.removeChild(_winningColor);
+			if( resultPage.contains(_targetCopy) ) resultPage.removeChild(_targetCopy);
 		}
 	}
 }
