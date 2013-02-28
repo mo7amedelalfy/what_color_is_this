@@ -5,6 +5,8 @@ package
 	import flash.display.Sprite;
 	import flash.display.StageAlign;
 	import flash.display.StageScaleMode;
+	import flash.ui.Multitouch;
+	import flash.ui.MultitouchInputMode;
 	
 	[SWF(width="480", height="300", frameRate="24")]
 	public class what_color_is_this extends Sprite
@@ -17,6 +19,8 @@ package
 			stage.align = StageAlign.TOP_LEFT;
 			stage.scaleMode = StageScaleMode.NO_SCALE;
 			stage.frameRate = 30;
+			
+			Multitouch.inputMode = MultitouchInputMode.GESTURE;
 			
 			trace("hello world");
 			

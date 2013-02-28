@@ -116,79 +116,7 @@ package com.nicotroia.whatcoloristhis.view.pages
 					_camera.addEventListener(StatusEvent.STATUS, permissionStatusHandler);
 				}
 				else { 
-					var r:Rectangle = welcomePage.target.getBounds(contextView.stage);
-					var fromX:uint = r.x;
-					var fromY:uint = r.y;
-					var toX:uint = r.x + r.width;
-					var toY:uint = r.y + r.height;
-					var posX:uint;
-					var posY:uint;
-					var color:uint;
-					var hex:String;
-					var bmd:BitmapData;
-					
-					trace("snap.");
-					
-					bmd = new BitmapData(_cameraRect.width, _cameraRect.height, false, 0);
-					
-					bmd.draw(_cameraView);
-					
-					var copy:BitmapData = new BitmapData(r.width, r.height, false, 0);
-					
-					if( layoutModel.orientation == StageOrientation.ROTATED_LEFT || layoutModel.orientation == StageOrientation.ROTATED_RIGHT ) { 
-						
-					}
-					else { 
-						fromY = r.y - layoutModel.navBarHeight;
-						toY -= layoutModel.navBarHeight;
-					}
-					
-					trace("target: " + r);
-					trace("capturing: " + fromX, "to", toX, fromY, "to", toY);
-					
-					_capturedPixels = new Object();
-					
-					for( var currentX:uint = fromX; currentX < toX; currentX++ ) { 
-						posX = Math.abs((toX - currentX) - uint(welcomePage.target.width));
-						
-						for( var currentY:uint = fromY; currentY < toY; currentY++ ) { 
-							posY = Math.abs((toY - currentY) - uint(welcomePage.target.height));
-							
-							color = bmd.getPixel(currentX, currentY);
-							hex = ColorHelper.colorToHexString(color);
-							
-							if( _capturedPixels[hex] ) { 
-								_capturedPixels[hex]++;
-							}
-							else { 
-								_capturedPixels[hex] = 1;
-							}
-							
-							copy.setPixel(posX, posY, color);
-							
-							//trace(posX, posY, hex);
-						}
-					}
-					
-					var winner:String;
-					var currentScore:uint;
-					
-					for( var key:String in _capturedPixels ) { 
-						currentScore = _capturedPixels[key];
-						
-						if( ! winner ) winner = key; 
-						
-						if( currentScore > _capturedPixels[winner] ) { 
-							winner = key;
-						}
-					}
-					
-					trace("most used color: 0x" + winner + " with " + _capturedPixels[winner]);
-					
-					cameraModel.winner = winner;
-					cameraModel.targetCopy = copy;
-					
-					cameraModel.saveImage(bmd);
+					//do everything areaSelectPageDoes
 					
 					eventDispatcher.dispatchEvent(new NavigationEvent(NavigationEvent.NAVIGATE_TO_PAGE, SequenceModel.PAGE_Result));
 				}
@@ -209,7 +137,6 @@ package com.nicotroia.whatcoloristhis.view.pages
 			trace("welcome page resized");
 			
 			var photoButtonWidth:Number;
-			var targetSize:Number;
 			
 			if( layoutModel.orientation == StageOrientation.ROTATED_LEFT || layoutModel.orientation == StageOrientation.ROTATED_RIGHT ) { 
 				welcomePage.actionBar.height = contextView.stage.stageHeight + 1;
@@ -217,18 +144,12 @@ package com.nicotroia.whatcoloristhis.view.pages
 				welcomePage.actionBar.x = contextView.stage.stageWidth - welcomePage.actionBar.width;
 				welcomePage.actionBar.y = 0;
 				
-				targetSize = (contextView.stage.stageHeight - welcomePage.actionBar.width) * 0.42;
 				photoButtonWidth = (contextView.stage.stageHeight * 0.3);
 				
 				welcomePage.takePhotoButton.width = photoButtonWidth;
 				welcomePage.takePhotoButton.scaleY = welcomePage.takePhotoButton.scaleX;
 				welcomePage.takePhotoButton.x = contextView.stage.stageWidth - welcomePage.takePhotoButton.width - 10;
 				welcomePage.takePhotoButton.y = (contextView.stage.stageHeight * 0.5) - (welcomePage.takePhotoButton.height * 0.5);
-				
-				welcomePage.target.width = targetSize;
-				welcomePage.target.scaleY = welcomePage.target.scaleX;
-				welcomePage.target.x = ((contextView.stage.stageWidth - welcomePage.actionBar.width) * 0.5) - (welcomePage.target.width * 0.5);
-				welcomePage.target.y = (contextView.stage.stageHeight * 0.5) - (welcomePage.target.height * 0.5);
 				
 				welcomePage.aboutPageButton.x = welcomePage.actionBar.x + 14;
 				welcomePage.aboutPageButton.y = 14;
@@ -243,7 +164,6 @@ package com.nicotroia.whatcoloristhis.view.pages
 				welcomePage.actionBar.x = 0;
 				welcomePage.actionBar.y = contextView.stage.stageHeight - welcomePage.actionBar.height;
 				
-				targetSize = (contextView.stage.stageWidth - welcomePage.actionBar.height - layoutModel.navBarHeight) * 0.42;
 				photoButtonWidth = (contextView.stage.stageWidth * 0.3);
 				
 				welcomePage.takePhotoButton.width = photoButtonWidth;
@@ -251,16 +171,10 @@ package com.nicotroia.whatcoloristhis.view.pages
 				welcomePage.takePhotoButton.x = (contextView.stage.stageWidth * 0.5) - (welcomePage.takePhotoButton.width * 0.5);
 				welcomePage.takePhotoButton.y = contextView.stage.stageHeight - welcomePage.takePhotoButton.height - 10;
 				
-				welcomePage.target.width = targetSize;
-				welcomePage.target.scaleY = welcomePage.target.scaleX;
-				welcomePage.target.x = (contextView.stage.stageWidth * 0.5) - (welcomePage.target.width * 0.5);
-				welcomePage.target.y = layoutModel.navBarHeight + (((contextView.stage.stageHeight - welcomePage.actionBar.height - layoutModel.navBarHeight) * 0.5) - (welcomePage.target.height * 0.5));
-				
 				welcomePage.aboutPageButton.x = 14;
 				welcomePage.aboutPageButton.y = welcomePage.actionBar.y + 14;
 				
 				if( _cameraView ) { 
-					//push it down, I guess
 					_cameraView.y = layoutModel.navBarHeight;
 				}
 			}

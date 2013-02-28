@@ -1,6 +1,7 @@
 package com.nicotroia.whatcoloristhis.view.pages
 {
 	import com.nicotroia.whatcoloristhis.controller.events.LayoutEvent;
+	import com.nicotroia.whatcoloristhis.controller.events.NotificationEvent;
 	import com.nicotroia.whatcoloristhis.model.CameraModel;
 	import com.nicotroia.whatcoloristhis.model.LayoutModel;
 	
@@ -26,25 +27,28 @@ package com.nicotroia.whatcoloristhis.view.pages
 		override public function onRegister():void
 		{
 			_winningColor = new Shape();
+			_targetCopy = new Bitmap(cameraModel.targetCopy);
 			
 			super.onRegister();
 			
 			resultPage.colorNameTF.text = "0x" + cameraModel.winner;
 			
 			resultPage.addChildAt(_winningColor, 0);
-			
-			_targetCopy = new Bitmap(cameraModel.targetCopy);
-			_targetCopy.x = 100;
-			_targetCopy.y = 100;
-			
 			resultPage.addChild(_targetCopy);
 			
-			//appResizedHandler(null);
+			eventDispatcher.dispatchEvent(new NotificationEvent(NotificationEvent.CHANGE_TOP_NAV_BAR_TITLE, "Results"));
 		}
 		
 		override protected function appResizedHandler(event:LayoutEvent):void
 		{
 			trace("result page resized");
+			
+			if( layoutModel.orientation == StageOrientation.ROTATED_LEFT || layoutModel.orientation == StageOrientation.ROTATED_RIGHT ) { 
+				
+			}
+			else { 
+				
+			}
 			
 			resultPage.backButton.height = layoutModel.navBarHeight * 0.70;
 			resultPage.backButton.scaleX = resultPage.backButton.scaleY;
@@ -59,14 +63,10 @@ package com.nicotroia.whatcoloristhis.view.pages
 			resultPage.colorNameTF.x = 0;
 			resultPage.colorNameTF.y = contextView.stage.stageHeight * 0.5;
 			
-			colorBackground();
+			_targetCopy.x = 10;
+			_targetCopy.y = contextView.stage.stageHeight - _targetCopy.height - 14;
 			
-			if( layoutModel.orientation == StageOrientation.ROTATED_LEFT || layoutModel.orientation == StageOrientation.ROTATED_RIGHT ) { 
-				
-			}
-			else { 
-				
-			}
+			colorBackground();
 		}
 		
 		private function colorBackground():void

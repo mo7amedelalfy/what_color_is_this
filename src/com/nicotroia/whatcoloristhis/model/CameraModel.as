@@ -1,6 +1,7 @@
 package com.nicotroia.whatcoloristhis.model
 {
 	import com.nicotroia.whatcoloristhis.controller.events.CameraEvent;
+	import com.nicotroia.whatcoloristhis.controller.events.NavigationEvent;
 	
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
@@ -48,29 +49,47 @@ package com.nicotroia.whatcoloristhis.model
 				_cameraUI = new CameraUI();
 				
 				_cameraUI.addEventListener(MediaEvent.COMPLETE, cameraPhotoCompleteHandler); 
-				_cameraUI.addEventListener(Event.CANCEL, mediaCancelHandler); 
+				_cameraUI.addEventListener(Event.CANCEL, cameraCancelHandler); 
 				_cameraUI.addEventListener(ErrorEvent.ERROR, cameraErrorHandler); 
 				
 				_cameraUI.launch(MediaType.IMAGE); 
 			}
 			else { 
 				trace("This device does not have Camera support");
+				
+				photoData = generateRandomBitmapData();
+				//photoData = new SexyWoman();
+				
+				eventDispatcher.dispatchEvent(new CameraEvent(CameraEvent.CAMERA_IMAGE_TAKEN));
 			}
+		}
+		
+		protected function cameraCancelHandler(event:Event):void
+		{
+			_cameraUI.removeEventListener(MediaEvent.COMPLETE, cameraPhotoCompleteHandler); 
+			_cameraUI.removeEventListener(Event.CANCEL, cameraCancelHandler); 
+			_cameraUI.removeEventListener(ErrorEvent.ERROR, cameraErrorHandler); 
+			
+			trace("Camera cancelled.");
+			
+			eventDispatcher.dispatchEvent(new NavigationEvent(NavigationEvent.NAVIGATE_TO_PAGE, SequenceModel.PAGE_Welcome));
 		}
 		
 		protected function cameraErrorHandler(event:ErrorEvent):void
 		{
 			_cameraUI.removeEventListener(MediaEvent.COMPLETE, cameraPhotoCompleteHandler); 
-			_cameraUI.removeEventListener(Event.CANCEL, mediaCancelHandler); 
+			_cameraUI.removeEventListener(Event.CANCEL, cameraCancelHandler); 
 			_cameraUI.removeEventListener(ErrorEvent.ERROR, cameraErrorHandler); 
 			
 			trace("Camera Error. " + event.errorID);
+			
+			eventDispatcher.dispatchEvent(new NavigationEvent(NavigationEvent.NAVIGATE_TO_PAGE, SequenceModel.PAGE_Welcome));
 		}
 		
 		protected function cameraPhotoCompleteHandler(event:MediaEvent):void
 		{
 			_cameraUI.removeEventListener(MediaEvent.COMPLETE, cameraPhotoCompleteHandler); 
-			_cameraUI.removeEventListener(Event.CANCEL, mediaCancelHandler); 
+			_cameraUI.removeEventListener(Event.CANCEL, cameraCancelHandler); 
 			_cameraUI.removeEventListener(ErrorEvent.ERROR, cameraErrorHandler); 
 			
 			var promise:MediaPromise = event.data;
@@ -166,16 +185,16 @@ package com.nicotroia.whatcoloristhis.model
 				_cameraRoll = new CameraRoll();
 				var options:CameraRollBrowseOptions = new CameraRollBrowseOptions();
 				
-				_cameraRoll.addEventListener(Event.CANCEL, mediaCancelHandler);
+				_cameraRoll.addEventListener(Event.CANCEL, cameraRollCancelHandler);
 				_cameraRoll.addEventListener(MediaEvent.SELECT, mediaSelectHandler);
 				
 				_cameraRoll.browseForImage( options );
 			}
 		}
 		
-		protected function mediaCancelHandler(event:Event):void
+		protected function cameraRollCancelHandler(event:Event):void
 		{
-			_cameraRoll.removeEventListener(Event.CANCEL, mediaCancelHandler);
+			_cameraRoll.removeEventListener(Event.CANCEL, cameraRollCancelHandler);
 			_cameraRoll.removeEventListener(MediaEvent.SELECT, mediaSelectHandler);
 			
 			trace("cancelled.");
@@ -183,7 +202,7 @@ package com.nicotroia.whatcoloristhis.model
 		
 		private function mediaSelectHandler(event:MediaEvent):void
 		{
-			_cameraRoll.removeEventListener(Event.CANCEL, mediaCancelHandler);
+			_cameraRoll.removeEventListener(Event.CANCEL, cameraRollCancelHandler);
 			_cameraRoll.removeEventListener(MediaEvent.SELECT, mediaSelectHandler);
 			
 			trace("selected.");
@@ -245,6 +264,22 @@ package com.nicotroia.whatcoloristhis.model
 			photoData = bmd;
 			
 			eventDispatcher.dispatchEvent(new CameraEvent(CameraEvent.CAMERA_ROLL_IMAGE_SELECTED));
+		}
+		
+		/*
+		*
+		* OTHER STUFF
+		*
+		*/
+		
+		public function generateRandomBitmapData():BitmapData
+		{
+			var bmd:BitmapData = new BitmapData(640, 480);
+			var seed:Number = Math.floor(Math.random()*100);
+			
+			bmd.perlinNoise(320, 240, 8, seed, true, true, 7, false, null);
+			
+			return bmd;
 		}
 	}
 }

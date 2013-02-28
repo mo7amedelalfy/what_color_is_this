@@ -12,9 +12,11 @@ package com.nicotroia.whatcoloristhis
 	import com.nicotroia.whatcoloristhis.model.LayoutModel;
 	import com.nicotroia.whatcoloristhis.model.SequenceModel;
 	import com.nicotroia.whatcoloristhis.view.buttons.AboutPageButtonMediator;
+	import com.nicotroia.whatcoloristhis.view.buttons.AcceptButtonMediator;
 	import com.nicotroia.whatcoloristhis.view.buttons.BackButtonMediator;
 	import com.nicotroia.whatcoloristhis.view.buttons.ButtonBase;
 	import com.nicotroia.whatcoloristhis.view.buttons.ButtonBaseMediator;
+	import com.nicotroia.whatcoloristhis.view.buttons.CancelButtonMediator;
 	import com.nicotroia.whatcoloristhis.view.buttons.NavBarMediator;
 	import com.nicotroia.whatcoloristhis.view.buttons.TakePhotoButtonMediator;
 	import com.nicotroia.whatcoloristhis.view.pages.AboutPageMediator;
@@ -89,6 +91,8 @@ package com.nicotroia.whatcoloristhis
 			mediatorMap.mapView(BackButton, BackButtonMediator, [ButtonBase, BackButton]);
 			mediatorMap.mapView(TakePhotoButton, TakePhotoButtonMediator, [ButtonBase, TakePhotoButton]);
 			mediatorMap.mapView(AboutPageButton, AboutPageButtonMediator, [ButtonBase, AboutPageButton]);
+			mediatorMap.mapView(AcceptButton, AcceptButtonMediator, [ButtonBase, AcceptButton]);
+			mediatorMap.mapView(CancelButton, CancelButtonMediator, [ButtonBase, CancelButton]);
 			
 			
 			contextView.stage.addEventListener(Event.RESIZE, appResizeHandler);
