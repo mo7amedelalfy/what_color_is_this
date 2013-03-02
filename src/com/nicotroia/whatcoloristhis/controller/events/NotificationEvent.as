@@ -5,6 +5,7 @@ package com.nicotroia.whatcoloristhis.controller.events
 	public class NotificationEvent extends Event
 	{
 		public static const CHANGE_TOP_NAV_BAR_TITLE:String = "ChangeTopNavBarTitle";
+		public static const ADD_TEXT_TO_LOADING_SPINNER:String = "AddTextToLoadingSpinner";
 		
 		public var text:String;
 		

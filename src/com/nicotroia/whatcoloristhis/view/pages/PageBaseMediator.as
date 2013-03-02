@@ -2,6 +2,8 @@ package com.nicotroia.whatcoloristhis.view.pages
 {
 	import com.nicotroia.whatcoloristhis.controller.events.LayoutEvent;
 	
+	import flash.display.DisplayObject;
+	import flash.display.Sprite;
 	import flash.events.Event;
 	
 	import org.robotlegs.mvcs.Mediator;
@@ -10,6 +12,9 @@ package com.nicotroia.whatcoloristhis.view.pages
 	{
 		[Inject]
 		public var view:PageBase;
+		
+		[Inject(name="overlayContainer")]
+		public var overlayContainer:Sprite;
 		
 		override public function onRegister():void
 		{
@@ -21,6 +26,16 @@ package com.nicotroia.whatcoloristhis.view.pages
 		protected function appResizedHandler(event:LayoutEvent):void
 		{
 			//override 
+		}
+		
+		protected function addToOverlay(obj:DisplayObject):void
+		{
+			overlayContainer.addChild(obj);
+		}
+		
+		protected function removeFromOverlay(obj:DisplayObject):void
+		{
+			overlayContainer.removeChild(obj);
 		}
 		
 		override public function onRemove():void

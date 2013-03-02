@@ -27,16 +27,15 @@ package com.nicotroia.whatcoloristhis.view.buttons
 		{
 			_textFormat = new TextFormat();
 			
+			super.onRegister();
+			
 			navBar.useHandCursor = false;
 			
-			eventDispatcher.addEventListener(LayoutEvent.UPDATE_LAYOUT, appResizedHandler);
 			eventDispatcher.addEventListener(NavigationEvent.NAVIGATE_TO_PAGE, pageChangeHandler); 
 			eventDispatcher.addEventListener(NotificationEvent.CHANGE_TOP_NAV_BAR_TITLE, changeNavBarTitleHandler);
-			
-			appResizedHandler(null);
 		}
 		
-		private function appResizedHandler(event:LayoutEvent):void
+		override protected function appResizedHandler(event:LayoutEvent):void
 		{
 			trace("navBar resizing. height= " + layoutModel.navBarHeight);
 			

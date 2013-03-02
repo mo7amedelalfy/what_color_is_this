@@ -58,7 +58,6 @@ package com.nicotroia.whatcoloristhis.model
 				trace("This device does not have Camera support");
 				
 				photoData = generateRandomBitmapData();
-				//photoData = new SexyWoman();
 				
 				eventDispatcher.dispatchEvent(new CameraEvent(CameraEvent.CAMERA_IMAGE_TAKEN));
 			}

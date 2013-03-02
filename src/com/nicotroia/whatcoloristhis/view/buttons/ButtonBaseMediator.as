@@ -1,5 +1,7 @@
 package com.nicotroia.whatcoloristhis.view.buttons
 {
+	import com.nicotroia.whatcoloristhis.controller.events.LayoutEvent;
+	
 	import flash.events.MouseEvent;
 	
 	import org.robotlegs.mvcs.Mediator;
@@ -12,11 +14,19 @@ package com.nicotroia.whatcoloristhis.view.buttons
 		override public function onRegister():void
 		{			
 			//view.gotoAndStop(1);
+			appResizedHandler(null);
 			
 			eventMap.mapListener(view, MouseEvent.ROLL_OVER, mouseOverHandler, MouseEvent, false, 0, true);
 			eventMap.mapListener(view, MouseEvent.ROLL_OUT, mouseOutHandler, MouseEvent, false, 0, true);
 			eventMap.mapListener(view, MouseEvent.MOUSE_DOWN, mouseDownHandler, MouseEvent, false, 0, true);
 			eventMap.mapListener(view, MouseEvent.CLICK, viewClickHandler, MouseEvent, false, 0, true);
+			
+			eventDispatcher.addEventListener(LayoutEvent.UPDATE_LAYOUT, appResizedHandler, false, 0, true);
+		}
+		
+		protected function appResizedHandler(event:LayoutEvent):void
+		{
+			//override
 		}
 		
 		protected function mouseOverHandler(event:MouseEvent):void

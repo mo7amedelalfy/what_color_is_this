@@ -1,13 +1,18 @@
 package com.nicotroia.whatcoloristhis
 {
+	import com.nicotroia.whatcoloristhis.controller.commands.AddTextToLoadingSpinnerCommand;
 	import com.nicotroia.whatcoloristhis.controller.commands.GotoPageCommand;
+	import com.nicotroia.whatcoloristhis.controller.commands.HideLoadingSpinnerCommand;
 	import com.nicotroia.whatcoloristhis.controller.commands.ImageSelectFailedCommand;
 	import com.nicotroia.whatcoloristhis.controller.commands.ImageSelectedCommand;
 	import com.nicotroia.whatcoloristhis.controller.commands.LayoutPageCommand;
 	import com.nicotroia.whatcoloristhis.controller.commands.ResizeAppCommand;
+	import com.nicotroia.whatcoloristhis.controller.commands.ShowLoadingSpinnerCommand;
 	import com.nicotroia.whatcoloristhis.controller.commands.StartupAnimationCommand;
 	import com.nicotroia.whatcoloristhis.controller.events.CameraEvent;
+	import com.nicotroia.whatcoloristhis.controller.events.LoadingEvent;
 	import com.nicotroia.whatcoloristhis.controller.events.NavigationEvent;
+	import com.nicotroia.whatcoloristhis.controller.events.NotificationEvent;
 	import com.nicotroia.whatcoloristhis.model.CameraModel;
 	import com.nicotroia.whatcoloristhis.model.LayoutModel;
 	import com.nicotroia.whatcoloristhis.model.SequenceModel;
@@ -19,6 +24,9 @@ package com.nicotroia.whatcoloristhis
 	import com.nicotroia.whatcoloristhis.view.buttons.CancelButtonMediator;
 	import com.nicotroia.whatcoloristhis.view.buttons.NavBarMediator;
 	import com.nicotroia.whatcoloristhis.view.buttons.TakePhotoButtonMediator;
+	import com.nicotroia.whatcoloristhis.view.overlay.ShadowBoxMediator;
+	import com.nicotroia.whatcoloristhis.view.overlay.ShadowBoxView;
+	import com.nicotroia.whatcoloristhis.view.overlay.TransparentSpinnerMediator;
 	import com.nicotroia.whatcoloristhis.view.pages.AboutPageMediator;
 	import com.nicotroia.whatcoloristhis.view.pages.AreaSelectPageMediator;
 	import com.nicotroia.whatcoloristhis.view.pages.PageBase;
@@ -38,6 +46,8 @@ package com.nicotroia.whatcoloristhis
 		public var pageContainer:Sprite;
 		public var overlayContainer:Sprite;
 		public var backgroundSprite:Sprite;
+		public var loadingSpinner:TransparentSpinner;
+		public var shadowBox:ShadowBoxView;
 		
 		public function ColorContext(contextView:DisplayObjectContainer = null, autoStartup:Boolean = true)
 		{
@@ -63,6 +73,12 @@ package com.nicotroia.whatcoloristhis
 			backgroundSprite = new Sprite();
 			injector.mapValue(Sprite, backgroundSprite, "backgroundSprite");
 			
+			loadingSpinner = new TransparentSpinner();
+			injector.mapValue(TransparentSpinner, loadingSpinner);
+			
+			shadowBox = new ShadowBoxView(contextView.stage.stageWidth, contextView.stage.stageHeight);
+			injector.mapValue(ShadowBoxView, shadowBox);
+			
 			
 			//startup chain
 			commandMap.mapEvent(ContextEvent.STARTUP_COMPLETE, StartupAnimationCommand, ContextEvent);
@@ -75,7 +91,9 @@ package com.nicotroia.whatcoloristhis
 			commandMap.mapEvent(CameraEvent.CAMERA_ROLL_IMAGE_SELECTED, ImageSelectedCommand, CameraEvent);
 			commandMap.mapEvent(CameraEvent.CAMERA_IMAGE_FAILED, ImageSelectFailedCommand, CameraEvent);
 			commandMap.mapEvent(CameraEvent.CAMERA_ROLL_IMAGE_FAILED, ImageSelectedCommand, CameraEvent);
-			
+			commandMap.mapEvent(LoadingEvent.COLOR_RESULT_LOADING, ShowLoadingSpinnerCommand, LoadingEvent);
+			commandMap.mapEvent(LoadingEvent.LOADING_FINISHED, HideLoadingSpinnerCommand, LoadingEvent);
+			commandMap.mapEvent(NotificationEvent.ADD_TEXT_TO_LOADING_SPINNER, AddTextToLoadingSpinnerCommand, NotificationEvent);
 			
 			//pages
 			mediatorMap.mapView(PageBase, PageBaseMediator);
@@ -93,10 +111,15 @@ package com.nicotroia.whatcoloristhis
 			mediatorMap.mapView(AboutPageButton, AboutPageButtonMediator, [ButtonBase, AboutPageButton]);
 			mediatorMap.mapView(AcceptButton, AcceptButtonMediator, [ButtonBase, AcceptButton]);
 			mediatorMap.mapView(CancelButton, CancelButtonMediator, [ButtonBase, CancelButton]);
+			mediatorMap.mapView(ShadowBoxView, ShadowBoxMediator);
+			mediatorMap.mapView(TransparentSpinner, TransparentSpinnerMediator);
 			
 			
+			//other
 			contextView.stage.addEventListener(Event.RESIZE, appResizeHandler);
 			
+			
+			//finally
 			super.startup();
 		}
 		
@@ -107,7 +130,6 @@ package com.nicotroia.whatcoloristhis
 			//trace("resize. " + contextView.stage.stageWidth, contextView.stage.stageHeight);
 			
 			eventDispatcher.dispatchEvent(event);
-			//eventDispatcher.dispatchEvent(new NotificationEvent(NotificationEvent.APP_RESIZED));
 		}
 	}
 }

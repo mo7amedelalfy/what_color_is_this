@@ -23,6 +23,9 @@ package com.nicotroia.whatcoloristhis.controller.commands
 		[Inject(name="pageContainer")]
 		public var pageContainer:Sprite;
 		
+		[Inject(name="overlayContainer")]
+		public var overlayContainer:Sprite;
+		
 		private var _pageConstant:Class;
 		private var _lastPage:PageBase;
 		private var _newPage:PageBase;
@@ -40,7 +43,7 @@ package com.nicotroia.whatcoloristhis.controller.commands
 			_newPage = sequenceModel.getPage( _pageConstant );
 			_assetRemoval = new Vector.<PageBase>();
 			
-			//remove old page
+			//Remove old page
 			if( _lastPage != null && pageContainer.contains(_lastPage) ) { 
 				_lastPage.hide(0.33, 0, function():void { 
 					pageContainer.removeChild(_lastPage);
@@ -82,7 +85,36 @@ package com.nicotroia.whatcoloristhis.controller.commands
 				}
 			}
 			
-			//add new page
+			//Ditto for overlays
+			for each( var OverlayPage:Class in sequenceModel.overlayList ) { 
+				//trace("checking if " + _pageConstant + " should include " + OverlayPage);
+				
+				var requiredOverlay:PageBase = sequenceModel.overlays[OverlayPage] as PageBase;
+				if(requiredOverlay == null) continue;
+				
+				if( Vector.<Class>(sequenceModel.overlayWaitingList[OverlayPage]).indexOf(_pageConstant) > -1 ) 
+				{ 
+					//add overlay that should belong
+					if( ! overlayContainer.contains(requiredOverlay) ) { 
+						overlayContainer.addChild(requiredOverlay);
+						requiredOverlay.show(0.25, delay);
+						delay += 0.15;
+					}
+				}
+				else 
+				{ 
+					//remove overlay that does not belong
+					if( requiredOverlay.parent == overlayContainer ) { 
+						_assetRemoval.push( requiredOverlay );
+						requiredOverlay.hide(0.25, delay, function():void { 
+							safeRemove(_assetRemoval.shift());
+						});
+						delay += 0.1;
+					}
+				}
+			}
+			
+			//Add the new page
 			pageContainer.addChild(_newPage);
 			_newPage.show(0.33, delay, function():void { 
 				//finally... finish.
@@ -90,9 +122,9 @@ package com.nicotroia.whatcoloristhis.controller.commands
 			});
 		}
 		
-		protected function safeRemove(myClip:DisplayObject):void
+		protected function safeRemove(obj:DisplayObject):void
 		{
-			if(myClip.parent) myClip.parent.removeChild(myClip);
+			if(obj.parent) obj.parent.removeChild(obj);
 		}
 	}
 }

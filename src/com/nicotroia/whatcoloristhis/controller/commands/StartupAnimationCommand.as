@@ -34,7 +34,7 @@ package com.nicotroia.whatcoloristhis.controller.commands
 			contextView.addChild( pageContainer );
 			contextView.addChild( overlayContainer );
 			
-			pageContainer.addChild(backgroundSprite);
+			pageContainer.addChild( backgroundSprite );
 			
 			eventDispatcher.addEventListener(LayoutEvent.UPDATE_LAYOUT, appResizedHandler);
 		}

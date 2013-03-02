@@ -44,8 +44,6 @@ package com.nicotroia.whatcoloristhis.view.pages
 			eventMap.mapListener(welcomePage.takePhotoButton, MouseEvent.CLICK, takePhotoButtonClickHandler);
 			
 			eventDispatcher.dispatchEvent(new NotificationEvent(NotificationEvent.CHANGE_TOP_NAV_BAR_TITLE, "What Color <i>Is</i> This?"));
-			
-			//initCamera();
 		}
 		
 		/*
@@ -138,10 +136,14 @@ package com.nicotroia.whatcoloristhis.view.pages
 			
 			var photoButtonWidth:Number;
 			
+			welcomePage.directionsTF.x = 14;
+			welcomePage.directionsTF.y = layoutModel.navBarHeight + 14;
+			
 			if( layoutModel.orientation == StageOrientation.ROTATED_LEFT || layoutModel.orientation == StageOrientation.ROTATED_RIGHT ) { 
-				welcomePage.actionBar.height = contextView.stage.stageHeight + 1;
+				welcomePage.actionBar.gotoAndStop(2);
+				welcomePage.actionBar.height = contextView.stage.stageHeight + 2;
 				welcomePage.actionBar.width = 85;
-				welcomePage.actionBar.x = contextView.stage.stageWidth - welcomePage.actionBar.width;
+				welcomePage.actionBar.x = contextView.stage.stageWidth - welcomePage.actionBar.width + 1;
 				welcomePage.actionBar.y = 0;
 				
 				photoButtonWidth = (contextView.stage.stageHeight * 0.3);
@@ -152,17 +154,17 @@ package com.nicotroia.whatcoloristhis.view.pages
 				welcomePage.takePhotoButton.y = (contextView.stage.stageHeight * 0.5) - (welcomePage.takePhotoButton.height * 0.5);
 				
 				welcomePage.aboutPageButton.x = welcomePage.actionBar.x + 14;
-				welcomePage.aboutPageButton.y = 14;
+				welcomePage.aboutPageButton.y = contextView.stage.stageHeight - welcomePage.aboutPageButton.height - 14;
 				
-				if( _cameraView ) { 
-					_cameraView.y = 0;
-				}
+				welcomePage.directionsTF.width = contextView.stage.stageWidth - welcomePage.actionBar.width - 28;
+				welcomePage.directionsTF.height = contextView.stage.stageHeight - welcomePage.directionsTF.y - 14;
 			}
 			else { 
+				welcomePage.actionBar.gotoAndStop(1);
 				welcomePage.actionBar.height = 85;
-				welcomePage.actionBar.width = contextView.stage.stageWidth + 1;
+				welcomePage.actionBar.width = contextView.stage.stageWidth + 2;
 				welcomePage.actionBar.x = 0;
-				welcomePage.actionBar.y = contextView.stage.stageHeight - welcomePage.actionBar.height;
+				welcomePage.actionBar.y = contextView.stage.stageHeight - welcomePage.actionBar.height + 1;
 				
 				photoButtonWidth = (contextView.stage.stageWidth * 0.3);
 				
@@ -174,9 +176,8 @@ package com.nicotroia.whatcoloristhis.view.pages
 				welcomePage.aboutPageButton.x = 14;
 				welcomePage.aboutPageButton.y = welcomePage.actionBar.y + 14;
 				
-				if( _cameraView ) { 
-					_cameraView.y = layoutModel.navBarHeight;
-				}
+				welcomePage.directionsTF.width = contextView.stage.stageWidth - 28;
+				welcomePage.directionsTF.height = contextView.stage.stageHeight - welcomePage.directionsTF.y - 14;
 			}
 			
 			//trace(targetSize);

@@ -31,6 +31,7 @@ package com.nicotroia.whatcoloristhis.view.pages
 		private var _image:Bitmap;
 		private var _target:Target;
 		private var _capturedPixels:Object;
+		private var _userMovedPhoto:Boolean;
 		
 		override public function onRegister():void
 		{
@@ -38,7 +39,8 @@ package com.nicotroia.whatcoloristhis.view.pages
 			
 			super.onRegister();
 			
-			//areaSelectPage.addChild(_fullImage);
+			trace("area select page registered");
+			
 			areaSelectPage.addChildAt(_image, 0);
 			areaSelectPage.addChildAt(_target, 1);
 			
@@ -77,7 +79,6 @@ package com.nicotroia.whatcoloristhis.view.pages
 					//trace(currentX, currentY, hex);
 				}
 			}
-			
 			
 			var winner:String;
 			var currentScore:uint;
@@ -118,74 +119,61 @@ package com.nicotroia.whatcoloristhis.view.pages
 			
 			trace("area select page resized");
 			
-			if( layoutModel.orientation == StageOrientation.ROTATED_LEFT || layoutModel.orientation == StageOrientation.ROTATED_RIGHT ) { 
-				scale = maxLength / cameraModel.photoData.height;
-				targetSize = contextView.stage.stageHeight * 0.42;
-								
-				_target.width = targetSize;
-				_target.scaleY = _target.scaleX;
-				_target.x = (contextView.stage.stageWidth * 0.5) - (_target.width * 0.5);
-				_target.y = (contextView.stage.stageHeight * 0.5) - (_target.height * 0.5);
-				
-				_image.y = contextView.stage.stageHeight;
-				_image.rotation = -90;
-				
-				areaSelectPage.actionBar.height = contextView.stage.stageHeight + 1;
-				areaSelectPage.actionBar.width = 85;
-				areaSelectPage.actionBar.x = contextView.stage.stageWidth - areaSelectPage.actionBar.width;
-				areaSelectPage.actionBar.y = 0;
-				
-			}
-			else { 
-				scale = maxLength / cameraModel.photoData.width;
-				targetSize = (contextView.stage.stageWidth - layoutModel.navBarHeight) * 0.42;
-				
-				_target.width = targetSize;
-				_target.scaleY = _target.scaleX;
-				_target.x = (contextView.stage.stageWidth * 0.5) - (_target.width * 0.5);
-				_target.y = layoutModel.navBarHeight + (((contextView.stage.stageHeight - layoutModel.navBarHeight) * 0.5) - (_target.height * 0.5));
-				
-				areaSelectPage.actionBar.height = 85;
-				areaSelectPage.actionBar.width = contextView.stage.stageWidth + 1;
-				areaSelectPage.actionBar.x = 0;
-				areaSelectPage.actionBar.y = contextView.stage.stageHeight - areaSelectPage.actionBar.height;
-				
-			}
+			//screw orientation
+			scale = maxLength / cameraModel.photoData.width;
+			targetSize = (contextView.stage.stageHeight - layoutModel.navBarHeight) * 0.42;
 			
-			areaSelectPage.backButton.height = areaSelectPage.actionBar.height * 0.70;
-			areaSelectPage.backButton.scaleX = areaSelectPage.backButton.scaleY;
-			areaSelectPage.backButton.x = 14;
-			areaSelectPage.backButton.y = (layoutModel.navBarHeight - areaSelectPage.backButton.height) * 0.5;
+			areaSelectPage.actionBar.gotoAndStop(1);
+			areaSelectPage.actionBar.height = 65;
+			areaSelectPage.actionBar.width = contextView.stage.stageWidth + 2;
+			areaSelectPage.actionBar.x = 0;
+			areaSelectPage.actionBar.y = contextView.stage.stageHeight - areaSelectPage.actionBar.height + 1;
 			
 			areaSelectPage.cancelButton.height = areaSelectPage.actionBar.height * 0.70;
 			areaSelectPage.cancelButton.scaleX = areaSelectPage.cancelButton.scaleY;
-			areaSelectPage.cancelButton.x = 14;
+			areaSelectPage.cancelButton.x = (contextView.stage.stageWidth * 0.20) - (areaSelectPage.cancelButton.width * 0.5);
 			areaSelectPage.cancelButton.y = areaSelectPage.actionBar.y + ((areaSelectPage.actionBar.height - areaSelectPage.cancelButton.height) * 0.5);
 			
 			areaSelectPage.acceptButton.height = areaSelectPage.actionBar.height * 0.70;
 			areaSelectPage.acceptButton.scaleX = areaSelectPage.acceptButton.scaleY;
-			areaSelectPage.acceptButton.x = contextView.stage.stageWidth - areaSelectPage.acceptButton.width - 14;
+			areaSelectPage.acceptButton.x = (contextView.stage.stageWidth * 0.80) - (areaSelectPage.acceptButton.width * 0.5);
 			areaSelectPage.acceptButton.y = areaSelectPage.actionBar.y + ((areaSelectPage.actionBar.height - areaSelectPage.acceptButton.height) * 0.5);
 			
-			var matrix:Matrix = new Matrix();
-			matrix.scale(scale, scale);
+			if( ! _userMovedPhoto ) { 
+				var matrix:Matrix = new Matrix();
+				matrix.scale(scale, scale);
+				
+				var smallBMD:BitmapData = new BitmapData(cameraModel.photoData.width * scale, cameraModel.photoData.height * scale, true);
+				smallBMD.draw(cameraModel.photoData, matrix, null, null, null, true);
+				
+				if( _image && areaSelectPage.contains(_image) ) areaSelectPage.removeChild(_image);
+				
+				_image = new Bitmap(smallBMD, PixelSnapping.NEVER, true);
+				
+				_image.x = (contextView.stage.stageWidth * 0.5) - (_image.width * 0.5);
+				_image.y = layoutModel.navBarHeight + (((contextView.stage.stageHeight - layoutModel.navBarHeight - areaSelectPage.actionBar.height) * 0.5) - (_image.height * 0.5));
+				
+				areaSelectPage.addChildAt(_image, 0);
+			}
 			
-			var smallBMD:BitmapData = new BitmapData(cameraModel.photoData.width * scale, cameraModel.photoData.height * scale, true);
-			smallBMD.draw(cameraModel.photoData, matrix, null, null, null, true);
-			
-			_image = new Bitmap(smallBMD, PixelSnapping.NEVER, true);
-			
-			_image.x = 14;
-			_image.y = layoutModel.navBarHeight + 14;
+			_target.width = targetSize;
+			_target.scaleY = _target.scaleX;
+			_target.x = (contextView.stage.stageWidth * 0.5) - (_target.width * 0.5);
+			_target.y = layoutModel.navBarHeight + (((contextView.stage.stageHeight - layoutModel.navBarHeight - areaSelectPage.actionBar.height) * 0.5) - (_target.height * 0.5));	
 		}
 		
 		override public function onRemove():void
 		{
+			super.onRemove();
+			
+			trace("areaSelectPage removed");
+			
 			if( areaSelectPage.contains(_image) ) areaSelectPage.removeChild(_image);
 			if( areaSelectPage.contains(_target) ) areaSelectPage.removeChild(_target);
 			
 			_image = null;
 			_target = null;
+			_capturedPixels = null;
 		}
 	}
 }

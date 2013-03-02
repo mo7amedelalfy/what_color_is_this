@@ -23,11 +23,6 @@ package com.nicotroia.whatcoloristhis.view.pages
 		{
 			trace("aboutPage resized");
 			
-			aboutPage.backButton.height = layoutModel.navBarHeight * 0.70;
-			aboutPage.backButton.scaleX = aboutPage.backButton.scaleY;
-			aboutPage.backButton.x = 14;
-			aboutPage.backButton.y = (layoutModel.navBarHeight - aboutPage.backButton.height) * 0.5;
-			
 			aboutPage.creditsTF.width = contextView.stage.stageWidth - 28;
 			aboutPage.creditsTF.x = 14;
 			aboutPage.creditsTF.y = layoutModel.navBarHeight + 14;
