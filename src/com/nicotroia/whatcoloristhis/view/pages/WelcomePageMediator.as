@@ -46,60 +46,6 @@ package com.nicotroia.whatcoloristhis.view.pages
 			eventDispatcher.dispatchEvent(new NotificationEvent(NotificationEvent.CHANGE_TOP_NAV_BAR_TITLE, "What Color <i>Is</i> This?"));
 		}
 		
-		/*
-		private function initCamera():void
-		{
-			trace("Init camera.");
-			
-			if( Camera.isSupported ) { 
-				_camera = Camera.getCamera();
-				
-				if( ! _camera ) { 
-					//camera in use or disabled
-					//display oops
-				}
-				else if( _camera.muted ) { 
-					//user denied the application access to camera
-					//display oops
-				}
-				else { 
-					attachCamera();
-				}
-			}
-			else { 
-				//no camera on this device
-				//display oops 
-			}
-		}
-		
-		private function attachCamera():void
-		{
-			trace("Attach camera.");
-			
-			if( contextView.stage.stageWidth > contextView.stage.stageHeight ) { 
-				_cameraRect = new Rectangle(0, 0, contextView.stage.stageWidth, contextView.stage.stageHeight);
-			}
-			else { 
-				//Camera is landscape only.
-				_cameraRect = new Rectangle(0, layoutModel.navBarHeight, contextView.stage.stageHeight, contextView.stage.stageWidth);
-			}
-			
-			trace(" Camera rect: " + _cameraRect);
-			
-			_cameraView = new Video(_cameraRect.width, _cameraRect.height);
-			_cameraView.x = _cameraRect.x;
-			_cameraView.y = _cameraRect.y;
-			
-			welcomePage.addChildAt(_cameraView, 0);
-			
-			_cameraView.attachCamera(_camera);
-			
-			_camera.setMode(_cameraRect.width, _cameraRect.height, 15); 
-			
-			appResizedHandler(null);
-		}
-		*/
-		
 		private function takePhotoButtonClickHandler(event:MouseEvent):void
 		{
 			cameraModel.initCamera(); 
@@ -132,52 +78,56 @@ package com.nicotroia.whatcoloristhis.view.pages
 		
 		override protected function appResizedHandler(event:LayoutEvent):void
 		{
-			trace("welcome page resized");
-			
 			var photoButtonWidth:Number;
 			
 			welcomePage.directionsTF.x = 14;
 			welcomePage.directionsTF.y = layoutModel.navBarHeight + 14;
 			
 			if( layoutModel.orientation == StageOrientation.ROTATED_LEFT || layoutModel.orientation == StageOrientation.ROTATED_RIGHT ) { 
+				trace(" welcome page resized for LEFT/RIGHT via " + event);
+				
 				welcomePage.actionBar.gotoAndStop(2);
-				welcomePage.actionBar.height = contextView.stage.stageHeight + 2;
+				welcomePage.actionBar.height = layoutModel.appHeight + 2;
 				welcomePage.actionBar.width = 85;
-				welcomePage.actionBar.x = contextView.stage.stageWidth - welcomePage.actionBar.width + 1;
+				welcomePage.actionBar.x = layoutModel.appWidth - welcomePage.actionBar.width + 1;
 				welcomePage.actionBar.y = 0;
 				
-				photoButtonWidth = (contextView.stage.stageHeight * 0.3);
+				photoButtonWidth = (layoutModel.appHeight * 0.3);
+				trace("  photobuttonWidth= " + layoutModel.appHeight + " * 0.3 = " + photoButtonWidth);
 				
 				welcomePage.takePhotoButton.width = photoButtonWidth;
 				welcomePage.takePhotoButton.scaleY = welcomePage.takePhotoButton.scaleX;
-				welcomePage.takePhotoButton.x = contextView.stage.stageWidth - welcomePage.takePhotoButton.width - 10;
-				welcomePage.takePhotoButton.y = (contextView.stage.stageHeight * 0.5) - (welcomePage.takePhotoButton.height * 0.5);
+				welcomePage.takePhotoButton.x = layoutModel.appWidth - welcomePage.takePhotoButton.width - 10;
+				welcomePage.takePhotoButton.y = (layoutModel.appHeight * 0.5) - (welcomePage.takePhotoButton.height * 0.5);
 				
 				welcomePage.aboutPageButton.x = welcomePage.actionBar.x + 14;
-				welcomePage.aboutPageButton.y = contextView.stage.stageHeight - welcomePage.aboutPageButton.height - 14;
+				welcomePage.aboutPageButton.y = layoutModel.appHeight - welcomePage.aboutPageButton.height - 14;
 				
-				welcomePage.directionsTF.width = contextView.stage.stageWidth - welcomePage.actionBar.width - 28;
-				welcomePage.directionsTF.height = contextView.stage.stageHeight - welcomePage.directionsTF.y - 14;
+				welcomePage.directionsTF.width = layoutModel.appWidth - welcomePage.actionBar.width - 28;
+				welcomePage.directionsTF.height = layoutModel.appHeight - welcomePage.directionsTF.y - 14;
 			}
 			else { 
+				trace(" welcome page resized for DEFAULT/UPSIDEDOWN via " + event);
+				
 				welcomePage.actionBar.gotoAndStop(1);
 				welcomePage.actionBar.height = 85;
-				welcomePage.actionBar.width = contextView.stage.stageWidth + 2;
+				welcomePage.actionBar.width = layoutModel.appWidth + 2;
 				welcomePage.actionBar.x = 0;
-				welcomePage.actionBar.y = contextView.stage.stageHeight - welcomePage.actionBar.height + 1;
+				welcomePage.actionBar.y = layoutModel.appHeight - welcomePage.actionBar.height + 1;
 				
-				photoButtonWidth = (contextView.stage.stageWidth * 0.3);
+				photoButtonWidth = (layoutModel.appWidth * 0.3);
+				trace("  photobuttonWidth= " + layoutModel.appWidth + " * 0.3 = " + photoButtonWidth);
 				
 				welcomePage.takePhotoButton.width = photoButtonWidth;
 				welcomePage.takePhotoButton.scaleY = welcomePage.takePhotoButton.scaleX;
-				welcomePage.takePhotoButton.x = (contextView.stage.stageWidth * 0.5) - (welcomePage.takePhotoButton.width * 0.5);
-				welcomePage.takePhotoButton.y = contextView.stage.stageHeight - welcomePage.takePhotoButton.height - 10;
+				welcomePage.takePhotoButton.x = (layoutModel.appWidth * 0.5) - (welcomePage.takePhotoButton.width * 0.5);
+				welcomePage.takePhotoButton.y = layoutModel.appHeight - welcomePage.takePhotoButton.height - 10;
 				
 				welcomePage.aboutPageButton.x = 14;
 				welcomePage.aboutPageButton.y = welcomePage.actionBar.y + 14;
 				
-				welcomePage.directionsTF.width = contextView.stage.stageWidth - 28;
-				welcomePage.directionsTF.height = contextView.stage.stageHeight - welcomePage.directionsTF.y - 14;
+				welcomePage.directionsTF.width = layoutModel.appWidth - 28;
+				welcomePage.directionsTF.height = layoutModel.appHeight - welcomePage.directionsTF.y - 14;
 			}
 			
 			//trace(targetSize);

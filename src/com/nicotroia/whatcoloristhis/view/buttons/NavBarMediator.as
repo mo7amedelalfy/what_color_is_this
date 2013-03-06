@@ -37,9 +37,9 @@ package com.nicotroia.whatcoloristhis.view.buttons
 		
 		override protected function appResizedHandler(event:LayoutEvent):void
 		{
-			trace("navBar resizing. height= " + layoutModel.navBarHeight);
+			trace(" navBar resizing via " + event + ". height= " + layoutModel.navBarHeight);
 			
-			navBar.graphic.width = contextView.stage.stageWidth + 1;
+			navBar.graphic.width = layoutModel.appWidth + 1;
 			navBar.graphic.x = 0;
 			navBar.graphic.y = 0;
 			

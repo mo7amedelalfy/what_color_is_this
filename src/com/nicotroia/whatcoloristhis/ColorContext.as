@@ -37,6 +37,7 @@ package com.nicotroia.whatcoloristhis
 	import flash.display.DisplayObjectContainer;
 	import flash.display.Sprite;
 	import flash.events.Event;
+	import flash.events.StageOrientationEvent;
 	
 	import org.robotlegs.base.ContextEvent;
 	import org.robotlegs.mvcs.Context;
@@ -86,6 +87,7 @@ package com.nicotroia.whatcoloristhis
 			
 			//events
 			commandMap.mapEvent(Event.RESIZE, LayoutPageCommand, Event);
+			commandMap.mapEvent(StageOrientationEvent.ORIENTATION_CHANGE, LayoutPageCommand, StageOrientationEvent);
 			commandMap.mapEvent(NavigationEvent.NAVIGATE_TO_PAGE, GotoPageCommand, NavigationEvent);
 			commandMap.mapEvent(CameraEvent.CAMERA_IMAGE_TAKEN, ImageSelectedCommand, CameraEvent);
 			commandMap.mapEvent(CameraEvent.CAMERA_ROLL_IMAGE_SELECTED, ImageSelectedCommand, CameraEvent);
@@ -94,6 +96,7 @@ package com.nicotroia.whatcoloristhis
 			commandMap.mapEvent(LoadingEvent.COLOR_RESULT_LOADING, ShowLoadingSpinnerCommand, LoadingEvent);
 			commandMap.mapEvent(LoadingEvent.LOADING_FINISHED, HideLoadingSpinnerCommand, LoadingEvent);
 			commandMap.mapEvent(NotificationEvent.ADD_TEXT_TO_LOADING_SPINNER, AddTextToLoadingSpinnerCommand, NotificationEvent);
+			
 			
 			//pages
 			mediatorMap.mapView(PageBase, PageBaseMediator);
@@ -117,17 +120,32 @@ package com.nicotroia.whatcoloristhis
 			
 			//other
 			contextView.stage.addEventListener(Event.RESIZE, appResizeHandler);
+			contextView.stage.addEventListener(StageOrientationEvent.ORIENTATION_CHANGE, orientationChangeHandler);
 			
 			
 			//finally
 			super.startup();
+			
+			eventDispatcher.dispatchEvent(new Event(Event.RESIZE)); //hmm
+		}
+		
+		protected function orientationChangeHandler(event:StageOrientationEvent):void
+		{
+			//event.preventDefault();
+			
+			trace("ORIENTATION CHANGE. " + event.beforeOrientation + " to " + event.afterOrientation);
+			
+			eventDispatcher.dispatchEvent(event);
 		}
 		
 		protected function appResizeHandler(event:Event):void
 		{
-			event.preventDefault();
+			//We really only need this to happen once...
+			contextView.stage.removeEventListener(Event.RESIZE, appResizeHandler);
 			
-			//trace("resize. " + contextView.stage.stageWidth, contextView.stage.stageHeight);
+			//event.preventDefault();
+			
+			trace("RESIZE. " + contextView.stage.stageWidth, contextView.stage.stageHeight + " full: " + contextView.stage.fullScreenWidth, contextView.stage.fullScreenHeight);
 			
 			eventDispatcher.dispatchEvent(event);
 		}

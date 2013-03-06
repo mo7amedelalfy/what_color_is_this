@@ -54,7 +54,7 @@ goto end
 	
 	::-connect -listen
 	:: -connect 192.168.0.50
-	call "%AIR_SDK%\bin\adt" -package -target apk-debug -listen -storetype pkcs12 -keystore %PROJECT_PATH%\build\cert.p12 -storepass 12345 %PROJECT_PATH%\bin-android\%FILENAME%.apk %PROJECT_PATH%\build\%FILENAME%-app.xml %FILENAME%.swf assets
+	call "%AIR_SDK%\bin\adt" -package -target apk-debug -listen -storetype pkcs12 -keystore %PROJECT_PATH%\build\android\cert.p12 -storepass 12345 %PROJECT_PATH%\bin-android\%FILENAME%.apk %PROJECT_PATH%\build\%FILENAME%-app.xml %FILENAME%.swf assets
 	
 	if errorlevel 1 (
 		echo package failed :(

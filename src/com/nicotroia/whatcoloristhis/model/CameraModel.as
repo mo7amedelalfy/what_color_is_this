@@ -41,6 +41,12 @@ package com.nicotroia.whatcoloristhis.model
 			
 		}
 		
+		/*
+		*
+		* CAMERA
+		*
+		*/
+		
 		public function initCamera():void
 		{	
 			trace("init camera.");
@@ -93,25 +99,17 @@ package com.nicotroia.whatcoloristhis.model
 			
 			var promise:MediaPromise = event.data;
 			
-			trace(promise.file.name, promise.file.url);
+			if( promise.file ) { 
+				//iOS does not actually create a file but keeps it in memory, so these would be null.
+				trace(promise.file);
+				trace(promise.file.name, promise.file.url);
+			}
 			
 			var loader:Loader = new Loader();
 			loader.contentLoaderInfo.addEventListener(Event.COMPLETE, filePromiseLoadedHandler);
 			loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, filePromiseLoadErrorHandler);
 			
 			loader.loadFilePromise(promise);
-			
-			/*
-			_dataSource = _promise.open();
-			
-			if( _promise.isAsync ) { 
-				var eventSource:IEventDispatcher = _dataSource as IEventDispatcher;
-				
-				eventSource.addEventListener(Event.COMPLETE, promiseLoadCompleteHandler);
-			}
-			else { 
-				readMediaData();
-			}*/
 		}
 		
 		protected function filePromiseLoadErrorHandler(event:IOErrorEvent):void
@@ -141,28 +139,9 @@ package com.nicotroia.whatcoloristhis.model
 		}
 		
 		/*
-		private function promiseLoadCompleteHandler(event:Event):void
-		{
-			IEventDispatcher(_dataSource).removeEventListener(Event.COMPLETE, promiseLoadCompleteHandler);
-			
-			trace("promise load complete");
-			
-			readMediaData();
-		}
-		
-		protected function readMediaData():void
-		{
-			trace("reading media data");
-			
-			var imageBytes:ByteArray = new ByteArray();
-			
-			_dataSource.readBytes( imageBytes );
-			
-			trace(_promise.file.name, _promise.file.url);
-		}
-		*/
-		/*
-		CAMERA ROLL
+		*
+		* CAMERA ROLL
+		*
 		*/
 		
 		public function saveImage(bmd:BitmapData):void

@@ -15,6 +15,7 @@ package com.nicotroia.whatcoloristhis.view.pages
 	import flash.events.SecurityErrorEvent;
 	import flash.net.URLLoader;
 	import flash.net.URLRequest;
+	import flash.text.TextFieldAutoSize;
 	import flash.text.TextFormat;
 
 	public class ResultPageMediator extends PageBaseMediator
@@ -31,6 +32,7 @@ package com.nicotroia.whatcoloristhis.view.pages
 		private var _winningColorShape:Shape;
 		private var _targetCopy:Bitmap;
 		private var _textFormat:TextFormat;
+		private var _closestMatch:String;
 		
 		override public function onRegister():void
 		{
@@ -53,12 +55,12 @@ package com.nicotroia.whatcoloristhis.view.pages
 			
 			eventDispatcher.dispatchEvent(new NotificationEvent(NotificationEvent.CHANGE_TOP_NAV_BAR_TITLE, "Results"));
 			
-			trace("loading: http://nicotroia.com/api/what-color-is-this/"+cameraModel.winner);
+			trace("loading: http://nicotroia.com/api/what-crayola-is-this/"+cameraModel.winner);
 			
 			eventDispatcher.dispatchEvent(new LoadingEvent(LoadingEvent.COLOR_RESULT_LOADING));
 			eventDispatcher.dispatchEvent(new NotificationEvent(NotificationEvent.ADD_TEXT_TO_LOADING_SPINNER, "Fetching result..."));
 			
-			urlLoader.load(new URLRequest("http://nicotroia.com/api/what-color-is-this/"+cameraModel.winner));
+			urlLoader.load(new URLRequest("http://nicotroia.com/api/what-crayola-is-this/"+cameraModel.winner));
 		}
 		
 		protected function urlLoaderCompleteHandler(event:Event):void
@@ -72,17 +74,22 @@ package com.nicotroia.whatcoloristhis.view.pages
 			urlLoader.removeEventListener(SecurityErrorEvent.SECURITY_ERROR, urlLoaderSecurityErrorHandler);
 			
 			var json:Object = JSON.parse(urlLoader.data);
-			var name:String = "";
+			var name:String = json.color_name; //"";
+			_closestMatch = json.closest_match;
 			
+			/*
 			for each(var n:String in json.color_names) { 
 				name += n + " / ";
 			}
 			name = name.substr(0,-3);
+			*/
 			
 			trace("ding. " + name);
+			trace("closest_match: " + _closestMatch);
 			
 			resultPage.thisThingTF.text = getRandomComment(); 
 			resultPage.colorNameTF.text = name;
+			resultPage.closestMatchHexTF.text = "(0x" + _closestMatch + ")";
 			
 			if(uint("0x"+cameraModel.winner) > 0xAAAAAA) { 
 				_textFormat.color = 0x2b2b2b;
@@ -92,7 +99,10 @@ package com.nicotroia.whatcoloristhis.view.pages
 			}
 			
 			resultPage.thisThingTF.setTextFormat(_textFormat);
-			resultPage.colorNameTF.setTextFormat(_textFormat);	
+			resultPage.colorNameTF.setTextFormat(_textFormat);
+			resultPage.closestMatchHexTF.setTextFormat(_textFormat);
+			
+			colorBackground();
 		}
 		
 		protected function urlLoaderIOErrorHandler(event:IOErrorEvent):void
@@ -129,29 +139,42 @@ package com.nicotroia.whatcoloristhis.view.pages
 			trace("result page resized");
 			
 			if( layoutModel.orientation == StageOrientation.ROTATED_LEFT || layoutModel.orientation == StageOrientation.ROTATED_RIGHT ) { 
-				maxWidth = contextView.stage.stageHeight * 0.25
+				maxWidth = layoutModel.appHeight * 0.25
 			}
 			else { 
-				maxWidth = contextView.stage.stageWidth * 0.25
+				maxWidth = layoutModel.appWidth * 0.25
 			}
 			
-			resultPage.thisThingTF.width = contextView.stage.stageWidth;
+			resultPage.thisThingTF.width = layoutModel.appWidth;
 			resultPage.thisThingTF.x = 0;
-			resultPage.thisThingTF.y = contextView.stage.stageHeight * 0.3;
+			resultPage.thisThingTF.y = layoutModel.appHeight * 0.3;
 			
-			resultPage.colorNameTF.width = contextView.stage.stageWidth;
+			resultPage.colorNameTF.width = layoutModel.appWidth;
 			resultPage.colorNameTF.x = 0;
-			resultPage.colorNameTF.y = resultPage.thisThingTF.y + resultPage.thisThingTF.height + 24;
+			resultPage.colorNameTF.y = resultPage.thisThingTF.y + resultPage.thisThingTF.textHeight + 24;
+			resultPage.colorNameTF.autoSize = TextFieldAutoSize.CENTER;
+			
+			resultPage.closestMatchHexTF.width = layoutModel.appWidth;
+			resultPage.closestMatchHexTF.x = 0;
+			resultPage.closestMatchHexTF.y = resultPage.colorNameTF.y + resultPage.colorNameTF.textHeight + 14;
 			
 			_targetCopy.width = maxWidth;
 			_targetCopy.scaleY = _targetCopy.scaleX;
 			_targetCopy.x = 14;
-			_targetCopy.y = contextView.stage.stageHeight - _targetCopy.height - 14;
+			_targetCopy.y = layoutModel.appHeight - _targetCopy.height - 14;
 			
+			colorBackground();
+		}
+		
+		private function colorBackground():void
+		{
 			_winningColorShape.graphics.clear();
-			_winningColorShape.graphics.beginFill( uint("0x"+ cameraModel.winner), 1.0 );
-			_winningColorShape.graphics.drawRect(0, 0, contextView.stage.stageWidth, contextView.stage.stageHeight);
-			_winningColorShape.graphics.endFill();
+			
+			if( _closestMatch ) { 
+				_winningColorShape.graphics.beginFill( uint("0x"+ _closestMatch), 1.0 );
+				_winningColorShape.graphics.drawRect(0, 0, layoutModel.appWidth, layoutModel.appHeight);
+				_winningColorShape.graphics.endFill();
+			}
 		}
 		
 		private function getRandomComment():String
@@ -181,6 +204,10 @@ package com.nicotroia.whatcoloristhis.view.pages
 			
 			if( resultPage.contains(_winningColorShape) ) resultPage.removeChild(_winningColorShape);
 			if( resultPage.contains(_targetCopy) ) resultPage.removeChild(_targetCopy);
+			
+			_closestMatch = '';
+			_targetCopy = null;
+			_winningColorShape = null;
 		}
 	}
 }
