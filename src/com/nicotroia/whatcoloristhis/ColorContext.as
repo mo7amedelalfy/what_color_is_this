@@ -6,10 +6,10 @@ package com.nicotroia.whatcoloristhis
 	import com.nicotroia.whatcoloristhis.controller.commands.ImageSelectFailedCommand;
 	import com.nicotroia.whatcoloristhis.controller.commands.ImageSelectedCommand;
 	import com.nicotroia.whatcoloristhis.controller.commands.LayoutPageCommand;
-	import com.nicotroia.whatcoloristhis.controller.commands.ResizeAppCommand;
 	import com.nicotroia.whatcoloristhis.controller.commands.ShowLoadingSpinnerCommand;
 	import com.nicotroia.whatcoloristhis.controller.commands.StartupAnimationCommand;
 	import com.nicotroia.whatcoloristhis.controller.events.CameraEvent;
+	import com.nicotroia.whatcoloristhis.controller.events.LayoutEvent;
 	import com.nicotroia.whatcoloristhis.controller.events.LoadingEvent;
 	import com.nicotroia.whatcoloristhis.controller.events.NavigationEvent;
 	import com.nicotroia.whatcoloristhis.controller.events.NotificationEvent;
@@ -18,37 +18,53 @@ package com.nicotroia.whatcoloristhis
 	import com.nicotroia.whatcoloristhis.model.SequenceModel;
 	import com.nicotroia.whatcoloristhis.view.buttons.AboutPageButtonMediator;
 	import com.nicotroia.whatcoloristhis.view.buttons.AcceptButtonMediator;
-	import com.nicotroia.whatcoloristhis.view.buttons.BackButtonMediator;
 	import com.nicotroia.whatcoloristhis.view.buttons.ButtonBase;
 	import com.nicotroia.whatcoloristhis.view.buttons.ButtonBaseMediator;
 	import com.nicotroia.whatcoloristhis.view.buttons.CancelButtonMediator;
 	import com.nicotroia.whatcoloristhis.view.buttons.NavBarMediator;
 	import com.nicotroia.whatcoloristhis.view.buttons.TakePhotoButtonMediator;
-	import com.nicotroia.whatcoloristhis.view.overlay.ShadowBoxMediator;
-	import com.nicotroia.whatcoloristhis.view.overlay.ShadowBoxView;
-	import com.nicotroia.whatcoloristhis.view.overlay.TransparentSpinnerMediator;
+	import com.nicotroia.whatcoloristhis.view.overlays.HeaderOverlay;
+	import com.nicotroia.whatcoloristhis.view.overlays.HeaderOverlayMediator;
+	import com.nicotroia.whatcoloristhis.view.overlays.ShadowBoxMediator;
+	import com.nicotroia.whatcoloristhis.view.overlays.ShadowBoxView;
+	import com.nicotroia.whatcoloristhis.view.overlays.TransparentSpinnerMediator;
+	import com.nicotroia.whatcoloristhis.view.pages.AboutPage;
 	import com.nicotroia.whatcoloristhis.view.pages.AboutPageMediator;
+	import com.nicotroia.whatcoloristhis.view.pages.AreaSelectPage;
 	import com.nicotroia.whatcoloristhis.view.pages.AreaSelectPageMediator;
+	import com.nicotroia.whatcoloristhis.view.pages.ConfirmColorPage;
+	import com.nicotroia.whatcoloristhis.view.pages.ConfirmColorPageMediator;
 	import com.nicotroia.whatcoloristhis.view.pages.PageBase;
 	import com.nicotroia.whatcoloristhis.view.pages.PageBaseMediator;
+	import com.nicotroia.whatcoloristhis.view.pages.ResultPage;
 	import com.nicotroia.whatcoloristhis.view.pages.ResultPageMediator;
+	import com.nicotroia.whatcoloristhis.view.pages.SettingsPage;
+	import com.nicotroia.whatcoloristhis.view.pages.SettingsPageMediator;
+	import com.nicotroia.whatcoloristhis.view.pages.WelcomePage;
 	import com.nicotroia.whatcoloristhis.view.pages.WelcomePageMediator;
 	
-	import flash.display.DisplayObjectContainer;
-	import flash.display.Sprite;
-	import flash.events.Event;
 	import flash.events.StageOrientationEvent;
+	import flash.geom.Rectangle;
 	
 	import org.robotlegs.base.ContextEvent;
-	import org.robotlegs.mvcs.Context;
+	import org.robotlegs.mvcs.StarlingContext;
+	
+	import starling.core.Starling;
+	import starling.display.DisplayObjectContainer;
+	import starling.display.Sprite;
+	import starling.events.Event;
+	import starling.events.ResizeEvent;
+	import starling.utils.RectangleUtil;
 
-	public class ColorContext extends Context
+	public class ColorContext extends StarlingContext
 	{
 		public var pageContainer:Sprite;
 		public var overlayContainer:Sprite;
 		public var backgroundSprite:Sprite;
 		public var loadingSpinner:TransparentSpinner;
 		public var shadowBox:ShadowBoxView;
+		
+		private var _init:Boolean;
 		
 		public function ColorContext(contextView:DisplayObjectContainer = null, autoStartup:Boolean = true)
 		{
@@ -86,8 +102,8 @@ package com.nicotroia.whatcoloristhis
 			
 			
 			//events
-			commandMap.mapEvent(Event.RESIZE, LayoutPageCommand, Event);
-			commandMap.mapEvent(StageOrientationEvent.ORIENTATION_CHANGE, LayoutPageCommand, StageOrientationEvent);
+			commandMap.mapEvent(LayoutEvent.RESIZE, LayoutPageCommand, LayoutEvent);
+			commandMap.mapEvent(LayoutEvent.ORIENTATION_CHANGE, LayoutPageCommand, LayoutEvent);
 			commandMap.mapEvent(NavigationEvent.NAVIGATE_TO_PAGE, GotoPageCommand, NavigationEvent);
 			commandMap.mapEvent(CameraEvent.CAMERA_IMAGE_TAKEN, ImageSelectedCommand, CameraEvent);
 			commandMap.mapEvent(CameraEvent.CAMERA_ROLL_IMAGE_SELECTED, ImageSelectedCommand, CameraEvent);
@@ -100,54 +116,68 @@ package com.nicotroia.whatcoloristhis
 			
 			//pages
 			mediatorMap.mapView(PageBase, PageBaseMediator);
+			mediatorMap.mapView(HeaderOverlay, HeaderOverlayMediator, [PageBase, HeaderOverlay]);
 			mediatorMap.mapView(WelcomePage, WelcomePageMediator, [PageBase, WelcomePage]);
+			mediatorMap.mapView(SettingsPage, SettingsPageMediator, [PageBase, SettingsPage]);
 			mediatorMap.mapView(AboutPage, AboutPageMediator, [PageBase, AboutPage]);
 			mediatorMap.mapView(AreaSelectPage, AreaSelectPageMediator, [PageBase, AreaSelectPage]);
+			mediatorMap.mapView(ConfirmColorPage, ConfirmColorPageMediator, [PageBase, ConfirmColorPage]);
 			mediatorMap.mapView(ResultPage, ResultPageMediator, [PageBase, ResultPage]);
 			
 			
 			//buttons
 			mediatorMap.mapView(ButtonBase, ButtonBaseMediator);
-			mediatorMap.mapView(NavBar, NavBarMediator, [ButtonBase, NavBar]);
-			mediatorMap.mapView(BackButton, BackButtonMediator, [ButtonBase, BackButton]);
-			mediatorMap.mapView(TakePhotoButton, TakePhotoButtonMediator, [ButtonBase, TakePhotoButton]);
-			mediatorMap.mapView(AboutPageButton, AboutPageButtonMediator, [ButtonBase, AboutPageButton]);
-			mediatorMap.mapView(AcceptButton, AcceptButtonMediator, [ButtonBase, AcceptButton]);
-			mediatorMap.mapView(CancelButton, CancelButtonMediator, [ButtonBase, CancelButton]);
+			//mediatorMap.mapView(NavBar, NavBarMediator, [ButtonBase, NavBar]);
+			//mediatorMap.mapView(BackButton, BackButtonMediator, [ButtonBase, BackButton]);
+			//mediatorMap.mapView(TakePhotoButton, TakePhotoButtonMediator, [ButtonBase, TakePhotoButton]);
+			//mediatorMap.mapView(AboutPageButton, AboutPageButtonMediator, [ButtonBase, AboutPageButton]);
+			//mediatorMap.mapView(AcceptButton, AcceptButtonMediator, [ButtonBase, AcceptButton]);
+			//mediatorMap.mapView(CancelButton, CancelButtonMediator, [ButtonBase, CancelButton]);
 			mediatorMap.mapView(ShadowBoxView, ShadowBoxMediator);
 			mediatorMap.mapView(TransparentSpinner, TransparentSpinnerMediator);
 			
 			
 			//other
 			contextView.stage.addEventListener(Event.RESIZE, appResizeHandler);
-			contextView.stage.addEventListener(StageOrientationEvent.ORIENTATION_CHANGE, orientationChangeHandler);
+			Starling.current.nativeStage.addEventListener(StageOrientationEvent.ORIENTATION_CHANGE, orientationChangeHandler);
 			
 			
 			//finally
-			super.startup();
+			//super.startup();
 			
-			eventDispatcher.dispatchEvent(new Event(Event.RESIZE)); //hmm
+			
+			appResizeHandler(new ResizeEvent(ResizeEvent.RESIZE, Starling.current.nativeStage.fullScreenWidth, Starling.current.nativeStage.fullScreenHeight)); //hmm
+		}
+		
+		protected function appResizeHandler(event:ResizeEvent = null):void
+		{
+			trace("RESIZE. " + event.width, event.height); 
+			
+			contextView.stage.stageWidth = event.width;
+			contextView.stage.stageHeight = event.height;
+			
+			var viewPort:Rectangle = RectangleUtil.fit(
+				new Rectangle(0, 0, event.width, event.height), 
+				new Rectangle(0, 0, Starling.current.nativeStage.fullScreenWidth, Starling.current.nativeStage.fullScreenHeight), 
+				"showAll");
+			
+			Starling.current.viewPort = viewPort;
+			
+			if( ! _init ) { 
+				_init = true;
+				
+				//finally
+				super.startup();
+				
+				eventDispatcher.dispatchEvent(new LayoutEvent(LayoutEvent.RESIZE));
+			}
 		}
 		
 		protected function orientationChangeHandler(event:StageOrientationEvent):void
 		{
-			//event.preventDefault();
-			
 			trace("ORIENTATION CHANGE. " + event.beforeOrientation + " to " + event.afterOrientation);
 			
-			eventDispatcher.dispatchEvent(event);
-		}
-		
-		protected function appResizeHandler(event:Event):void
-		{
-			//We really only need this to happen once...
-			contextView.stage.removeEventListener(Event.RESIZE, appResizeHandler);
-			
-			//event.preventDefault();
-			
-			trace("RESIZE. " + contextView.stage.stageWidth, contextView.stage.stageHeight + " full: " + contextView.stage.fullScreenWidth, contextView.stage.fullScreenHeight);
-			
-			eventDispatcher.dispatchEvent(event);
+			eventDispatcher.dispatchEvent(new LayoutEvent(LayoutEvent.ORIENTATION_CHANGE)); //, false, {"beforeOrientation":event.beforeOrientation, "afterOrientation":event.afterOrientation}));
 		}
 	}
 }

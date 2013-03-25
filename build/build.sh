@@ -33,7 +33,15 @@ mkdir -p $PROJECT_PATH/bin-debug
 
 cd $SRC_PATH
 
-"$AIR_SDK/bin/amxmlc" -debug -library-path+=assets/swc what_color_is_this.as -output $PROJECT_PATH/bin-debug/$FILENAME.swf
+if [ $2 == "-debug" ] 
+then
+	DEBUG="true"
+else 
+	DEBUG="false"
+fi
+
+#For some reason I get "Initial window content is invalid" when I remove "-debug"...
+"$AIR_SDK/bin/amxmlc" -debug=$DEBUG -compress=false -library-path+=$PROJECT_PATH/libs $FILENAME.as -output $PROJECT_PATH/bin-debug/$FILENAME.swf
 
 # Read the exit static of mxmlc to determine if there was an error
 STATUS=$?
@@ -129,6 +137,7 @@ then
 			STATUS=$?
 			if [ $STATUS -eq 0 ]
 			then
+				echo ;
 				echo "Install success"
 				echo ;
 				echo "Please run the app on the device then type 'run' in fdb"
@@ -171,6 +180,7 @@ then
 			STATUS=$?
 			if [ $STATUS -eq 0 ]
 			then
+				echo ;
 				echo "Install success"
 				echo ;
 				

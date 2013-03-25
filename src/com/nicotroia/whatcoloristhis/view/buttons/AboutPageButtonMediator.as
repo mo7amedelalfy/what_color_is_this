@@ -14,7 +14,7 @@ package com.nicotroia.whatcoloristhis.view.buttons
 		{
 			super.onRegister();
 			
-			eventMap.mapListener(testPageButton, MouseEvent.CLICK, testPageButtonClickHandler);
+			//eventMap.mapListener(testPageButton, MouseEvent.CLICK, testPageButtonClickHandler);
 		}
 		
 		private function testPageButtonClickHandler(event:MouseEvent):void

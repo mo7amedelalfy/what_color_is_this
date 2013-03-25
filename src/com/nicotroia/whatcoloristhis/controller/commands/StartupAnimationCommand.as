@@ -5,12 +5,13 @@ package com.nicotroia.whatcoloristhis.controller.commands
 	import com.nicotroia.whatcoloristhis.model.LayoutModel;
 	import com.nicotroia.whatcoloristhis.model.SequenceModel;
 	
-	import flash.display.Sprite;
 	import flash.events.Event;
 	
-	import org.robotlegs.mvcs.Command;
+	import org.robotlegs.mvcs.StarlingCommand;
+	
+	import starling.display.Sprite;
 
-	public class StartupAnimationCommand extends Command
+	public class StartupAnimationCommand extends StarlingCommand
 	{
 		[Inject]
 		public var event:Event;

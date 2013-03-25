@@ -1,5 +1,6 @@
 package com.nicotroia.whatcoloristhis.view.pages
 {
+	import com.nicotroia.whatcoloristhis.Assets;
 	import com.nicotroia.whatcoloristhis.controller.events.LayoutEvent;
 	import com.nicotroia.whatcoloristhis.controller.events.NavigationEvent;
 	import com.nicotroia.whatcoloristhis.controller.events.NotificationEvent;
@@ -8,62 +9,90 @@ package com.nicotroia.whatcoloristhis.view.pages
 	import com.nicotroia.whatcoloristhis.model.LayoutModel;
 	import com.nicotroia.whatcoloristhis.model.SequenceModel;
 	
+	import feathers.controls.Button;
+	
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
-	import flash.display.PixelSnapping;
 	import flash.display.StageOrientation;
-	import flash.events.MouseEvent;
 	import flash.geom.Matrix;
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
+	import flash.utils.getTimer;
+	
+	import starling.display.DisplayObject;
+	import starling.display.Image;
+	import starling.events.Event;
 
 	public class AreaSelectPageMediator extends PageBaseMediator
 	{
 		[Inject]
 		public var areaSelectPage:AreaSelectPage;
 		
-		[Inject]
-		public var layoutModel:LayoutModel;
-		
-		[Inject]
-		public var cameraModel:CameraModel;
-		
-		private var _image:Bitmap;
 		private var _target:Target;
+		private var _image:Image;
 		private var _capturedPixels:Object;
 		private var _userMovedPhoto:Boolean;
 		
 		override public function onRegister():void
 		{
-			_target = new Target();
+			_target = areaSelectPage.vectorPage.target;
+			_image = areaSelectPage.image;
 			
 			super.onRegister();
 			
 			trace("area select page registered");
 			
-			areaSelectPage.addChildAt(_image, 0);
-			areaSelectPage.addChildAt(_target, 1);
+			//areaSelectPage.addChildAt(_image, 0);
+			//areaSelectPage.addChildAt(_target, 1);
 			
-			eventMap.mapListener(areaSelectPage.cancelButton, MouseEvent.CLICK, cancelButtonClickHandler);
-			eventMap.mapListener(areaSelectPage.acceptButton, MouseEvent.CLICK, acceptButtonClickHandler);
+			eventDispatcher.dispatchEvent(new NotificationEvent(NotificationEvent.CHANGE_TOP_NAV_BAR_TITLE, "Select the area"));
+			eventDispatcher.dispatchEvent(new NavigationEvent(NavigationEvent.ADD_NAV_BUTTON_TO_HEADER_LEFT, null, areaSelectPage.backButton));
 			
-			eventDispatcher.dispatchEvent(new NotificationEvent(NotificationEvent.CHANGE_TOP_NAV_BAR_TITLE, "Select an area to analyze."));
+			areaSelectPage.drawCapturedImage(layoutModel, cameraModel);
+			
+			eventMap.mapStarlingListener(areaSelectPage, Event.TRIGGERED, areaSelectPageTriggeredHandler);
+			areaSelectPage.backButton.addEventListener(Event.TRIGGERED, backButtonTriggeredHandler);
 		}
 		
-		private function acceptButtonClickHandler(event:MouseEvent):void
+		private function backButtonTriggeredHandler(event:Event):void
 		{
-			var r:Rectangle = _target.getBounds(_image);
+			eventDispatcher.dispatchEvent(new NavigationEvent(NavigationEvent.NAVIGATE_TO_PAGE, SequenceModel.PAGE_Welcome));
+		}
+		
+		private function areaSelectPageTriggeredHandler(event:Event):void
+		{
+			var buttonTriggered:DisplayObject = event.target as DisplayObject;
+			
+			trace("area select page triggered: " + buttonTriggered);
+			
+			if( buttonTriggered == areaSelectPage.acceptButton ) { 
+				acceptButtonClickHandler();
+			}
+			
+			if( buttonTriggered == areaSelectPage.cancelButton ) { 
+				cancelButtonClickHandler();
+			}
+		}
+		
+		private function acceptButtonClickHandler():void
+		{
+			var r:Rectangle = areaSelectPage.target.getBounds(areaSelectPage.image); 
 			var copy:BitmapData = new BitmapData(uint(r.width), uint(r.height), false, 0);
 			var color:uint;
 			var hex:String;
+			var top5:Array = [];
 			
 			trace("snap.");
 			trace("target: " + r);
 			
 			_capturedPixels = new Object();
-			copy.copyPixels(_image.bitmapData, r, new Point());
+			copy.copyPixels(areaSelectPage.imageBitmap.bitmapData, r, new Point());
 			
 			//if we copy outside the bounds of the image, how can the fill be transparent?
+			
+			var before:uint;
+			
+			before = getTimer();
 			
 			for( var currentX:uint = 0; currentX < uint(r.width); currentX++ ) { 
 				for( var currentY:uint = 0; currentY < uint(r.height); currentY++ ) { 
@@ -76,104 +105,92 @@ package com.nicotroia.whatcoloristhis.view.pages
 					
 					_capturedPixels[hex] = (( _capturedPixels[hex] ) ? _capturedPixels[hex] + 1 : 1);
 					
-					//trace(currentX, currentY, hex);
+					//trace("PIXEL: "+ currentX, ",", currentY +" .... 0x"+ hex +", count: "+ _capturedPixels[hex]);
+					
+					//rank 1-5, hex, count
+					if( top5.length == 5 ) { 
+						//we will check in reverse to deal with doubles
+						for( var rank:int = 0; rank < 5; rank++ ) { 
+							//trace("top5 #"+ rank +" is " + top5[rank]);
+							
+							if( _capturedPixels[hex] > _capturedPixels[top5[rank]] ) { 
+								//trace(hex +"("+ _capturedPixels[hex] +") > rank "+ rank +": "+ top5[rank] +"("+ _capturedPixels[top5[rank]] +")");
+								
+								var loserHex:String = top5[rank];
+								
+								//remove the loser
+								top5.splice(rank, 1);
+								
+								//add the winner at loser's old position
+								top5.splice(rank, 0, hex);
+								
+								//add the loser back at rank+1
+								top5.splice(rank + 1, 0, loserHex);
+								
+								//remove any winner duplicates, since it's most likely already on the list
+								if( rank != 0 && top5[0] == hex ) { 
+									top5.splice(0, 1);
+								}
+								else if( rank != 1 && top5[1] == hex ) { 
+									top5.splice(1, 1);
+								}
+								else if( rank != 2 && top5[2] == hex ) { 
+									top5.splice(2, 1);
+								}
+								else if( rank != 3 && top5[3] == hex ) { 
+									top5.splice(3, 1);
+								}
+								else if( rank != 4 && top5[4] == hex ) { 
+									top5.splice(4, 1);
+								}
+								else { 
+									//or, since all items are unique, just pop() to keep 5 only
+									top5.pop();
+								}
+								
+								break;
+							}	
+						}
+					}
+					else { 
+						top5[top5.length] = hex;
+					}
 				}
 			}
 			
-			var winner:String;
-			var currentScore:uint;
+			trace("--------------- counting and sorting took: " + (getTimer() - before) +"ms");
 			
-			for( var key:String in _capturedPixels ) { 
-				currentScore = _capturedPixels[key];
-				
-				if( ! winner ) winner = key;
-				
-				if( currentScore > _capturedPixels[winner] ) { 
-					winner = key;
-				}
-			}
+			trace("0: " + top5[0] + " with " + _capturedPixels[top5[0]]);
+			trace("1: " + top5[1] + " with " + _capturedPixels[top5[1]]);
+			trace("2: " + top5[2] + " with " + _capturedPixels[top5[2]]);
+			trace("3: " + top5[3] + " with " + _capturedPixels[top5[3]]);
+			trace("4: " + top5[4] + " with " + _capturedPixels[top5[4]]);
 			
-			trace("most used color: 0x" + winner + " with " + _capturedPixels[winner]);
+			cameraModel.top5 = top5;
+			//cameraModel.winnerHex = top5[0];
+			cameraModel.targetedPixels = copy;
 			
-			cameraModel.winner = winner;
-			cameraModel.targetCopy = copy;
-			
+			//if iOS only... i think.
 			//cameraModel.saveImage(bmd);
 			
-			eventDispatcher.dispatchEvent(new NavigationEvent(NavigationEvent.NAVIGATE_TO_PAGE, SequenceModel.PAGE_Result));
+			eventDispatcher.dispatchEvent(new NavigationEvent(NavigationEvent.NAVIGATE_TO_PAGE, SequenceModel.PAGE_ConfirmColor));
 		}
 		
-		private function cancelButtonClickHandler(event:MouseEvent):void
+		private function cancelButtonClickHandler():void
 		{
 			trace("cancel");
 			
 			eventDispatcher.dispatchEvent(new NavigationEvent(NavigationEvent.NAVIGATE_TO_PAGE, SequenceModel.PAGE_Welcome));
 		}
 		
-		override protected function appResizedHandler(event:LayoutEvent):void
-		{
-			var targetSize:Number;
-			var isPortrait:Boolean = (cameraModel.photoData.height / cameraModel.photoData.width) > 1.0;
-			var maxLength:int = Math.min(contextView.stage.stageWidth - 28, contextView.stage.stageHeight - layoutModel.navBarHeight - 28);
-			var scale:Number;
-			
-			trace("area select page resized");
-			
-			//screw orientation
-			scale = maxLength / cameraModel.photoData.width;
-			targetSize = (contextView.stage.stageHeight - layoutModel.navBarHeight) * 0.42;
-			
-			areaSelectPage.actionBar.gotoAndStop(1);
-			areaSelectPage.actionBar.height = 65;
-			areaSelectPage.actionBar.width = contextView.stage.stageWidth + 2;
-			areaSelectPage.actionBar.x = 0;
-			areaSelectPage.actionBar.y = contextView.stage.stageHeight - areaSelectPage.actionBar.height + 1;
-			
-			areaSelectPage.cancelButton.height = areaSelectPage.actionBar.height * 0.70;
-			areaSelectPage.cancelButton.scaleX = areaSelectPage.cancelButton.scaleY;
-			areaSelectPage.cancelButton.x = (contextView.stage.stageWidth * 0.20) - (areaSelectPage.cancelButton.width * 0.5);
-			areaSelectPage.cancelButton.y = areaSelectPage.actionBar.y + ((areaSelectPage.actionBar.height - areaSelectPage.cancelButton.height) * 0.5);
-			
-			areaSelectPage.acceptButton.height = areaSelectPage.actionBar.height * 0.70;
-			areaSelectPage.acceptButton.scaleX = areaSelectPage.acceptButton.scaleY;
-			areaSelectPage.acceptButton.x = (contextView.stage.stageWidth * 0.80) - (areaSelectPage.acceptButton.width * 0.5);
-			areaSelectPage.acceptButton.y = areaSelectPage.actionBar.y + ((areaSelectPage.actionBar.height - areaSelectPage.acceptButton.height) * 0.5);
-			
-			if( ! _userMovedPhoto ) { 
-				var matrix:Matrix = new Matrix();
-				matrix.scale(scale, scale);
-				
-				var smallBMD:BitmapData = new BitmapData(cameraModel.photoData.width * scale, cameraModel.photoData.height * scale, true);
-				smallBMD.draw(cameraModel.photoData, matrix, null, null, null, true);
-				
-				if( _image && areaSelectPage.contains(_image) ) areaSelectPage.removeChild(_image);
-				
-				_image = new Bitmap(smallBMD, PixelSnapping.NEVER, true);
-				
-				_image.x = (contextView.stage.stageWidth * 0.5) - (_image.width * 0.5);
-				_image.y = layoutModel.navBarHeight + (((contextView.stage.stageHeight - layoutModel.navBarHeight - areaSelectPage.actionBar.height) * 0.5) - (_image.height * 0.5));
-				
-				areaSelectPage.addChildAt(_image, 0);
-			}
-			
-			_target.width = targetSize;
-			_target.scaleY = _target.scaleX;
-			_target.x = (contextView.stage.stageWidth * 0.5) - (_target.width * 0.5);
-			_target.y = layoutModel.navBarHeight + (((contextView.stage.stageHeight - layoutModel.navBarHeight - areaSelectPage.actionBar.height) * 0.5) - (_target.height * 0.5));	
-		}
-		
 		override public function onRemove():void
 		{
-			super.onRemove();
+			eventMap.unmapStarlingListener(areaSelectPage, Event.TRIGGERED, areaSelectPageTriggeredHandler);
+			areaSelectPage.backButton.removeEventListener(Event.TRIGGERED, backButtonTriggeredHandler);
 			
 			trace("areaSelectPage removed");
 			
-			if( areaSelectPage.contains(_image) ) areaSelectPage.removeChild(_image);
-			if( areaSelectPage.contains(_target) ) areaSelectPage.removeChild(_target);
-			
-			_image = null;
-			_target = null;
-			_capturedPixels = null;
+			super.onRemove();
 		}
 	}
 }

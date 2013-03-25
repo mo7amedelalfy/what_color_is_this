@@ -1,16 +1,18 @@
 package com.nicotroia.whatcoloristhis.controller.commands
 {
+	import com.nicotroia.whatcoloristhis.controller.events.LayoutEvent;
 	import com.nicotroia.whatcoloristhis.model.LayoutModel;
 	
-	import flash.events.Event;
 	import flash.events.StageOrientationEvent;
 	
-	import org.robotlegs.mvcs.Command;
+	import org.robotlegs.mvcs.StarlingCommand;
+	
+	import starling.core.Starling;
 
-	public class LayoutPageCommand extends Command
+	public class LayoutPageCommand extends StarlingCommand
 	{
 		[Inject]
-		public var event:Event;
+		public var event:LayoutEvent;
 		
 		[Inject]
 		public var layoutModel:LayoutModel;
@@ -19,18 +21,17 @@ package com.nicotroia.whatcoloristhis.controller.commands
 		{
 			trace("LayoutPageCommand via " + event.type);
 			
-			if( event.type == Event.RESIZE ) { 
-				layoutModel.layoutApp(contextView.stage.orientation, contextView.stage.fullScreenWidth, contextView.stage.fullScreenHeight);
-				//layoutModel.appWidth = contextView.stage.fullScreenWidth; //contextView.stage.stageWidth;
-				//layoutModel.appHeight = contextView.stage.fullScreenHeight; //stageHeight;
+			//trace(contextView.stage.stageWidth, Starling.current.nativeStage.stageWidth, Starling.current.nativeStage.fullScreenWidth);
+			
+			if( event.type == LayoutEvent.RESIZE ) { 
+				
 			}
-			else if( event.type == StageOrientationEvent.ORIENTATION_CHANGE ) { 
-				layoutModel.layoutApp(contextView.stage.orientation, contextView.stage.fullScreenWidth, contextView.stage.fullScreenHeight);
-				//layoutModel.orientation = contextView.stage.orientation;
-				//layoutModel.appWidth = contextView.stage.fullScreenWidth; //contextView.stage.stageWidth;
-				//layoutModel.appHeight = contextView.stage.fullScreenHeight; //stageHeight;
+			else if( event.type == LayoutEvent.ORIENTATION_CHANGE ) { 
+				
 			}
 			
+			layoutModel.layoutApp(Starling.current.nativeStage.orientation, contextView.stage.stageWidth, contextView.stage.stageHeight);
+			//layoutModel.layoutApp(Starling.current.nativeStage.orientation, Starling.current.nativeStage.stageWidth, Starling.current.nativeStage.stageHeight);
 		}
 	}
 }

@@ -1,5 +1,6 @@
 package com.nicotroia.whatcoloristhis.model
 {
+	import com.nicotroia.whatcoloristhis.Assets;
 	import com.nicotroia.whatcoloristhis.controller.events.CameraEvent;
 	import com.nicotroia.whatcoloristhis.controller.events.NavigationEvent;
 	
@@ -22,14 +23,18 @@ package com.nicotroia.whatcoloristhis.model
 	import flash.media.MediaType;
 	import flash.utils.ByteArray;
 	import flash.utils.IDataInput;
+	import flash.utils.getTimer;
 	
 	import org.robotlegs.mvcs.Actor;
 
 	public class CameraModel extends Actor
 	{
-		public var winner:String;
 		public var photoData:BitmapData;
-		public var targetCopy:BitmapData;
+		public var targetedPixels:BitmapData;
+		public var top5:Array;
+		public var chosenWinnerHex:String;
+		public var closestMatchHex:String;
+		public var resultName:String;
 		
 		protected var _cameraUI:CameraUI;
 		protected var _cameraRoll:CameraRoll;
@@ -50,6 +55,23 @@ package com.nicotroia.whatcoloristhis.model
 		public function initCamera():void
 		{	
 			trace("init camera.");
+			
+			/*
+			//force random
+			var before:uint = getTimer();
+			photoData = generateRandomBitmapData();
+			var after:uint = getTimer();
+			trace("------------ random bitmap "+ photoData.width +"x"+ photoData.height +" took: " + (after-before) +"ms");
+			*/
+			/*
+			//force goat
+			var bitmap:Bitmap = new Assets.ScreamingGoat() as Bitmap;
+			photoData = bitmap.bitmapData;
+			*/
+			/*
+			eventDispatcher.dispatchEvent(new CameraEvent(CameraEvent.CAMERA_IMAGE_TAKEN));
+			return;
+			*/
 			
 			if( CameraUI.isSupported ) { 
 				_cameraUI = new CameraUI();
@@ -252,10 +274,10 @@ package com.nicotroia.whatcoloristhis.model
 		
 		public function generateRandomBitmapData():BitmapData
 		{
-			var bmd:BitmapData = new BitmapData(640, 480);
+			var bmd:BitmapData = new BitmapData(480, 320); //640, 480);
 			var seed:Number = Math.floor(Math.random()*100);
 			
-			bmd.perlinNoise(320, 240, 8, seed, true, true, 7, false, null);
+			bmd.perlinNoise(100, 100, 8, seed, true, true, 7, false, null);
 			
 			return bmd;
 		}

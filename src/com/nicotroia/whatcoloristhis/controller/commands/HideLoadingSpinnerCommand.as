@@ -1,13 +1,14 @@
 package com.nicotroia.whatcoloristhis.controller.commands
 {
-	import com.nicotroia.whatcoloristhis.view.overlay.ShadowBoxView;
+	import com.nicotroia.whatcoloristhis.view.overlays.ShadowBoxView;
 	
-	import flash.display.Sprite;
 	import flash.events.Event;
 	
-	import org.robotlegs.mvcs.Command;
+	import org.robotlegs.mvcs.StarlingCommand;
 	
-	public class HideLoadingSpinnerCommand extends Command
+	import starling.display.Sprite;
+	
+	public class HideLoadingSpinnerCommand extends StarlingCommand
 	{
 		[Inject]
 		public var event:Event;
@@ -27,8 +28,8 @@ package com.nicotroia.whatcoloristhis.controller.commands
 			
 			loadingSpinner.notificationTF.text = '';
 			
-			if( overlayContainer.contains(shadowBox) ) overlayContainer.removeChild(shadowBox);
-			if( overlayContainer.contains(loadingSpinner) ) overlayContainer.removeChild(loadingSpinner);
+			//if( overlayContainer.contains(shadowBox) ) overlayContainer.removeChild(shadowBox);
+			//if( overlayContainer.contains(loadingSpinner) ) overlayContainer.removeChild(loadingSpinner);
 		}
 	}
 }

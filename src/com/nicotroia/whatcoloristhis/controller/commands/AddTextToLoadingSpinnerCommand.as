@@ -2,9 +2,9 @@ package com.nicotroia.whatcoloristhis.controller.commands
 {
 	import com.nicotroia.whatcoloristhis.controller.events.NotificationEvent;
 	
-	import org.robotlegs.mvcs.Command;
+	import org.robotlegs.mvcs.StarlingCommand;
 	
-	public class AddTextToLoadingSpinnerCommand extends Command
+	public class AddTextToLoadingSpinnerCommand extends StarlingCommand
 	{
 		[Inject]
 		public var notificationEvent:NotificationEvent;

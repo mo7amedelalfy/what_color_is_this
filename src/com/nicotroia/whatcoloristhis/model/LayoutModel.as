@@ -2,21 +2,52 @@ package com.nicotroia.whatcoloristhis.model
 {
 	import com.nicotroia.whatcoloristhis.controller.events.LayoutEvent;
 	
+	import feathers.system.DeviceCapabilities;
+	
 	import flash.display.StageOrientation;
 	
 	import org.robotlegs.mvcs.Actor;
+	
+	import starling.core.Starling;
 
 	public class LayoutModel extends Actor
 	{
+		private static const ORIGINAL_DPI_IPHONE_RETINA:int = 326;
+		private static const ORIGINAL_DPI_IPAD_RETINA:int = 264;
+		
 		public var navBarHeight:Number = 1;
+		public var scale:Number = 1;
+		public var infoDispBold:InfoDispBold;
 		
 		private var _orientation:String;
 		private var _appWidth:Number;
 		private var _appHeight:Number;
+		private var _originalDPI:int;
+		private var _scaleToDPI:Boolean;
 		
 		public function LayoutModel()
 		{
+			infoDispBold = new InfoDispBold();
+			_scaleToDPI = true;
+			const scaledDPI:int = DeviceCapabilities.dpi / Starling.contentScaleFactor;
+			this._originalDPI = scaledDPI;
+			if(this._scaleToDPI)
+			{
+				if(DeviceCapabilities.isTablet(Starling.current.nativeStage))
+				{
+					this._originalDPI = ORIGINAL_DPI_IPAD_RETINA;
+				}
+				else
+				{
+					this._originalDPI = ORIGINAL_DPI_IPHONE_RETINA;
+				}
+			}
+			
+			this.scale = scaledDPI / this._originalDPI;
+			
 			_orientation = StageOrientation.UNKNOWN;
+			_appWidth = Starling.current.nativeStage.fullScreenWidth;
+			_appHeight = Starling.current.nativeStage.fullScreenHeight;
 		}
 		
 		public function layoutApp($orientation:String, $appWidth:Number, $appHeight:Number):void

@@ -11,7 +11,7 @@ package com.nicotroia.whatcoloristhis.view.buttons
 		{
 			super.onRegister();
 			
-			eventMap.mapListener(takePhotoButton, MouseEvent.CLICK, takePhotoButtonClickHandler);
+			//eventMap.mapListener(takePhotoButton, MouseEvent.CLICK, takePhotoButtonClickHandler);
 		}
 		
 		private function takePhotoButtonClickHandler(event:MouseEvent):void

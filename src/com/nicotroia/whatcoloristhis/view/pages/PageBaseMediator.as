@@ -1,14 +1,18 @@
 package com.nicotroia.whatcoloristhis.view.pages
 {
 	import com.nicotroia.whatcoloristhis.controller.events.LayoutEvent;
+	import com.nicotroia.whatcoloristhis.controller.events.NavigationEvent;
+	import com.nicotroia.whatcoloristhis.model.CameraModel;
+	import com.nicotroia.whatcoloristhis.model.LayoutModel;
+	import com.nicotroia.whatcoloristhis.model.SequenceModel;
 	
-	import flash.display.DisplayObject;
-	import flash.display.Sprite;
-	import flash.events.Event;
+	import org.robotlegs.mvcs.StarlingMediator;
 	
-	import org.robotlegs.mvcs.Mediator;
+	import starling.display.DisplayObject;
+	import starling.display.Sprite;
+	import starling.events.Event;
 
-	public class PageBaseMediator extends Mediator
+	public class PageBaseMediator extends StarlingMediator
 	{
 		[Inject]
 		public var view:PageBase;
@@ -16,16 +20,43 @@ package com.nicotroia.whatcoloristhis.view.pages
 		[Inject(name="overlayContainer")]
 		public var overlayContainer:Sprite;
 		
+		[Inject]
+		public var layoutModel:LayoutModel;
+		
+		[Inject]
+		public var cameraModel:CameraModel;
+		
+		[Inject]
+		public var sequenceModel:SequenceModel;
+		
 		override public function onRegister():void
 		{
-			appResizedHandler(null);
+			trace("pagebase onRegister");
 			
-			eventDispatcher.addEventListener(LayoutEvent.UPDATE_LAYOUT, appResizedHandler, false, 0, true);
+			//This shit's expensive... Resize only the first time it's added
+			if( ! view.reflowed ) { 
+				callAppResizedHandler();
+			}
+			
+			view.addEventListener(Event.RESIZE, callAppResizedHandler);
+			eventMap.mapListener(eventDispatcher, LayoutEvent.UPDATE_LAYOUT, reflowPage);
 		}
 		
-		protected function appResizedHandler(event:LayoutEvent):void
+		protected function callAppResizedHandler():void
 		{
-			//override 
+			reflowPage();
+		}
+		
+		protected function reflowPage(event:LayoutEvent = null):void
+		{
+			if( ! view.parent ) return;
+			
+			view.reflowed = false;
+			
+			view.reflowVectors(layoutModel, cameraModel);
+			view.drawVectors(layoutModel, cameraModel);
+			
+			view.reflowed = true;
 		}
 		
 		protected function addToOverlay(obj:DisplayObject):void
@@ -40,7 +71,15 @@ package com.nicotroia.whatcoloristhis.view.pages
 		
 		override public function onRemove():void
 		{
-			eventDispatcher.removeEventListener(LayoutEvent.UPDATE_LAYOUT, appResizedHandler);
+			view.removeEventListener(Event.RESIZE, callAppResizedHandler);
+			eventMap.unmapListener(eventDispatcher, LayoutEvent.UPDATE_LAYOUT, reflowPage);
+			
+			trace("pagebase onRemove");
+			
+			super.onRemove();
+			
+			//we have to make sure somehow that overlays don't accidentally trigger pages "successful removal"
+			sequenceModel.lastPageRemovedSuccessfully = true;
 		}
 	}
 }

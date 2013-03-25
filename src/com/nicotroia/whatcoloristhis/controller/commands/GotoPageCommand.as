@@ -4,15 +4,16 @@ package com.nicotroia.whatcoloristhis.controller.commands
 	import com.nicotroia.whatcoloristhis.model.SequenceModel;
 	import com.nicotroia.whatcoloristhis.view.pages.PageBase;
 	
-	import flash.display.DisplayObject;
-	import flash.display.Sprite;
 	import flash.events.Event;
 	import flash.system.System;
 	import flash.utils.getQualifiedClassName;
 	
-	import org.robotlegs.mvcs.Command;
+	import org.robotlegs.mvcs.StarlingCommand;
+	
+	import starling.display.DisplayObject;
+	import starling.display.Sprite;
 
-	public class GotoPageCommand extends Command
+	public class GotoPageCommand extends StarlingCommand
 	{
 		[Inject]
 		public var event:Event;
@@ -33,7 +34,9 @@ package com.nicotroia.whatcoloristhis.controller.commands
 		
 		override public function execute():void
 		{
-			if( event.type != NavigationEvent.NAVIGATE_TO_PAGE || sequenceModel.isTransitioning ) return;
+			if( event.type != NavigationEvent.NAVIGATE_TO_PAGE || 
+				sequenceModel.isTransitioning || 
+				sequenceModel.lastPageRemovedSuccessfully == false ) return;
 			else trace("GotoPageCommand " + NavigationEvent(event).pageConstant) + " via " + event.type;
 			
 			sequenceModel.isTransitioning = true;
@@ -43,9 +46,14 @@ package com.nicotroia.whatcoloristhis.controller.commands
 			_newPage = sequenceModel.getPage( _pageConstant );
 			_assetRemoval = new Vector.<PageBase>();
 			
+			//Remove all navigational buttons from header
+			eventDispatcher.dispatchEvent(new NavigationEvent(NavigationEvent.REMOVE_HEADER_NAV_BUTTONS));
+			
 			//Remove old page
 			if( _lastPage != null && pageContainer.contains(_lastPage) ) { 
 				_lastPage.hide(0.33, 0, function():void { 
+					trace(" ---- removing " + _lastPage);
+					sequenceModel.lastPageRemovedSuccessfully = false;
 					pageContainer.removeChild(_lastPage);
 					
 					if( System.pauseForGCIfCollectionImminent != null ) { 
@@ -96,6 +104,7 @@ package com.nicotroia.whatcoloristhis.controller.commands
 				{ 
 					//add overlay that should belong
 					if( ! overlayContainer.contains(requiredOverlay) ) { 
+						//trace("adding overlay: " + requiredOverlay);
 						overlayContainer.addChild(requiredOverlay);
 						requiredOverlay.show(0.25, delay);
 						delay += 0.15;

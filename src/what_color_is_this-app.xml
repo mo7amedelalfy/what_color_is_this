@@ -1,8 +1,8 @@
-<?xml version="1.0" encoding="utf-8" ?> 
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
 <application xmlns="http://ns.adobe.com/air/application/3.6">
 
 	<id>com.nicotroia.whatcoloristhis</id>
-	<versionNumber>0.1</versionNumber>
+	<versionNumber>0.1.0</versionNumber>
 	<supportedProfiles>mobileDevice desktop</supportedProfiles>
 	<filename>What Color Is This</filename>
 	
@@ -12,7 +12,8 @@
 
 	<initialWindow>
 		<content>what_color_is_this.swf</content>
-		<autoOrients>true</autoOrients>
+		<aspectRatio>portrait</aspectRatio>
+		<autoOrients>false</autoOrients>
         <renderMode>direct</renderMode>
         <fullScreen>false</fullScreen>
         <visible>true</visible>
