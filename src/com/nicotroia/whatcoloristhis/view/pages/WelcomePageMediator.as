@@ -1,22 +1,8 @@
 package com.nicotroia.whatcoloristhis.view.pages
 {
-	import com.nicotroia.whatcoloristhis.controller.events.LayoutEvent;
 	import com.nicotroia.whatcoloristhis.controller.events.NavigationEvent;
 	import com.nicotroia.whatcoloristhis.controller.events.NotificationEvent;
-	import com.nicotroia.whatcoloristhis.controller.utils.ColorHelper;
-	import com.nicotroia.whatcoloristhis.model.CameraModel;
-	import com.nicotroia.whatcoloristhis.model.LayoutModel;
 	import com.nicotroia.whatcoloristhis.model.SequenceModel;
-	
-	import flash.display.BitmapData;
-	import flash.display.StageOrientation;
-	import flash.events.StatusEvent;
-	import flash.geom.Rectangle;
-	import flash.media.Camera;
-	import flash.media.Video;
-	import flash.system.Security;
-	import flash.system.SecurityPanel;
-	import flash.text.TextField;
 	
 	import starling.display.Button;
 	import starling.events.Event;
@@ -25,11 +11,6 @@ package com.nicotroia.whatcoloristhis.view.pages
 	{
 		[Inject]
 		public var welcomePage:WelcomePage;
-		
-		//private var _camera:Camera;
-		//private var _cameraView:Video;
-		//private var _cameraRect:Rectangle;
-		//private var _capturedPixels:Object;
 		
 		override public function onRegister():void
 		{
@@ -42,11 +23,17 @@ package com.nicotroia.whatcoloristhis.view.pages
 			
 			eventMap.mapStarlingListener(welcomePage, Event.TRIGGERED, welcomePageTriggeredHandler);
 			welcomePage.settingsButton.addEventListener(Event.TRIGGERED, settingsButtonTriggeredHandler);
+			welcomePage.choosePhotoButton.addEventListener(Event.TRIGGERED, choosePhotoButtonTriggeredHandler);
 		}
 		
 		private function settingsButtonTriggeredHandler(event:Event):void
 		{
 			eventDispatcher.dispatchEvent(new NavigationEvent(NavigationEvent.NAVIGATE_TO_PAGE, SequenceModel.PAGE_Settings));
+		}
+		
+		private function choosePhotoButtonTriggeredHandler(event:Event):void
+		{
+			cameraModel.initCameraRoll();
 		}
 		
 		private function welcomePageTriggeredHandler(event:Event):void
@@ -66,8 +53,10 @@ package com.nicotroia.whatcoloristhis.view.pages
 		
 		override public function onRemove():void
 		{
+			
 			eventMap.unmapStarlingListener(welcomePage, Event.TRIGGERED, welcomePageTriggeredHandler);
 			welcomePage.settingsButton.removeEventListener(Event.TRIGGERED, settingsButtonTriggeredHandler);
+			welcomePage.choosePhotoButton.removeEventListener(Event.TRIGGERED, choosePhotoButtonTriggeredHandler);
 			
 			trace("welcome page removing.");
 			

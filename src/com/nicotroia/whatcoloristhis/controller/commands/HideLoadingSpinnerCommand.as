@@ -1,8 +1,11 @@
 package com.nicotroia.whatcoloristhis.controller.commands
 {
+	import com.nicotroia.whatcoloristhis.model.LayoutModel;
 	import com.nicotroia.whatcoloristhis.view.overlays.ShadowBoxView;
+	import com.nicotroia.whatcoloristhis.view.overlays.TransparentSpinner;
 	
 	import flash.events.Event;
+	import flash.utils.setTimeout;
 	
 	import org.robotlegs.mvcs.StarlingCommand;
 	
@@ -22,14 +25,21 @@ package com.nicotroia.whatcoloristhis.controller.commands
 		[Inject]
 		public var loadingSpinner:TransparentSpinner;
 		
+		[Inject]
+		public var layoutModel:LayoutModel;
+		
 		override public function execute():void
 		{
 			trace("HideLoadingSpinnerCommand via " + event.type);
 			
-			loadingSpinner.notificationTF.text = '';
+			//setTimeout( function():void { 
+				
+			loadingSpinner.changeText("", layoutModel);
 			
-			//if( overlayContainer.contains(shadowBox) ) overlayContainer.removeChild(shadowBox);
-			//if( overlayContainer.contains(loadingSpinner) ) overlayContainer.removeChild(loadingSpinner);
+			if( overlayContainer.contains(shadowBox) ) overlayContainer.removeChild(shadowBox);
+			if( overlayContainer.contains(loadingSpinner) ) overlayContainer.removeChild(loadingSpinner);
+			
+			//}, 2000);
 		}
 	}
 }

@@ -66,6 +66,21 @@ package com.nicotroia.whatcoloristhis.view.pages
 			
 			addChild( image );
 			addChild( target );
+			addChild( _actionBar );
+			addChild( acceptButton );
+			addChild( cancelButton );
+		}
+		
+		public function drawScaledImage():BitmapData
+		{
+			//trace(imageBitmap.width, imageBitmap.height, imageBitmap.transform.matrix.a, imageBitmap.transform.matrix.d);
+			
+			var bitmapData:BitmapData = new BitmapData(image.width, image.height, true, 0);
+			bitmapData.drawWithQuality(imageBitmap, image.transformationMatrix); //imageBitmap.transform.matrix); 
+			
+			//trace(bitmapData.width, bitmapData.height, image.transformationMatrix.a, image.transformationMatrix.d);
+			
+			return bitmapData;
 		}
 		
 		override public function reflowVectors(layoutModel:LayoutModel=null, cameraModel:CameraModel=null):void
@@ -93,7 +108,6 @@ package com.nicotroia.whatcoloristhis.view.pages
 			vectorPage.acceptButton.x = (layoutModel.appWidth * 0.80) - (vectorPage.acceptButton.width * 0.5);
 			vectorPage.acceptButton.y = vectorPage.actionBar.y + ((vectorPage.actionBar.height - vectorPage.acceptButton.height) * 0.5);
 			
-			//29000ms * 0.42
 			vectorPage.target.width = (layoutModel.appHeight - layoutModel.navBarHeight) * 0.21;
 			vectorPage.target.scaleY = vectorPage.target.scaleX;
 			vectorPage.target.x = (layoutModel.appWidth * 0.5) - (vectorPage.target.width * 0.5);
@@ -105,12 +119,13 @@ package com.nicotroia.whatcoloristhis.view.pages
 			trace("area select page drawing vectors");
 			
 			//Remove first
+			removeDrawnVector( _background );
 			removeDrawnVector( target );
 			removeDrawnVector( _actionBar );
-			removeDrawnVector( backButton );
 			removeDrawnVector( acceptButton );
 			removeDrawnVector( cancelButton );
 			
+			_background = drawBackgroundQuad();
 			backButton = new feathers.controls.Button();
 			target = createImageFromDisplayObject( vectorPage.target );
 			_actionBar = createImageFromDisplayObject(vectorPage.actionBar);
@@ -118,6 +133,7 @@ package com.nicotroia.whatcoloristhis.view.pages
 			cancelButton = createButtonFromMovieClip(vectorPage.cancelButton);
 			
 			//Now add
+			addChildAt( _background, 0 );
 			addChild( target );
 			addChild( _actionBar );
 			addChild( acceptButton );
@@ -125,6 +141,7 @@ package com.nicotroia.whatcoloristhis.view.pages
 			
 			//Settings
 			backButton.label = "Cancel";
+			target.touchable = false;
 		}
 	}
 }

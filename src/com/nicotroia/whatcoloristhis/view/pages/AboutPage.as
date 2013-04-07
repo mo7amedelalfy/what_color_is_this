@@ -49,12 +49,14 @@ package com.nicotroia.whatcoloristhis.view.pages
 			
 			//Remove first
 			//removeDrawnVector( backButton );
+			removeDrawnVector( _background );
 			
 			//Create
-			//_header = new Header();
+			_background = drawBackgroundQuad();
 			backButton = new Button();
 			
 			//Add
+			addChildAt(_background, 0);
 			//addChild( _header );
 			//addChild( backButton );
 			

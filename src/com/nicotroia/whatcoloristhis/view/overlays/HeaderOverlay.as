@@ -11,6 +11,7 @@ package com.nicotroia.whatcoloristhis.view.overlays
 	
 	import flash.text.TextFormat;
 	
+	import starling.core.Starling;
 	import starling.display.DisplayObject;
 	import starling.events.Event;
 
@@ -83,6 +84,7 @@ package com.nicotroia.whatcoloristhis.view.overlays
 			header.title = "";
 			header.titleProperties.textFormat = _textFormat;
 			header.width = layoutModel.appWidth;
+			header.height = layoutModel.navBarHeight;
 		}
 		
 		override protected function removedFromStageHandler(event:Event):void

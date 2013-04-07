@@ -23,6 +23,8 @@ class Main {
 		//var foutTxt = "assets/pantone_chart_clean.txt";
 		var finTxt = "assets/crayola.txt";
 		var foutTxt = "assets/crayola_clean.txt";
+		//var finTxt = "assets/njit.txt";
+		//var foutTxt = "assets/njit_clean.txt";
 		
 		var fin = File.read(finTxt, true);
 		var fout = File.write(foutTxt, false);

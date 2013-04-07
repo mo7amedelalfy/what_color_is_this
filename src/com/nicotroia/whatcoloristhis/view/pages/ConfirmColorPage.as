@@ -40,14 +40,17 @@ package com.nicotroia.whatcoloristhis.view.pages
 			trace("confirm color page drawing vectors");
 			
 			//Remove first
+			removeDrawnVector( _background );
 			removeDrawnVector( colorList );
 			
 			
 			//Create
+			_background = drawBackgroundQuad();
 			colorList = new List();
 			
 			
 			//Now add
+			addChildAt(_background, 0);
 			addChild(colorList);
 			
 			
@@ -55,17 +58,14 @@ package com.nicotroia.whatcoloristhis.view.pages
 			backButton.label = "Back";
 			
 			colorList.x = 0;
-			colorList.y = (88 * layoutModel.scale);
+			colorList.y = layoutModel.navBarHeight/Starling.contentScaleFactor;
 			colorList.width = layoutModel.appWidth;
-			colorList.height = layoutModel.appHeight - (88 * layoutModel.scale);
+			colorList.height = layoutModel.appHeight - colorList.y;
 			
-			var options:ListCollection = new ListCollection([
-				{text:"0x"+ cameraModel.top5[0], hex:cameraModel.top5[0] }, 
-				{text:"0x"+ cameraModel.top5[1], hex:cameraModel.top5[1] }, 
-				{text:"0x"+ cameraModel.top5[2], hex:cameraModel.top5[2] }, 
-				{text:"0x"+ cameraModel.top5[3], hex:cameraModel.top5[3] }, 
-				{text:"0x"+ cameraModel.top5[4], hex:cameraModel.top5[4] }, 
-			]);
+			var options:ListCollection = new ListCollection();
+			for( var i:uint = 0; i < cameraModel.top5.length; i++ ) { 
+				options.push({text:"0x"+ cameraModel.top5[i], hex:cameraModel.top5[i]});
+			}
 			
 			colorList.dataProvider = options;
 			

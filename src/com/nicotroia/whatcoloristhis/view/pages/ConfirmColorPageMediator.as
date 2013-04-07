@@ -15,19 +15,19 @@ package com.nicotroia.whatcoloristhis.view.pages
 		{
 			super.onRegister();
 			
-			confirmColorPage.reset();
 			confirmColorPage.drawVectors(layoutModel, cameraModel);
 			
 			eventDispatcher.dispatchEvent(new NotificationEvent(NotificationEvent.CHANGE_TOP_NAV_BAR_TITLE, "Confirm Color"));
 			eventDispatcher.dispatchEvent(new NavigationEvent(NavigationEvent.ADD_NAV_BUTTON_TO_HEADER_LEFT, null, confirmColorPage.backButton));
 			
 			confirmColorPage.colorList.addEventListener(Event.CHANGE, colorListSelectedHandler);
+			//confirmColorPage.colorList.addEventListener(Event.TRIGGERED, colorListSelectedHandler);
 			confirmColorPage.backButton.addEventListener(Event.TRIGGERED, backButtonTriggeredHandler);
 		}
 		
 		private function colorListSelectedHandler(event:Event):void
 		{
-			trace("selected: " + confirmColorPage.colorList.selectedItem.hex );
+			trace("selected: 0x" + confirmColorPage.colorList.selectedItem.hex );
 			
 			cameraModel.chosenWinnerHex = confirmColorPage.colorList.selectedItem.hex;
 			
@@ -37,12 +37,14 @@ package com.nicotroia.whatcoloristhis.view.pages
 		private function backButtonTriggeredHandler(event:Event):void
 		{
 			//i really hope the area select page info is saved
-			eventDispatcher.dispatchEvent(new NavigationEvent(NavigationEvent.NAVIGATE_TO_PAGE, SequenceModel.PAGE_AreaSelect));
+			eventDispatcher.dispatchEvent(new NavigationEvent(NavigationEvent.NAVIGATE_TO_PAGE, SequenceModel.PAGE_AreaSelect, null, NavigationEvent.NAVIGATE_LEFT));
 		}
 		
 		override public function onRemove():void
 		{
 			confirmColorPage.backButton.removeEventListener(Event.TRIGGERED, backButtonTriggeredHandler);
+			
+			confirmColorPage.reset();
 			
 			super.onRemove();
 		}

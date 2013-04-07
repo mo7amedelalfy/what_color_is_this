@@ -30,7 +30,7 @@ package com.nicotroia.whatcoloristhis.view.pages
 		
 		private function backButtonTriggeredHandler(event:Event):void
 		{
-			eventDispatcher.dispatchEvent(new NavigationEvent(NavigationEvent.NAVIGATE_TO_PAGE, SequenceModel.PAGE_Welcome));
+			eventDispatcher.dispatchEvent(new NavigationEvent(NavigationEvent.NAVIGATE_TO_PAGE, SequenceModel.PAGE_Welcome, null, NavigationEvent.NAVIGATE_LEFT));
 		}
 		
 		private function aboutPageTriggeredHandler(event:Event):void

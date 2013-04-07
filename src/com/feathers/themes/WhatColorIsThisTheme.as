@@ -24,6 +24,8 @@
  */
 package com.feathers.themes
 {
+	import com.nicotroia.whatcoloristhis.view.feathers.ResultListItemRenderer;
+	
 	import feathers.controls.Button;
 	import feathers.controls.ButtonGroup;
 	import feathers.controls.Callout;
@@ -83,16 +85,16 @@ package com.feathers.themes
 
 	public class WhatColorIsThisTheme extends DisplayListWatcher
 	{
-		[Embed(source="/Users/nicotroia/PROJECTS/starling_robotlegs/src/assets/images/metalworks.png")]
+		[Embed(source="/Users/nicotroia/PROJECTS/what_color_is_this/src/assets/themes/whatcoloristhis.png")]
 		protected static const ATLAS_IMAGE:Class;
 
-		[Embed(source="/Users/nicotroia/PROJECTS/starling_robotlegs/src/assets/images/metalworks.xml",mimeType="application/octet-stream")]
+		[Embed(source="/Users/nicotroia/PROJECTS/what_color_is_this/src/assets/themes/whatcoloristhis.xml", mimeType="application/octet-stream")]
 		protected static const ATLAS_XML:Class;
 
 		protected static const LIGHT_TEXT_COLOR:uint = 0xe5e5e5;
 		protected static const DARK_TEXT_COLOR:uint = 0x1a1a1a;
 		protected static const SELECTED_TEXT_COLOR:uint = 0xff9900;
-		protected static const DISABLED_TEXT_COLOR:uint = 0x333333;
+		protected static const DISABLED_TEXT_COLOR:uint = 0xcccccc; //0x333333;
 
 		protected static const ORIGINAL_DPI_IPHONE_RETINA:int = 326;
 		protected static const ORIGINAL_DPI_IPAD_RETINA:int = 264;
@@ -148,7 +150,7 @@ package com.feathers.themes
 			return this._scaleToDPI;
 		}
 
-		protected var scale:Number = 1;
+		public var scale:Number = 1;
 
 		protected var primaryBackground:TiledImage;
 
@@ -171,6 +173,9 @@ package com.feathers.themes
 		protected var smallDarkTextFormat:TextFormat;
 		protected var smallLightTextFormat:TextFormat;
 		protected var smallDisabledTextFormat:TextFormat;
+		
+		protected var resultNameTextFormat:TextFormat;
+		protected var resultDescriptionTextFormat:TextFormat;
 
 		protected var atlas:TextureAtlas;
 		protected var atlasBitmapData:BitmapData;
@@ -217,6 +222,8 @@ package com.feathers.themes
 		protected var calloutLeftArrowSkinTexture:Texture;
 		protected var verticalScrollBarThumbSkinTextures:Scale3Textures;
 		protected var horizontalScrollBarThumbSkinTextures:Scale3Textures;
+		
+		protected var _infoDispBold:InfoDispBold;
 
 		override public function dispose():void
 		{
@@ -246,9 +253,9 @@ package com.feathers.themes
 
 		protected function initializeRoot():void
 		{
-			this.primaryBackground = new TiledImage(this.primaryBackgroundTexture);
-			this.primaryBackground.width = root.stage.stageWidth;
-			this.primaryBackground.height = root.stage.stageHeight;
+			//this.primaryBackground = new TiledImage(this.primaryBackgroundTexture);
+			//this.primaryBackground.width = root.stage.stageWidth;
+			//this.primaryBackground.height = root.stage.stageHeight;
 			//this.root.addChildAt(this.primaryBackground, 0);
 			this.root.stage.addEventListener(ResizeEvent.RESIZE, stage_resizeHandler);
 			this.root.addEventListener(Event.REMOVED_FROM_STAGE, root_removedFromStageHandler);
@@ -286,6 +293,8 @@ package com.feathers.themes
 			FeathersControl.defaultTextEditorFactory = textEditorFactory;
 
 			const fontNames:String = "Helvetica Neue,Helvetica,Roboto,Arial,_sans";
+			
+			_infoDispBold = new InfoDispBold();
 
 			this.headerTextFormat = new TextFormat(fontNames, Math.round(36 * this.scale), LIGHT_TEXT_COLOR, true);
 
@@ -306,6 +315,9 @@ package com.feathers.themes
 			this.largeDarkTextFormat = new TextFormat(fontNames, 30 * this.scale, DARK_TEXT_COLOR);
 			this.largeLightTextFormat = new TextFormat(fontNames, 30 * this.scale, LIGHT_TEXT_COLOR);
 			this.largeDisabledTextFormat = new TextFormat(fontNames, 30 * this.scale, DISABLED_TEXT_COLOR);
+			
+			this.resultNameTextFormat = new TextFormat(_infoDispBold.fontName, 42 * this.scale, 0x2b2b2b);
+			this.resultDescriptionTextFormat = new TextFormat(fontNames, 30 * this.scale, 0x444444);
 
 			PopUpManager.overlayFactory = popUpOverlayFactory;
 			Callout.stagePaddingTop = Callout.stagePaddingRight = Callout.stagePaddingBottom =
@@ -431,6 +443,7 @@ package com.feathers.themes
 			this.setInitializerForClass(Scroller, scrollerInitializer);
 			this.setInitializerForClass(List, nothingInitializer, PickerList.DEFAULT_CHILD_NAME_LIST);
 			this.setInitializerForClass(GroupedList, insetGroupedListInitializer, GroupedList.ALTERNATE_NAME_INSET_GROUPED_LIST);
+			this.setInitializerForClass(ResultListItemRenderer, resultListInitializer);
 		}
 
 		protected function pageIndicatorNormalSymbolFactory():DisplayObject
@@ -536,7 +549,7 @@ package com.feathers.themes
 			};
 			button.stateToSkinFunction = skinSelector.updateValue;
 
-			button.defaultLabelProperties.textFormat = this.smallUIDarkTextFormat;
+			button.defaultLabelProperties.textFormat = this.smallUILightTextFormat; //this.smallUIDarkTextFormat;
 			button.disabledLabelProperties.textFormat = this.smallUIDisabledTextFormat;
 			button.selectedDisabledLabelProperties.textFormat = this.smallUIDisabledTextFormat;
 
@@ -643,7 +656,7 @@ package com.feathers.themes
 			};
 			renderer.stateToSkinFunction = skinSelector.updateValue;
 
-			renderer.defaultLabelProperties.textFormat = this.largeLightTextFormat;
+			renderer.defaultLabelProperties.textFormat = this.largeDarkTextFormat; //this.largeLightTextFormat;
 			renderer.downLabelProperties.textFormat = this.largeDarkTextFormat;
 			renderer.defaultSelectedLabelProperties.textFormat = this.largeDarkTextFormat;
 
@@ -660,6 +673,12 @@ package com.feathers.themes
 
 			renderer.accessoryLoaderFactory = this.imageLoaderFactory;
 			renderer.iconLoaderFactory = this.imageLoaderFactory;
+		}
+		
+		protected function resultListInitializer(list:ResultListItemRenderer):void
+		{
+			list.nameLabelTextFormat = this.resultNameTextFormat;
+			list.descriptionLabelTextFormat = this.resultDescriptionTextFormat;
 		}
 
 		protected function pickerListItemRendererInitializer(renderer:BaseDefaultItemRenderer):void
@@ -959,11 +978,11 @@ package com.feathers.themes
 			header.paddingTop = header.paddingRight = header.paddingBottom =
 				header.paddingLeft = 14 * this.scale;
 
-			const backgroundSkin:Quad = new Quad(88 * this.scale, 88 * this.scale, 0x333333);
-			backgroundSkin.setVertexColor(0, 0x444444);
-			backgroundSkin.setVertexColor(1, 0x444444);
-			backgroundSkin.setVertexColor(2, 0x2b2b2b);
-			backgroundSkin.setVertexColor(3, 0x2b2b2b);
+			const backgroundSkin:Quad = new Quad(88 * this.scale, 88 * this.scale, 0x5e68e7); //0x333333);
+			//backgroundSkin.setVertexColor(0, 0x444444);
+			//backgroundSkin.setVertexColor(1, 0x444444);
+			//backgroundSkin.setVertexColor(2, 0x2b2b2b);
+			//backgroundSkin.setVertexColor(3, 0x2b2b2b);
 			header.backgroundSkin = backgroundSkin;
 			header.titleProperties.textFormat = this.headerTextFormat;
 		}
@@ -1059,7 +1078,7 @@ package com.feathers.themes
 			layout.verticalAlign = VerticalLayout.VERTICAL_ALIGN_TOP;
 			list.layout = layout;
 		}
-
+		
 		protected function stage_resizeHandler(event:ResizeEvent):void
 		{
 			this.primaryBackground.width = event.width;

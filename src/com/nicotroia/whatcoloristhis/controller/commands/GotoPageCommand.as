@@ -16,7 +16,7 @@ package com.nicotroia.whatcoloristhis.controller.commands
 	public class GotoPageCommand extends StarlingCommand
 	{
 		[Inject]
-		public var event:Event;
+		public var event:NavigationEvent;
 		
 		[Inject]
 		public var sequenceModel:SequenceModel;
@@ -44,20 +44,35 @@ package com.nicotroia.whatcoloristhis.controller.commands
 			_pageConstant = NavigationEvent(event).pageConstant;
 			_lastPage = sequenceModel.currentPage;
 			_newPage = sequenceModel.getPage( _pageConstant );
+			
+			var pageSpeed:Number = 0.42;
+			
+			if( _newPage == _lastPage ) { 
+				//Just display the show animation and stop
+				sequenceModel.isTransitioning = true;
+				_newPage.show(pageSpeed, delay, direction, function():void { 
+					sequenceModel.isTransitioning = false;
+				});
+				
+				return;
+			}
+			
 			_assetRemoval = new Vector.<PageBase>();
+			var direction:String = event.direction;
 			
 			//Remove all navigational buttons from header
 			eventDispatcher.dispatchEvent(new NavigationEvent(NavigationEvent.REMOVE_HEADER_NAV_BUTTONS));
 			
 			//Remove old page
 			if( _lastPage != null && pageContainer.contains(_lastPage) ) { 
-				_lastPage.hide(0.33, 0, function():void { 
+				_lastPage.hide(pageSpeed, 0, direction, function():void { 
 					trace(" ---- removing " + _lastPage);
 					sequenceModel.lastPageRemovedSuccessfully = false;
 					pageContainer.removeChild(_lastPage);
 					
 					if( System.pauseForGCIfCollectionImminent != null ) { 
-						System.pauseForGCIfCollectionImminent(); //advise the player to trigger a sweep of marked memory if almost done (0.75 default)
+						//advise the player to trigger a sweep of marked memory if almost ready (0.75 default)
+						System.pauseForGCIfCollectionImminent(); 
 					}
 				});
 			}
@@ -76,7 +91,7 @@ package com.nicotroia.whatcoloristhis.controller.commands
 					//add asset that should belong
 					if( ! pageContainer.contains(requiredAsset) ) { 
 						pageContainer.addChild(requiredAsset);
-						requiredAsset.show(0.25, delay);
+						requiredAsset.show(0.25, delay, direction);
 						delay += 0.15;
 					}
 				}
@@ -85,7 +100,7 @@ package com.nicotroia.whatcoloristhis.controller.commands
 					//remove asset that does not belong
 					if( requiredAsset.parent == pageContainer ) { 
 						_assetRemoval.push( requiredAsset );
-						requiredAsset.hide(0.25, delay, function():void { 
+						requiredAsset.hide(0.25, delay, direction, function():void { 
 							safeRemove(_assetRemoval.shift());
 						});
 						delay += 0.1;
@@ -106,7 +121,7 @@ package com.nicotroia.whatcoloristhis.controller.commands
 					if( ! overlayContainer.contains(requiredOverlay) ) { 
 						//trace("adding overlay: " + requiredOverlay);
 						overlayContainer.addChild(requiredOverlay);
-						requiredOverlay.show(0.25, delay);
+						requiredOverlay.show(0.25, delay, direction);
 						delay += 0.15;
 					}
 				}
@@ -115,7 +130,7 @@ package com.nicotroia.whatcoloristhis.controller.commands
 					//remove overlay that does not belong
 					if( requiredOverlay.parent == overlayContainer ) { 
 						_assetRemoval.push( requiredOverlay );
-						requiredOverlay.hide(0.25, delay, function():void { 
+						requiredOverlay.hide(0.25, delay, direction, function():void { 
 							safeRemove(_assetRemoval.shift());
 						});
 						delay += 0.1;
@@ -125,7 +140,7 @@ package com.nicotroia.whatcoloristhis.controller.commands
 			
 			//Add the new page
 			pageContainer.addChild(_newPage);
-			_newPage.show(0.33, delay, function():void { 
+			_newPage.show(pageSpeed, delay, direction, function():void { 
 				//finally... finish.
 				sequenceModel.isTransitioning = false;
 			});

@@ -17,13 +17,18 @@ package com.nicotroia.whatcoloristhis.view.overlays
 		{
 			super.onRegister();
 			
+			transparentSpinner.setTextFormat(layoutModel);
+			
+			if( ! transparentSpinner.hasBeenDrawn ) { 
+				transparentSpinner.draw(layoutModel);
+			}
+			
 			eventDispatcher.addEventListener(LayoutEvent.UPDATE_LAYOUT, appResizedHandler, false, 0, true);
 		}
 		
 		private function appResizedHandler(event:LayoutEvent):void
 		{
-			transparentSpinner.x = (layoutModel.appWidth * 0.5) - (transparentSpinner.spinner.width * 0.5);
-			transparentSpinner.y = (layoutModel.appHeight * 0.5) - (transparentSpinner.spinner.height * 0.5);
+			transparentSpinner.draw(layoutModel);
 		}
 	}
 }

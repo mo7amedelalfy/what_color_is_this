@@ -1,6 +1,9 @@
 package com.nicotroia.whatcoloristhis.controller.commands
 {
+	import com.nicotroia.whatcoloristhis.Assets;
+	import com.nicotroia.whatcoloristhis.model.LayoutModel;
 	import com.nicotroia.whatcoloristhis.view.overlays.ShadowBoxView;
+	import com.nicotroia.whatcoloristhis.view.overlays.TransparentSpinner;
 	
 	import flash.events.Event;
 	
@@ -22,19 +25,24 @@ package com.nicotroia.whatcoloristhis.controller.commands
 		[Inject(name="overlayContainer")]
 		public var overlayContainer:Sprite;
 		
+		[Inject]
+		public var layoutModel:LayoutModel;
+		
 		private var _hideSpinner:Boolean;
 		
 		override public function execute():void
 		{
 			trace("ShowLoadingSpinnerCommand via " + event.type);
 			
-			shadowBox.redraw(contextView.stage.stageWidth, contextView.stage.stageHeight);
-						
-			loadingSpinner.x = (contextView.stage.stageWidth * 0.5) - (loadingSpinner.spinner.width * 0.5); 
-			loadingSpinner.y = (contextView.stage.stageHeight * 0.5) - (loadingSpinner.spinner.height * 0.5); 
+			var color:uint = Assets.getRandomColor();
 			
-			//if( ! overlayContainer.contains( shadowBox ) ) overlayContainer.addChildAt( shadowBox, 0 );
-			//if( ! overlayContainer.contains( loadingSpinner ) ) overlayContainer.addChildAt( loadingSpinner, 1 );
+			layoutModel.shadowBoxColor = color;
+			
+			shadowBox.draw(layoutModel.appWidth, layoutModel.appHeight, color);
+			loadingSpinner.draw(layoutModel);
+			
+			if( ! overlayContainer.contains( shadowBox ) ) overlayContainer.addChildAt( shadowBox, 0 );
+			if( ! overlayContainer.contains( loadingSpinner ) ) overlayContainer.addChildAt( loadingSpinner, 1 );
 		}
 	}
 }

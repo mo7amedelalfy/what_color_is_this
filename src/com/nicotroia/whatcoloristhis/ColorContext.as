@@ -27,6 +27,7 @@ package com.nicotroia.whatcoloristhis
 	import com.nicotroia.whatcoloristhis.view.overlays.HeaderOverlayMediator;
 	import com.nicotroia.whatcoloristhis.view.overlays.ShadowBoxMediator;
 	import com.nicotroia.whatcoloristhis.view.overlays.ShadowBoxView;
+	import com.nicotroia.whatcoloristhis.view.overlays.TransparentSpinner;
 	import com.nicotroia.whatcoloristhis.view.overlays.TransparentSpinnerMediator;
 	import com.nicotroia.whatcoloristhis.view.pages.AboutPage;
 	import com.nicotroia.whatcoloristhis.view.pages.AboutPageMediator;
@@ -106,9 +107,13 @@ package com.nicotroia.whatcoloristhis
 			commandMap.mapEvent(LayoutEvent.ORIENTATION_CHANGE, LayoutPageCommand, LayoutEvent);
 			commandMap.mapEvent(NavigationEvent.NAVIGATE_TO_PAGE, GotoPageCommand, NavigationEvent);
 			commandMap.mapEvent(CameraEvent.CAMERA_IMAGE_TAKEN, ImageSelectedCommand, CameraEvent);
-			commandMap.mapEvent(CameraEvent.CAMERA_ROLL_IMAGE_SELECTED, ImageSelectedCommand, CameraEvent);
 			commandMap.mapEvent(CameraEvent.CAMERA_IMAGE_FAILED, ImageSelectFailedCommand, CameraEvent);
-			commandMap.mapEvent(CameraEvent.CAMERA_ROLL_IMAGE_FAILED, ImageSelectedCommand, CameraEvent);
+			commandMap.mapEvent(CameraEvent.CAMERA_ROLL_IMAGE_SELECTED, ImageSelectedCommand, CameraEvent);
+			commandMap.mapEvent(CameraEvent.CAMERA_ROLL_IMAGE_FAILED, ImageSelectFailedCommand, CameraEvent);
+			commandMap.mapEvent(LoadingEvent.PAGE_LOADING, ShowLoadingSpinnerCommand, LoadingEvent);
+			commandMap.mapEvent(LoadingEvent.CAMERA_LOADING, ShowLoadingSpinnerCommand, LoadingEvent);
+			commandMap.mapEvent(LoadingEvent.CAMERA_ROLL_LOADING, ShowLoadingSpinnerCommand, LoadingEvent);
+			commandMap.mapEvent(LoadingEvent.COUNTING_PIXELS, ShowLoadingSpinnerCommand, LoadingEvent);
 			commandMap.mapEvent(LoadingEvent.COLOR_RESULT_LOADING, ShowLoadingSpinnerCommand, LoadingEvent);
 			commandMap.mapEvent(LoadingEvent.LOADING_FINISHED, HideLoadingSpinnerCommand, LoadingEvent);
 			commandMap.mapEvent(NotificationEvent.ADD_TEXT_TO_LOADING_SPINNER, AddTextToLoadingSpinnerCommand, NotificationEvent);
@@ -127,12 +132,6 @@ package com.nicotroia.whatcoloristhis
 			
 			//buttons
 			mediatorMap.mapView(ButtonBase, ButtonBaseMediator);
-			//mediatorMap.mapView(NavBar, NavBarMediator, [ButtonBase, NavBar]);
-			//mediatorMap.mapView(BackButton, BackButtonMediator, [ButtonBase, BackButton]);
-			//mediatorMap.mapView(TakePhotoButton, TakePhotoButtonMediator, [ButtonBase, TakePhotoButton]);
-			//mediatorMap.mapView(AboutPageButton, AboutPageButtonMediator, [ButtonBase, AboutPageButton]);
-			//mediatorMap.mapView(AcceptButton, AcceptButtonMediator, [ButtonBase, AcceptButton]);
-			//mediatorMap.mapView(CancelButton, CancelButtonMediator, [ButtonBase, CancelButton]);
 			mediatorMap.mapView(ShadowBoxView, ShadowBoxMediator);
 			mediatorMap.mapView(TransparentSpinner, TransparentSpinnerMediator);
 			

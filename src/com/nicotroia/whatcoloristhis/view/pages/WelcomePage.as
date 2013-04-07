@@ -9,8 +9,6 @@ package com.nicotroia.whatcoloristhis.view.pages
 	import feathers.display.Scale9Image;
 	import feathers.textures.Scale9Textures;
 	
-	import flash.display.Bitmap;
-	import flash.display.BitmapData;
 	import flash.display.MovieClip;
 	import flash.display.StageOrientation;
 	import flash.geom.Matrix;
@@ -29,6 +27,7 @@ package com.nicotroia.whatcoloristhis.view.pages
 		public var settingsButton:feathers.controls.Button;
 		public var aboutPageButton:starling.display.Button;
 		public var takePhotoButton:starling.display.Button;
+		public var choosePhotoButton:feathers.controls.Button;
 		
 		private var _actionBar:Image;
 		private var _settingsIcon:Image;
@@ -36,12 +35,6 @@ package com.nicotroia.whatcoloristhis.view.pages
 		public function WelcomePage()
 		{
 			vectorPage = new WelcomePageVector();
-			settingsButton = new feathers.controls.Button();
-			//settingsButton.defaultIcon = new Image( Assets.getAtlas().getTexture("button_up") );
-			settingsButton.horizontalAlign = feathers.controls.Button.HORIZONTAL_ALIGN_CENTER;
-			settingsButton.verticalAlign = feathers.controls.Button.VERTICAL_ALIGN_MIDDLE;
-			settingsButton.iconPosition = feathers.controls.Button.ICON_POSITION_TOP;
-			settingsButton.gap = 10;
 			
 			super();
 		}
@@ -84,23 +77,41 @@ package com.nicotroia.whatcoloristhis.view.pages
 			trace("welcome page drawing vectors");
 			
 			//Remove first
+			removeDrawnVector( _background );
 			removeDrawnVector( _actionBar );
 			removeDrawnVector( aboutPageButton );
 			removeDrawnVector( takePhotoButton );
+			removeDrawnVector( choosePhotoButton );
+			removeDrawnVector( settingsButton );
 			
 			//Make things
+			_background = drawBackgroundQuad();
 			aboutPageButton = createButtonFromMovieClip( vectorPage.aboutPageButton );
 			takePhotoButton = createButtonFromMovieClip( vectorPage.takePhotoButton );
-			_settingsIcon = createImageFromDisplayObject( vectorPage.settingsIcon );
+			choosePhotoButton = new feathers.controls.Button();
 			_actionBar = createImageFromDisplayObject( vectorPage.actionBar );
+			_settingsIcon = createImageFromDisplayObject( vectorPage.settingsIcon );
+			settingsButton = new feathers.controls.Button();
 			
 			//Add
+			addChildAt( _background, 0 );
 			addChild( _actionBar );
 			addChild( aboutPageButton );
 			addChild( takePhotoButton );
+			addChild( choosePhotoButton );
 			
 			//Settings
 			settingsButton.defaultIcon = _settingsIcon;
+			settingsButton.horizontalAlign = feathers.controls.Button.HORIZONTAL_ALIGN_CENTER;
+			settingsButton.verticalAlign = feathers.controls.Button.VERTICAL_ALIGN_MIDDLE;
+			settingsButton.iconPosition = feathers.controls.Button.ICON_POSITION_TOP;
+			settingsButton.gap = 10;
+			
+			choosePhotoButton.label = "Choose Photo";
+			choosePhotoButton.validate();
+			choosePhotoButton.x = layoutModel.appWidth - choosePhotoButton.width - 7;
+			choosePhotoButton.y = _actionBar.y + ((_actionBar.height - choosePhotoButton.height) * 0.5);
+			
 		}
 	}
 }

@@ -31,7 +31,7 @@ package com.nicotroia.whatcoloristhis.view.pages
 		
 		override public function onRegister():void
 		{
-			trace("pagebase onRegister");
+			//trace("pagebase onRegister");
 			
 			//This shit's expensive... Resize only the first time it's added
 			if( ! view.reflowed ) { 
@@ -74,7 +74,7 @@ package com.nicotroia.whatcoloristhis.view.pages
 			view.removeEventListener(Event.RESIZE, callAppResizedHandler);
 			eventMap.unmapListener(eventDispatcher, LayoutEvent.UPDATE_LAYOUT, reflowPage);
 			
-			trace("pagebase onRemove");
+			//trace("pagebase onRemove");
 			
 			super.onRemove();
 			

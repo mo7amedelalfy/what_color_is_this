@@ -2,6 +2,7 @@ package com.nicotroia.whatcoloristhis.model
 {
 	import com.nicotroia.whatcoloristhis.Assets;
 	import com.nicotroia.whatcoloristhis.controller.events.CameraEvent;
+	import com.nicotroia.whatcoloristhis.controller.events.LoadingEvent;
 	import com.nicotroia.whatcoloristhis.controller.events.NavigationEvent;
 	
 	import flash.display.Bitmap;
@@ -14,7 +15,6 @@ package com.nicotroia.whatcoloristhis.model
 	import flash.events.IOErrorEvent;
 	import flash.events.MediaEvent;
 	import flash.events.ProgressEvent;
-	import flash.filters.BlurFilter;
 	import flash.geom.Point;
 	import flash.media.CameraRoll;
 	import flash.media.CameraRollBrowseOptions;
@@ -33,8 +33,8 @@ package com.nicotroia.whatcoloristhis.model
 		public var targetedPixels:BitmapData;
 		public var top5:Array;
 		public var chosenWinnerHex:String;
-		public var closestMatchHex:String;
-		public var resultName:String;
+		//public var closestMatchHex:String;
+		//public var resultName:String;
 		
 		protected var _cameraUI:CameraUI;
 		protected var _cameraRoll:CameraRoll;
@@ -46,9 +46,20 @@ package com.nicotroia.whatcoloristhis.model
 			
 		}
 		
+		public function saveImage(bmd:BitmapData):void
+		{
+			if( CameraRoll.supportsAddBitmapData ) { 
+				trace("saving image to camera roll.");
+				
+				if( ! _cameraRoll ) _cameraRoll = new CameraRoll();
+				
+				_cameraRoll.addBitmapData(bmd);
+			}
+		}
+		
 		/*
 		*
-		* CAMERA
+		* CAMERA UI
 		*
 		*/
 		
@@ -56,22 +67,7 @@ package com.nicotroia.whatcoloristhis.model
 		{	
 			trace("init camera.");
 			
-			/*
-			//force random
-			var before:uint = getTimer();
-			photoData = generateRandomBitmapData();
-			var after:uint = getTimer();
-			trace("------------ random bitmap "+ photoData.width +"x"+ photoData.height +" took: " + (after-before) +"ms");
-			*/
-			/*
-			//force goat
-			var bitmap:Bitmap = new Assets.ScreamingGoat() as Bitmap;
-			photoData = bitmap.bitmapData;
-			*/
-			/*
-			eventDispatcher.dispatchEvent(new CameraEvent(CameraEvent.CAMERA_IMAGE_TAKEN));
-			return;
-			*/
+			eventDispatcher.dispatchEvent(new LoadingEvent(LoadingEvent.CAMERA_LOADING));
 			
 			if( CameraUI.isSupported ) { 
 				_cameraUI = new CameraUI();
@@ -85,9 +81,11 @@ package com.nicotroia.whatcoloristhis.model
 			else { 
 				trace("This device does not have Camera support");
 				
-				photoData = generateRandomBitmapData();
+				//force random
+				//photoData = generateRandomBitmapData();
+				//eventDispatcher.dispatchEvent(new CameraEvent(CameraEvent.CAMERA_IMAGE_TAKEN));
 				
-				eventDispatcher.dispatchEvent(new CameraEvent(CameraEvent.CAMERA_IMAGE_TAKEN));
+				eventDispatcher.dispatchEvent(new CameraEvent(CameraEvent.CAMERA_IMAGE_FAILED));
 			}
 		}
 		
@@ -99,7 +97,7 @@ package com.nicotroia.whatcoloristhis.model
 			
 			trace("Camera cancelled.");
 			
-			eventDispatcher.dispatchEvent(new NavigationEvent(NavigationEvent.NAVIGATE_TO_PAGE, SequenceModel.PAGE_Welcome));
+			eventDispatcher.dispatchEvent(new CameraEvent(CameraEvent.CAMERA_IMAGE_FAILED));
 		}
 		
 		protected function cameraErrorHandler(event:ErrorEvent):void
@@ -110,7 +108,7 @@ package com.nicotroia.whatcoloristhis.model
 			
 			trace("Camera Error. " + event.errorID);
 			
-			eventDispatcher.dispatchEvent(new NavigationEvent(NavigationEvent.NAVIGATE_TO_PAGE, SequenceModel.PAGE_Welcome));
+			eventDispatcher.dispatchEvent(new CameraEvent(CameraEvent.CAMERA_IMAGE_FAILED));
 		}
 		
 		protected function cameraPhotoCompleteHandler(event:MediaEvent):void
@@ -153,8 +151,6 @@ package com.nicotroia.whatcoloristhis.model
 			loaderInfo.removeEventListener(Event.COMPLETE, filePromiseLoadedHandler);
 			loaderInfo.removeEventListener(IOErrorEvent.IO_ERROR, filePromiseLoadErrorHandler);
 			
-			trace("yay");
-			
 			photoData = Bitmap(event.target.content).bitmapData;
 			
 			eventDispatcher.dispatchEvent(new CameraEvent(CameraEvent.CAMERA_IMAGE_TAKEN));
@@ -166,20 +162,20 @@ package com.nicotroia.whatcoloristhis.model
 		*
 		*/
 		
-		public function saveImage(bmd:BitmapData):void
-		{
-			if( CameraRoll.supportsAddBitmapData ) { 
-				trace("saving image to camera roll.");
-				
-				if( ! _cameraRoll ) _cameraRoll = new CameraRoll();
-				
-				_cameraRoll.addBitmapData(bmd);
-			}
-		}
-		
 		public function initCameraRoll():void
 		{
 			trace("init camera roll.");
+			
+			eventDispatcher.dispatchEvent(new LoadingEvent(LoadingEvent.CAMERA_ROLL_LOADING));
+			
+			//force goat
+			var bitmap:Bitmap = new Assets.ScreamingGoat() as Bitmap;
+			
+			photoData = bitmap.bitmapData;
+			
+			eventDispatcher.dispatchEvent(new CameraEvent(CameraEvent.CAMERA_ROLL_IMAGE_SELECTED));
+			
+			return;
 			
 			if( CameraRoll.supportsBrowseForImage ) { 
 				_cameraRoll = new CameraRoll();
@@ -190,6 +186,17 @@ package com.nicotroia.whatcoloristhis.model
 				
 				_cameraRoll.browseForImage( options );
 			}
+			else { 
+				trace("This device does not have Camera Roll support");
+				
+				//force goat
+				var bitmap:Bitmap = new Assets.ScreamingGoat() as Bitmap;
+				
+				photoData = bitmap.bitmapData;
+				
+				eventDispatcher.dispatchEvent(new CameraEvent(CameraEvent.CAMERA_ROLL_IMAGE_SELECTED));
+				//eventDispatcher.dispatchEvent(new CameraEvent(CameraEvent.CAMERA_ROLL_IMAGE_FAILED));
+			}
 		}
 		
 		protected function cameraRollCancelHandler(event:Event):void
@@ -198,6 +205,8 @@ package com.nicotroia.whatcoloristhis.model
 			_cameraRoll.removeEventListener(MediaEvent.SELECT, mediaSelectHandler);
 			
 			trace("cancelled.");
+			
+			eventDispatcher.dispatchEvent(new CameraEvent(CameraEvent.CAMERA_ROLL_IMAGE_FAILED));
 		}
 		
 		private function mediaSelectHandler(event:MediaEvent):void
@@ -223,8 +232,12 @@ package com.nicotroia.whatcoloristhis.model
 			{
 				trace("Synchronous media promise." );
 				_imageLoader.loadFilePromise( promise );
-				//this.addChild( loader );
-				handleLoadedBitmap( _imageLoader.contentLoaderInfo.content as Bitmap );
+				
+				var bitmap:Bitmap = _imageLoader.contentLoaderInfo.content as Bitmap;
+				
+				photoData = bitmap.bitmapData;
+				
+				eventDispatcher.dispatchEvent(new CameraEvent(CameraEvent.CAMERA_ROLL_IMAGE_SELECTED));
 			}
 		}
 		
@@ -234,6 +247,8 @@ package com.nicotroia.whatcoloristhis.model
 			_imageLoader.contentLoaderInfo.removeEventListener( IOErrorEvent.IO_ERROR, mediaLoadFailHandler );
 			
 			trace("image load fail. Error " + event.errorID);
+			
+			eventDispatcher.dispatchEvent(new CameraEvent(CameraEvent.CAMERA_ROLL_IMAGE_FAILED));
 		}
 		
 		private function mediaLoadCompleteHandler(event:Event):void
@@ -243,25 +258,9 @@ package com.nicotroia.whatcoloristhis.model
 			
 			trace("load complete.");
 			
-			handleLoadedBitmap( event.target.content );
-		}
-		
-		private function handleLoadedBitmap(bitmap:Bitmap):void
-		{
-			trace(bitmap);
-			var bmd:BitmapData = bitmap.bitmapData;
+			var bitmap:Bitmap = event.target.content as Bitmap;
 			
-			for( var x:uint = 0; x < bmd.width; x++ ) { 
-				for( var y:uint = 0; y < bmd.height; y++ ) { 
-					//trace("("+ x +","+ y + ") 0x" + bmd.getPixel(x,y).toString(16));
-				}
-			}
-			
-			trace("iteration complete");
-			
-			bmd.applyFilter(bmd, bmd.rect, new Point(), new BlurFilter(16,16,3));
-			
-			photoData = bmd;
+			photoData = bitmap.bitmapData;
 			
 			eventDispatcher.dispatchEvent(new CameraEvent(CameraEvent.CAMERA_ROLL_IMAGE_SELECTED));
 		}

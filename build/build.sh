@@ -41,7 +41,8 @@ else
 fi
 
 #For some reason I get "Initial window content is invalid" when I remove "-debug"...
-"$AIR_SDK/bin/amxmlc" -debug=$DEBUG -compress=false -library-path+=$PROJECT_PATH/libs $FILENAME.as -output $PROJECT_PATH/bin-debug/$FILENAME.swf
+#-compress=false 
+"$AIR_SDK/bin/amxmlc" -debug=$DEBUG -library-path+=$PROJECT_PATH/libs $FILENAME.as -output $PROJECT_PATH/bin-debug/$FILENAME.swf
 
 # Read the exit static of mxmlc to determine if there was an error
 STATUS=$?

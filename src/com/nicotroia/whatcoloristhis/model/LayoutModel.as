@@ -18,6 +18,7 @@ package com.nicotroia.whatcoloristhis.model
 		public var navBarHeight:Number = 1;
 		public var scale:Number = 1;
 		public var infoDispBold:InfoDispBold;
+		public var shadowBoxColor:uint;
 		
 		private var _orientation:String;
 		private var _appWidth:Number;
@@ -48,6 +49,10 @@ package com.nicotroia.whatcoloristhis.model
 			_orientation = StageOrientation.UNKNOWN;
 			_appWidth = Starling.current.nativeStage.fullScreenWidth;
 			_appHeight = Starling.current.nativeStage.fullScreenHeight;
+			
+			navBarHeight = 140 * this.scale * Starling.contentScaleFactor;
+			
+			trace("LayoutModel init");
 		}
 		
 		public function layoutApp($orientation:String, $appWidth:Number, $appHeight:Number):void
@@ -107,19 +112,19 @@ package com.nicotroia.whatcoloristhis.model
 		{
 			switch( _orientation ) { 
 				case StageOrientation.DEFAULT : 
-					navBarHeight = _appHeight * 0.2;
+					//navBarHeight = 150 * this.scale * Starling.contentScaleFactor;
 					break;
 				case StageOrientation.ROTATED_LEFT : 
-					navBarHeight = _appHeight * 0.2;
+					//navBarHeight = 120 * this.scale * Starling.contentScaleFactor;
 					break;
 				case StageOrientation.ROTATED_RIGHT : 
-					navBarHeight = _appHeight * 0.2;
+					//navBarHeight = 120 * this.scale * Starling.contentScaleFactor;
 					break;
 				case StageOrientation.UPSIDE_DOWN : 
-					navBarHeight = _appHeight * 0.2;
+					//navBarHeight = 150 * this.scale * Starling.contentScaleFactor;
 					break;
 				case StageOrientation.UNKNOWN : 
-					navBarHeight = 0;
+					//navBarHeight = 0;
 					break;
 				default : 
 					break;

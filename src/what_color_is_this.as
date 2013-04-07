@@ -3,10 +3,10 @@ package
 	import com.mrdoob.stats.Stats;
 	import com.nicotroia.whatcoloristhis.Application;
 	import com.nicotroia.whatcoloristhis.Assets;
-	import com.nicotroia.whatcoloristhis.ColorContext;
 	
 	import flash.desktop.NativeApplication;
 	import flash.display.Bitmap;
+	import flash.display.Shape;
 	import flash.display.Sprite;
 	import flash.display.StageAlign;
 	import flash.display.StageQuality;
@@ -14,6 +14,9 @@ package
 	import flash.events.Event;
 	import flash.geom.Rectangle;
 	import flash.system.Capabilities;
+	import flash.text.TextField;
+	import flash.text.TextFormat;
+	import flash.text.TextFormatAlign;
 	import flash.ui.Multitouch;
 	import flash.ui.MultitouchInputMode;
 	
@@ -24,17 +27,10 @@ package
 	[SWF(frameRate="60", width="320", height="480", backgroundColor="0xffffff")]
 	public class what_color_is_this extends Sprite
 	{
-		// Startup image for SD screens
-		[Embed(source="/Users/nicotroia/PROJECTS/starling_robotlegs/src/assets/graphics/startup.jpg")]
-		private static var Background:Class;
-		
-		// Startup image for HD screens
-		[Embed(source="/Users/nicotroia/PROJECTS/starling_robotlegs/src/assets/graphics/startupHD.jpg")]
-		private static var BackgroundHD:Class;
-		
-		//private var _context:ColorContext;
 		private var _stats:Stats;
 		private var _starling:Starling;
+		private var _startupBackground:Shape;
+		private var _startupImage:StartupImage;
 		
 		public function what_color_is_this()
 		{
@@ -57,12 +53,13 @@ package
 			_stats.y = 100;
 			addChild(_stats);
 			
-			var stageWidth:int = 320; //640; //320;
-			var stageHeight:int = 480; //960; //480;
+			//I have no idea what these numbers are for, but the app will scale to the full width/height
+			var stageWidth:int = 320; 
+			var stageHeight:int = 480; 
 			var iOS:Boolean = Capabilities.manufacturer.indexOf("iOS") != -1;
 			
-			Starling.multitouchEnabled = true;  // useful on mobile devices
-			Starling.handleLostContext = true; //!iOS;  // not necessary on iOS. Saves a lot of memory!
+			Starling.multitouchEnabled = true; // useful on mobile devices
+			Starling.handleLostContext = true; //I was getting errors without this. //!iOS;  // not necessary on iOS. Saves a lot of memory!
 			
 			// create a suitable viewport for the screen size
 			// 
@@ -75,18 +72,10 @@ package
 				new Rectangle(0, 0, stage.fullScreenWidth, stage.fullScreenHeight), 
 				"showAll");
 			
-			// create the AssetManager, which handles all required assets for this resolution
-			
+			//This scaleFactor is for when you have two asset sizes, "standard" and "HD"
+			//In this app we scale and draw vectors, so we can use the precise Starling scaleFactor
 			var scaleFactor:int = viewPort.width < 480 ? 1 : 2; // midway between 320 and 640
-			//var appDir:File = File.applicationDirectory;
-			//var assets:AssetManager = new AssetManager(scaleFactor);
-			
-			//assets.verbose = Capabilities.isDebugger;
-			/*assets.enqueue(
-			appDir.resolvePath("audio"),
-			appDir.resolvePath(formatString("fonts/{0}x", scaleFactor)),
-			appDir.resolvePath(formatString("textures/{0}x", scaleFactor))
-			);*/
+			Assets.roundedScaleFactor = scaleFactor;
 			
 			// While Stage3D is initializing, the screen will be blank. To avoid any flickering, 
 			// we display a startup image now and remove it below, when Starling is ready to go.
@@ -99,15 +88,31 @@ package
 			// Note that we cannot embed "Default.png" (or its siblings), because any embedded
 			// files will vanish from the application package, and those are picked up by the OS!
 			
-			var background:Bitmap = scaleFactor == 1 ? new Background() : new BackgroundHD();
-			Background = BackgroundHD = null; // no longer needed!
+			//Beautiful startup greeting
 			
-			background.x = viewPort.x;
-			background.y = viewPort.y;
-			background.width  = viewPort.width;
-			background.height = viewPort.height;
-			background.smoothing = true;
-			addChild(background);
+			_startupBackground = Assets.createRandomColorShape(stage.fullScreenWidth, stage.fullScreenHeight);
+			_startupImage = new StartupImage();
+			
+			var greetings:Vector.<String> = new <String>["Hello", "Ciao", "Hej", "Hallo", "Hola", "Shalom", "Bonjour", "Namaste"];
+			var tf:TextField = _startupImage.greetingTF;
+			var textFormat:TextFormat = tf.defaultTextFormat;
+			tf.width = stage.fullScreenWidth;
+			tf.height = stage.fullScreenHeight * 0.5;
+			tf.text = greetings[Math.floor(Math.random() * greetings.length)];
+			
+			if( Assets.lastRandomColor >= 0xffff00 ) textFormat.color = 0x2b2b2b;
+			else textFormat.color = 0xffffff;
+			
+			textFormat.size = 32 * scaleFactor;
+			textFormat.align = TextFormatAlign.CENTER;
+			
+			tf.setTextFormat(textFormat);
+			tf.x = 0;
+			tf.y = (stage.fullScreenHeight * 0.5) - (tf.textHeight * 0.5) - (14 * scaleFactor);
+			
+			addChild(_startupBackground);
+			addChild(_startupImage);
+			
 			
 			// launch Starling
 			
@@ -120,13 +125,12 @@ package
 			trace("stage: " + stage.stageWidth, ",", stage.stageHeight);
 			trace("screen: " + stage.fullScreenWidth, ",", stage.fullScreenHeight);
 			trace("viewPort: " + viewPort);
-			trace("starlingScaleFactor: " + _starling.contentScaleFactor, "scaleFactor: " + scaleFactor);
-			
-			//Assets.scaleFactor = scaleFactor; //_starling.contentScaleFactor;
+			trace("scaleFactor: " + _starling.contentScaleFactor);
 			
 			_starling.addEventListener(starling.events.Event.ROOT_CREATED, function():void
 			{
-				removeChild(background);
+				removeChild(_startupBackground);
+				removeChild(_startupImage);
 				
 				_starling.start();
 			});

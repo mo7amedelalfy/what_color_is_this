@@ -1,0 +1,556 @@
+Grey,545454
+Silver,C0C0C0
+Light Gray,D3D3D3
+Light Slate Grey,778899
+Slate Gray,708090
+Slate Gray,C6E2FF
+Slate Gray,B9D3EE
+Slate Gray,9FB6CD
+Slate Gray,6C7B8B
+Black,000000
+Black,050505
+Black,1C1C1C
+Grey,363636
+Grey,4F4F4F
+Grey,696969
+Grim Grey,696969
+Grey,828282
+Grey,9C9C9C
+Grey,B5B5B5
+Grey,CFCFCF
+White,E8E8E8
+White Smoke,F0F0F0
+White Smoke,F5F5F5
+White,FFFFFF
+Dark Slate Grey,2F4F4F
+Dim Grey,545454
+Very Light Grey,CDCDCD
+Free Speech Grey, 635688
+AliceBlue,F0F8FF
+Blue Violet,8A2BE2
+Cadet Blue,5F9F9F
+Cadet Blue,5F9EA0
+Cadet Blue,5F9EA0
+Cadet Blue,98F5FF
+Cadet Blue,8EE5EE
+Cadet Blue,7AC5CD
+Cadet Blue,53868B
+Corn Flower Blue,42426F
+Cornflower Blue,6495ED
+Dark Slate Blue,483D8B
+Dark Turquoise,00CED1
+Deep Sky Blue,00BFFF
+Deep Sky Blue,00BFFF
+Deep Sky Blue,00B2EE
+Deep Sky Blue,009ACD
+Deep Sky Blue,00688B
+Dodger Blue,1E90FF
+Dodger Blue,1E90FF
+Dodger Blue,1C86EE
+Dodger Blue,1874CD
+Dodger Blue,104E8B
+Light Blue,ADD8E6
+Light Blue,BFEFFF
+Light Blue,B2DFEE
+Light Blue,9AC0CD
+Light Blue,68838B
+Light Cyan,E0FFFF
+Light Cyan,E0FFFF
+Light Cyan,D1EEEE
+Light Cyan,B4CDCD
+Light Cyan,7A8B8B
+Light Sky Blue,87CEFA
+Light Sky Blue,B0E2FF
+Light Sky Blue,A4D3EE
+Light Sky Blue,8DB6CD
+Light Sky Blue,607B8B
+Light Slate Blue,8470FF
+Light Steel Blue,B0C4DE
+Light Steel Blue,CAE1FF
+Light Steel Blue,BCD2EE
+Light Steel Blue,A2B5CD
+Light Steel Blue,6E7B8B
+Aquamarine,70DB93
+Medium Blue,0000CD
+Medium Slate Blue,7B68EE
+Medium Turquoise,48D1CC
+Midnight Blue,191970
+Navy Blue,000080
+Pale Turquoise,AFEEEE
+Pale Turquoise,BBFFFF
+Pale Turquoise,AEEEEE
+Pale Turquoise,96CDCD
+Pale Turquoise,668B8B
+Powder Blue,B0E0E6
+Royal Blue,4169E1
+Royal Blue,4876FF
+Royal Blue,436EEE
+Royal Blue,3A5FCD
+Royal Blue,27408B
+Royal Blue 5,002266
+Sky Blue,87CEEB
+Sky Blue,87CEFF
+Sky Blue,7EC0EE
+Sky Blue,6CA6CD
+Sky Blue,4A708B
+Slate Blue,6A5ACD
+Slate Blue,836FFF
+Slate Blue,7A67EE
+Slate Blue,6959CD
+Slate Blue,473C8B
+Steel Blue,4682B4
+Steel Blue,63B8FF
+Steel Blue,5CACEE
+Steel Blue,4F94CD
+Steel Blue,36648B
+Aquamarine,7FFFD4
+Aquamarine,7FFFD4
+Aquamarine,76EEC6
+Aquamarine,66CDAA
+Medium Aquamarine,66CDAA
+Aquamarine,458B74
+Azure,F0FFFF
+Azure,F0FFFF
+Azure,E0EEEE
+Azure,C1CDCD
+Azure,838B8B
+Blue,0000FF
+Blue,0000FF
+Blue,0000EE
+Blue,0000CD
+Blue,00008B
+Aqua,00FFFF
+True Iris Blue,03B4CC
+Cyan,00FFFF
+Cyan,00FFFF
+Cyan,00EEEE
+Cyan,00CDCD
+Cyan,008B8B
+Navy,000080
+Teal,008080
+Turquoise,40E0D0
+Turquoise,00F5FF
+Turquoise,00E5EE
+Turquoise,00C5CD
+Turquoise,00868B
+Dark Slate Gray,2F4F4F
+Dark Slate Gray,97FFFF
+Dark Slate Gray,8DEEEE
+Dark Slate Gray,79CDCD
+Dark Slate Gray,528B8B
+Dark Slate Blue,241882
+Dark Turquoise,7093DB
+Medium Slate Blue,7F00FF
+Medium Turquoise,70DBDB
+Midnight Blue,2F2F4F
+Navy Blue,23238E
+Neon Blue,4D4DFF
+New Midnight Blue,00009C
+Rich Blue,5959AB
+Sky Blue,3299CC
+Slate Blue,007FFF
+Summer Sky,38B0DE
+Iris Blue,03B4C8
+Rosy Brown,BC8F8F
+Rosy Brown,FFC1C1
+Rosy Brown,EEB4B4
+Rosy Brown,CD9B9B
+Rosy Brown,8B6969
+Saddle Brown,8B4513
+Sandy Brown,F4A460
+Beige,F5F5DC
+Brown,A52A2A
+Brown,A62A2A
+Brown,FF4040
+Brown,EE3B3B
+Brown,CD3333
+Brown,8B2323
+Dark brown,5C4033
+Burly wood,DEB887
+Burly wood,FFD39B
+Burly wood,EEC591
+Burly wood,CDAA7D
+Burly wood,8B7355
+Baker's Chocolate,5C3317
+Chocolate,D2691E
+Chocolate,FF7F24
+Chocolate,EE7621
+Chocolate,CD661D
+Chocolate,8B4513
+Peru,CD853F
+Tan,D2B48C
+Tan,FFA54F
+Tan,EE9A49
+Tan,CD853F
+Tan,8B5A2B
+Dark Tan,97694F
+Dark Wood,855E42
+Light Wood,856363
+Medium Wood,A68064
+New Tan,EBC79E
+Semi-Sweet Chocolate,6B4226
+Sienna,8E6B23
+Tan,DB9370
+Very Dark Brown,5C4033
+Dark Green,2F4F2F
+Dark Green,006400
+Dark Green Copper,4A766E
+Dark Khaki,BDB76B
+Dark Olive Green,556B2F
+Dark Olive Green,CAFF70
+Dark Olive Green,BCEE68
+Dark Olive Green,A2CD5A
+Dark Olive Green,6E8B3D
+Olive,808000
+Dark Sea Green,8FBC8F
+Dark Sea Green,C1FFC1
+Dark Sea Green,B4EEB4
+Dark Sea Green,9BCD9B
+Dark Sea Green,698B69
+Forest Green,228B22
+Green Yellow,ADFF2F
+Lawn Green,7CFC00
+Light Sea Green,20B2AA
+Lime Green,32CD32
+Medium Sea Green,3CB371
+Medium Spring Green,00FA9A
+Mint Cream,F5FFFA
+Olive Drab,6B8E23
+Olive Drab,C0FF3E
+Olive Drab,B3EE3A
+Olive Drab,9ACD32
+Olive Drab,698B22
+Pale Green,98FB98
+Pale Green,9AFF9A
+Pale Green,90EE90
+Pale Green,7CCD7C
+Pale Green,548B54
+Sea Green,2E8B57
+Sea Green,54FF9F
+Sea Green,4EEE94
+Sea Green,43CD80
+Spring Green,00FF7F
+Spring Green,00FF7F
+Spring Green,00EE76
+Spring Green,00CD66
+Spring Green,008B45
+Yellow Green,9ACD32
+Chartreuse,7FFF00
+Chartreuse,7FFF00
+Chartreuse,76EE00
+Chartreuse,66CD00
+Chartreuse,458B00
+Green,00FF00
+Green,008000
+Lime,00FF00
+Green,00FF00
+Green,00EE00
+Green,00CD00
+Green,008B00
+Khaki,F0E68C
+Khaki,FFF68F
+Khaki,EEE685
+Khaki,CDC673
+Khaki,8B864E
+Dark Olive Green,4F4F2F
+Green Yellow,D19275
+Hunter Green,8E2323
+Forest Green,238E23
+Medium Forest Green,DBDB70
+Medium Sea Green,426F42
+Medium Spring Green,7FFF00
+Pale Green,8FBC8F
+Sea Green,238E68
+Spring Green,00FF7F
+Free Speech Green,09F911
+Free Speech Aquamarine,029D74
+Dark Orange,FF8C00
+Dark Orange,FF7F00
+Dark Orange,EE7600
+Dark Orange,CD6600
+Dark Orange,8B4500
+Dark Salmon,E9967A
+Light Coral,F08080
+Light Salmon,FFA07A
+Light Salmon,FFA07A
+Light Salmon,EE9572
+Light Salmon,CD8162
+Light Salmon,8B5742
+Peach Puff,FFDAB9
+Peach Puff,FFDAB9
+Peach Puff,EECBAD
+Peach Puff,CDAF95
+Peach Puff,8B7765
+Bisque,FFE4C4
+Bisque,FFE4C4
+Bisque,EED5B7
+Bisque,CDB79E
+Bisque,8B7D6B
+Coral,FF7F00
+Coral,FF7F50
+Coral,FF7256
+Coral,EE6A50
+Coral,CD5B45
+Coral,8B3E2F
+Honeydew,F0FFF0
+Honeydew,F0FFF0
+Honeydew,E0EEE0
+Honeydew,C1CDC1
+Honeydew,838B83
+Orange,FFA500
+Orange,FFA500
+Orange,EE9A00
+Orange,CD8500
+Orange,8B5A00
+Salmon,FA8072
+Salmon,FF8C69
+Salmon,EE8262
+Salmon,CD7054
+Salmon,8B4C39
+Sienna,A0522D
+Sienna,FF8247
+Sienna,EE7942
+Sienna,CD6839
+Sienna,8B4726
+Mandarian Orange,8E2323
+Orange,FF7F00
+Orange Red,FF2400
+Deep Pink,FF1493
+Deep Pink,FF1493
+Deep Pink,EE1289
+Deep Pink,CD1076
+Deep Pink,8B0A50
+Hot Pink,FF69B4
+Hot Pink,FF6EB4
+Hot Pink,EE6AA7
+Hot Pink,CD6090
+Hot Pink,8B3A62
+Indian Red,CD5C5C
+Indian Red,FF6A6A
+Indian Red,EE6363
+Indian Red,CD5555
+Indian Red,8B3A3A
+Light Pink,FFB6C1
+Light Pink,FFAEB9
+Light Pink,EEA2AD
+Light Pink,CD8C95
+Light Pink,8B5F65
+Medium Violet Red,C71585
+Misty Rose,FFE4E1
+Misty Rose,FFE4E1
+Misty Rose,EED5D2
+Misty Rose,CDB7B5
+Misty Rose,8B7D7B
+Orange Red,FF4500
+Orange Red,FF4500
+Orange Red,EE4000
+Orange Red,CD3700
+Orange Red,8B2500
+Pale Violet Red,DB7093
+Pale Violet Red,FF82AB
+Pale Violet Red,EE799F
+Pale Violet Red,CD6889
+Pale Violet Red,8B475D
+Violet Red,D02090
+Violet Red,FF3E96
+Violet Red,EE3A8C
+Violet Red,CD3278
+Violet Red,8B2252
+Firebrick,B22222
+Firebrick,FF3030
+Firebrick,EE2C2C
+Firebrick,CD2626
+Firebrick,8B1A1A
+Pink,FFC0CB
+Pink,FFB5C5
+Pink,EEA9B8
+Pink,CD919E
+Pink,8B636C
+Feldspar,D19275
+Red,FF0000
+Red,FF0000
+Red,EE0000
+Red,CD0000
+Red,8B0000
+Tomato,FF6347
+Tomato,FF6347
+Tomato,EE5C42
+Tomato,CD4F39
+Tomato,8B3626
+Dusty Rose,856363
+Firebrick,8E2323
+Indian Red,F5CCB0
+Pink,BC8F8F
+Salmon,6F4242
+Scarlet,8C1717
+Spicy Pink,FF1CAE
+Free Speech Magenta,E35BD8
+Free Speech Red,C00000
+Dark Orchid,9932CC
+Dark Orchid,BF3EFF
+Dark Orchid,B23AEE
+Dark Orchid,9A32CD
+Dark Orchid,68228B
+Dark Violet,9400D3
+Lavender Blush,FFF0F5
+Lavender Blush,FFF0F5
+Lavender Blush,EEE0E5
+Lavender Blush,CDC1C5
+Lavender Blush,8B8386
+Medium Orchid,BA55D3
+Medium Orchid,E066FF
+Medium Orchid,D15FEE
+Medium Orchid,B452CD
+Medium Orchid,7A378B
+Medium Purple,9370DB
+Medium Orchid,9370DB
+Medium Purple,AB82FF
+Dark Orchid,9932CD
+Medium Purple,9F79EE
+Medium Purple,8968CD
+Medium Purple,5D478B
+Lavender,E6E6FA
+Magenta,FF00FF
+Fuchsia,FF00FF
+Magenta,FF00FF
+Magenta,EE00EE
+Magenta,CD00CD
+Magenta,8B008B
+Maroon,B03060
+Maroon,FF34B3
+Maroon,EE30A7
+Maroon,CD2990
+Maroon,8B1C62
+Orchid,DA70D6
+Orchid,DB70DB
+Orchid,FF83FA
+Orchid,EE7AE9
+Orchid,CD69C9
+Orchid,8B4789
+Plum,DDA0DD
+Plum,FFBBFF
+Plum,EEAEEE
+Plum,CD96CD
+Plum,8B668B
+Purple,A020F0
+Purple,800080
+Purple,9B30FF
+Purple,912CEE
+Purple,7D26CD
+Purple,551A8B
+Thistle,D8BFD8
+Thistle,FFE1FF
+Thistle,EED2EE
+Thistle,CDB5CD
+Thistle,8B7B8B
+Violet,EE82EE
+Violet Blue,9F5F9F
+Dark Purple,871F78
+Maroon,800000
+Medium Violet Red,DB7093
+Neon Pink,FF6EC7
+Plum,EAADEA
+Thistle,D8BFD8
+Turquoise,ADEAEA
+Violet,4F2F4F
+Violet Red,CC3299
+Antique White,FAEBD7
+Antique White,FFEFDB
+Antique White,EEDFCC
+Antique White,CDC0B0
+Antique White,8B8378
+Floral White,FFFAF0
+Ghost White,F8F8FF
+Navajo White,FFDEAD
+Navajo White,FFDEAD
+Navajo White,EECFA1
+Navajo White,CDB38B
+Navajo White,8B795E
+Old Lace,FDF5E6
+White Smoke,F5F5F5
+Gainsboro,DCDCDC
+Ivory,FFFFF0
+Ivory,FFFFF0
+Ivory,EEEEE0
+Ivory,CDCDC1
+Ivory,8B8B83
+Linen,FAF0E6
+Seashell,FFF5EE
+Seashell,FFF5EE
+Seashell,EEE5DE
+Seashell,CDC5BF
+Seashell,8B8682
+Snow,FFFAFA
+Snow,FFFAFA
+Snow,EEE9E9
+Snow,CDC9C9
+Snow,8B8989
+Wheat,F5DEB3
+Wheat,FFE7BA
+Wheat,EED8AE
+Wheat,CDBA96
+Wheat,8B7E66
+Quartz,D9D9F3
+Wheat,D8D8BF
+Blanched Almond,FFEBCD
+Dark Goldenrod,B8860B
+Dark Goldenrod,FFB90F
+Dark Goldenrod,EEAD0E
+Dark Goldenrod,CD950C
+Dark Goldenrod,8B6508
+Lemon Chiffon,FFFACD
+Lemon Chiffon,FFFACD
+Lemon Chiffon,EEE9BF
+Lemon Chiffon,CDC9A5
+Lemon Chiffon,8B8970
+Light Goldenrod,EEDD82
+Light Goldenrod,FFEC8B
+Light Goldenrod,EEDC82
+Light Goldenrod,CDBE70
+Light Goldenrod,8B814C
+Light Goldenrod Yellow,FAFAD2
+Light Yellow,FFFFE0
+Light Yellow,FFFFE0
+Light Yellow,EEEED1
+Light Yellow,CDCDB4
+Light Yellow,8B8B7A
+Pale Goldenrod,EEE8AA
+Papaya Whip,FFEFD5
+Cornsilk,FFF8DC
+Cornsilk,FFF8DC
+Cornsilk,EEE8CD
+Cornsilk,CDC8B1
+Cornsilk,8B8878
+Goldenrod,DAA520
+Goldenrod,FFC125
+Goldenrod,EEB422
+Goldenrod,CD9B1D
+Goldenrod,8B6914
+Goldenrod,DBDB70
+Moccasin,FFE4B5
+Yellow,FFFF00
+Yellow,FFFF00
+Yellow,EEEE00
+Yellow,CDCD00
+Yellow,8B8B00
+Gold,FFD700
+Gold,FFD700
+Gold,EEC900
+Gold,CDAD00
+Gold,8B7500
+Medium Goldenrod,EAEAAE
+Yellow Green,99CC32
+Copper,B87333
+Cool Copper,D98719
+Green Copper,856363
+Brass,B5A642
+Bronze,8C7853
+Bronze,A67D3D
+Bright Gold,D9D919
+Old Gold,CFB53B
+Gold,CD7F32
+Silver,E6E8FA
+Silver,C0C0C0
+Grey,C0C0C0
+Light Steel Blue,545454
+Steel Blue,236B8E

@@ -25,6 +25,12 @@ package com.nicotroia.whatcoloristhis.view.pages
 			settingsPage.backButton.addEventListener(Event.TRIGGERED, backButtonTriggeredHandler);
 			settingsPage.fetchCrayolaToggle.addEventListener(Event.CHANGE, fetchCrayolaToggleChangeHandler);
 			settingsPage.fetchPantoneToggle.addEventListener(Event.CHANGE, fetchPantoneToggleChangeHandler);
+			settingsPage.numberOfChoicesSlider.addEventListener(Event.CHANGE, numberOfChoicesSliderChangeHandler);
+		}
+		
+		private function numberOfChoicesSliderChangeHandler(event:Event):void
+		{
+			Settings.colorChoicesGivenToUser = settingsPage.numberOfChoicesSlider.value;
 		}
 		
 		private function fetchPantoneToggleChangeHandler(event:Event):void
@@ -39,7 +45,7 @@ package com.nicotroia.whatcoloristhis.view.pages
 		
 		private function backButtonTriggeredHandler():void
 		{
-			eventDispatcher.dispatchEvent(new NavigationEvent(NavigationEvent.NAVIGATE_TO_PAGE, SequenceModel.PAGE_Welcome));
+			eventDispatcher.dispatchEvent(new NavigationEvent(NavigationEvent.NAVIGATE_TO_PAGE, SequenceModel.PAGE_Welcome, null, NavigationEvent.NAVIGATE_LEFT));
 		}
 		
 		private function settingsPageTriggeredHandler(event:Event):void
@@ -54,6 +60,9 @@ package com.nicotroia.whatcoloristhis.view.pages
 			
 			eventMap.unmapStarlingListener(settingsPage, Event.TRIGGERED, settingsPageTriggeredHandler); 
 			settingsPage.backButton.removeEventListener(Event.TRIGGERED, backButtonTriggeredHandler);
+			settingsPage.fetchCrayolaToggle.removeEventListener(Event.CHANGE, fetchCrayolaToggleChangeHandler);
+			settingsPage.fetchPantoneToggle.removeEventListener(Event.CHANGE, fetchPantoneToggleChangeHandler);
+			settingsPage.numberOfChoicesSlider.removeEventListener(Event.CHANGE, numberOfChoicesSliderChangeHandler);
 			
 			super.onRemove();
 			

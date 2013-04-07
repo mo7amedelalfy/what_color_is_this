@@ -2,8 +2,9 @@ package com.nicotroia.whatcoloristhis.view.pages
 {
 	import com.feathers.themes.WhatColorIsThisTheme;
 	import com.greensock.TweenLite;
-	import com.greensock.easing.Circ;
+	import com.greensock.easing.Quart;
 	import com.nicotroia.whatcoloristhis.Assets;
+	import com.nicotroia.whatcoloristhis.controller.events.NavigationEvent;
 	import com.nicotroia.whatcoloristhis.model.CameraModel;
 	import com.nicotroia.whatcoloristhis.model.LayoutModel;
 	
@@ -19,6 +20,7 @@ package com.nicotroia.whatcoloristhis.view.pages
 	import starling.display.Button;
 	import starling.display.DisplayObject;
 	import starling.display.Image;
+	import starling.display.Quad;
 	import starling.display.Sprite;
 	import starling.events.Event;
 	import starling.textures.Texture;
@@ -29,6 +31,7 @@ package com.nicotroia.whatcoloristhis.view.pages
 		public var reflowed:Boolean;
 		
 		protected var _feathersTheme:WhatColorIsThisTheme;
+		protected var _background:Quad;
 		
 		public function PageBase()
 		{
@@ -105,16 +108,34 @@ package com.nicotroia.whatcoloristhis.view.pages
 			return bmd;
 		}
 		
-		public function show(durationSec:Number = 0.5, delaySec:Number = 0, callBack:Function = null):void
+		protected function drawBackgroundQuad(color:uint = 0xf5f5f5):Quad
 		{
-			this.x = stage.stageWidth * 0.25;
-			TweenLite.to(this, durationSec, {alpha:1.0, x:0, delay:delaySec, ease:Circ.easeInOut, onComplete:callBack });
+			this._background = new Quad(Starling.current.nativeStage.fullScreenWidth, Starling.current.nativeStage.fullScreenHeight, color);
+			
+			return this._background;
 		}
 		
-		public function hide(durationSec:Number = 0.5, delaySec:Number = 0, callBack:Function = null):void
+		public function show(durationSec:Number = 0.5, delaySec:Number = 0, direction:String = "NavigateRight", callBack:Function = null):void
 		{
-			//x:-50,
-			TweenLite.to(this, durationSec, {alpha:0.0, x:-(stage.stageWidth * 0.25), delay:delaySec, ease:Circ.easeInOut, onComplete:callBack });			
+			if( direction == NavigationEvent.NAVIGATE_RIGHT ) { 
+				this.x = stage.stageWidth;
+			}
+			else { 
+				this.x = -stage.stageWidth;
+			}
+			TweenLite.to(this, durationSec, {alpha:1.0, x:0, delay:delaySec, ease:Quart.easeInOut, onComplete:callBack });
+		}
+		
+		public function hide(durationSec:Number = 0.5, delaySec:Number = 0, direction:String = "NavigateRight", callBack:Function = null):void
+		{
+			var targetX:Number;
+			if( direction == NavigationEvent.NAVIGATE_RIGHT ) { 
+				targetX = -stage.stageWidth;
+			}
+			else { 
+				targetX = stage.stageWidth;
+			}
+			TweenLite.to(this, durationSec, {alpha:0.0, x:targetX, delay:delaySec, ease:Quart.easeInOut, onComplete:callBack });			
 		}
 		
 		protected function removeDrawnVector(target:DisplayObject):void
