@@ -1,10 +1,10 @@
 package com.nicotroia.whatcoloristhis.view.feathers
 {
-	import feathers.controls.Button;
 	import feathers.controls.Label;
 	import feathers.controls.List;
-	import feathers.controls.renderers.IListItemRenderer;
+	import feathers.controls.renderers.DefaultListItemRenderer;
 	import feathers.core.FeathersControl;
+	import feathers.skins.Scale9ImageStateValueSelector;
 	
 	import flash.text.TextFormat;
 	
@@ -12,73 +12,20 @@ package com.nicotroia.whatcoloristhis.view.feathers
 	import starling.display.DisplayObject;
 	import starling.events.Event;
 	
-	public class ResultListItemRenderer extends Button implements IListItemRenderer
+	public class ResultListItemRenderer extends DefaultListItemRenderer //Button implements IListItemRenderer
 	{
 		protected var _nameLabel:Label;
 		protected var _descriptionLabel:Label;
 		protected var _nameLabelTextFormat:TextFormat;
 		protected var _descriptionLabelTextFormat:TextFormat;
-		protected var _index:int = -1;
-		protected var _owner:List;
-		protected var _data:Object;
-		protected var _icon:DisplayObject;
 		protected var _title:String;
 		protected var _description:String;
-		protected var _iconFunction:Function;
 		protected var _titleFunction:Function;
 		protected var _descriptionFunction:Function;
 		
 		public function ResultListItemRenderer()
 		{
 			
-		}
-		
-		public function get index():int { return this._index; }
-		
-		public function set index(value:int):void
-		{
-			if(this._index == value)
-			{
-				return;
-			}
-			this._index = value;
-			this.invalidate(INVALIDATION_FLAG_DATA);
-		}
-		
-		public function get owner():List { return List(this._owner); }
-		
-		public function set owner(value:List):void
-		{
-			if(this._owner == value)
-			{
-				return;
-			}
-			this._owner = value;
-			this.invalidate(INVALIDATION_FLAG_DATA);
-		}
-		
-		public function get data():Object { return this._data; }
-		
-		public function set data(value:Object):void
-		{
-			if(this._data == value)
-			{
-				return;
-			}
-			this._data = value;
-			this.invalidate(INVALIDATION_FLAG_DATA);
-		}
-		
-		public function get iconFunction():Function { return this._iconFunction; }
-		
-		public function set iconFunction(value:Function):void
-		{
-			if(this._iconFunction == value)
-			{
-				return;
-			}
-			this._iconFunction = value;
-			this.invalidate(INVALIDATION_FLAG_DATA);
 		}
 		
 		public function get title():String { return this._title; }
@@ -137,8 +84,6 @@ package com.nicotroia.whatcoloristhis.view.feathers
 		
 		override protected function initialize():void
 		{
-			//trace("resultListItemRenderer initialize");
-			
 			if( ! this._nameLabel) {
 				this._nameLabel = new Label();
 				this.addChild(this._nameLabel);
@@ -148,56 +93,6 @@ package com.nicotroia.whatcoloristhis.view.feathers
 				this._descriptionLabel = new Label();
 				this.addChild(this._descriptionLabel);
 			}
-		}
-		
-		protected function replaceIcon(newIcon:DisplayObject):void
-		{
-			if( this._icon ) { 
-				removeChild(this._icon);
-				this._icon.dispose();
-			}
-			this._icon = null;
-			
-			this.defaultIcon = this._icon = newIcon;
-			addChild(this._icon);
-		}
-		
-		protected function itemToIcon(item:Object):DisplayObject
-		{
-			if(this._iconFunction != null)
-			{
-				return this._iconFunction(item) as DisplayObject;
-			}
-			
-			return null;
-		}
-		
-		override protected function draw():void
-		{
-			const dataInvalid:Boolean = this.isInvalid(INVALIDATION_FLAG_DATA);
-			const stylesInvalid:Boolean = this.isInvalid(INVALIDATION_FLAG_STYLES);
-			const selectionInvalid:Boolean = this.isInvalid(INVALIDATION_FLAG_SELECTED);
-			var sizeInvalid:Boolean = this.isInvalid(INVALIDATION_FLAG_SIZE);
-			
-			if(dataInvalid)
-			{
-				this.commitData();
-			}
-			
-			if(stylesInvalid)// || stateInvalid || selectedInvalid)
-			{
-				this.refreshSkin();
-				this.refreshIcon();
-			}
-			
-			sizeInvalid = this.autoSizeIfNeeded() || sizeInvalid;
-			
-			if(dataInvalid || sizeInvalid)
-			{
-				this.layout();
-			}
-			
-			this.refreshSkin();
 		}
 		
 		override protected function autoSizeIfNeeded():Boolean
@@ -221,7 +116,7 @@ package com.nicotroia.whatcoloristhis.view.feathers
 			var newHeight:Number = this.explicitHeight;
 			if(needsHeight)
 			{
-				var iconHeight:Number = this.paddingTop + this._icon.height + this.paddingBottom;
+				var iconHeight:Number = this.paddingTop + this.currentIcon.height + this.paddingBottom;
 				var textHeight:Number = this.paddingTop + this._nameLabel.height + this.gap + this._descriptionLabel.height + this.paddingBottom;
 				newHeight = Math.max(iconHeight, textHeight);
 			}
@@ -229,12 +124,16 @@ package com.nicotroia.whatcoloristhis.view.feathers
 			return this.setSizeInternal(newWidth, newHeight, false);
 		}
 		
-		protected function commitData():void
+		override public function itemToLabel(item:Object):String
+		{
+			//no label
+			return "";
+		}
+		
+		override protected function commitData():void
 		{
 			//trace("resultListItemRenderer commitData");
-			
-			const newIcon:DisplayObject = this.itemToIcon(this._data);
-			this.replaceIcon(newIcon);
+			super.commitData();
 			
 			if( this._titleFunction ) this._title = this._titleFunction(this._data); 
 			if( this._title ) { 
@@ -253,28 +152,27 @@ package com.nicotroia.whatcoloristhis.view.feathers
 			}
 		}
 		
-		protected function layout():void
+		override protected function layoutContent():void
 		{
-			trace("resultListItemRenderer layout");
+			//trace("resultListItemRenderer layout");
 			
-			this._icon.x = this.paddingLeft;
-			this._icon.y = this.paddingTop;
+			super.layoutContent();
 			
-			//var labelWidth:Number = this.actualWidth - this.paddingLeft - this._icon.width - this.gap - this.paddingRight;
-			
-			this._nameLabel.x = this.paddingLeft + this._icon.width + this.gap;
+			this._nameLabel.x = this.paddingLeft + this.currentIcon.width + this.gap;
 			this._nameLabel.y = this.paddingTop;
 			this._nameLabel.width = this.actualWidth - this._nameLabel.x - this.paddingRight;
-			this._nameLabel.height = (20 * Starling.contentScaleFactor);
+			//this._nameLabel.height = (20 * Starling.contentScaleFactor);
+			this._nameLabel.textRendererProperties.embedFonts = true;
 			this._nameLabel.textRendererProperties.wordWrap = false;
 			this._nameLabel.textRendererProperties.textFormat = _nameLabelTextFormat
 			
-			this._descriptionLabel.x = this.paddingLeft + this._icon.width + this.gap;
-			this._descriptionLabel.y = this._nameLabel.y + this._nameLabel.height + this.gap;
+			this._descriptionLabel.x = this.paddingLeft + this.currentIcon.width + this.gap;
+			this._descriptionLabel.y = this.paddingTop + (this.currentIcon.height * 0.5); // + this.gap;
 			this._descriptionLabel.width = this.actualWidth - this._nameLabel.x - this.paddingRight; //labelWidth;
-			this._descriptionLabel.height = (20 * Starling.contentScaleFactor);
+			//this._descriptionLabel.height = (20 * Starling.contentScaleFactor);
+			this._descriptionLabel.textRendererProperties.embedFonts = false;
 			this._descriptionLabel.textRendererProperties.wordWrap = true;
-			this._descriptionLabel.textRendererProperties.textFormat = _descriptionLabelTextFormat
+			this._descriptionLabel.textRendererProperties.textFormat = _descriptionLabelTextFormat;
 		}
 	}
 }

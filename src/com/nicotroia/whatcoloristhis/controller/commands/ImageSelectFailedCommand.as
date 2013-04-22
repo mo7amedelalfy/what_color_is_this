@@ -12,12 +12,16 @@ package com.nicotroia.whatcoloristhis.controller.commands
 		[Inject]
 		public var event:CameraEvent;
 		
+		[Inject]
+		public var sequenceModel:SequenceModel;
+		
 		override public function execute():void
 		{
 			trace("ImageSelectFailedCommand via " + event.type);
 			
-			//what else?
-			eventDispatcher.dispatchEvent(new LoadingEvent(LoadingEvent.LOADING_FINISHED));
+			trace("keeping the spinner up for now...");
+			sequenceModel.cancelLoadingOncePageFullyLoads = true;
+			//eventDispatcher.dispatchEvent(new LoadingEvent(LoadingEvent.LOADING_FINISHED));
 			eventDispatcher.dispatchEvent(new NavigationEvent(NavigationEvent.NAVIGATE_TO_PAGE, SequenceModel.PAGE_Welcome));
 		}
 	}

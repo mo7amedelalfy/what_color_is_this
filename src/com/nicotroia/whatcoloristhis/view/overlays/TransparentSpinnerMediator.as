@@ -17,8 +17,6 @@ package com.nicotroia.whatcoloristhis.view.overlays
 		{
 			super.onRegister();
 			
-			transparentSpinner.setTextFormat(layoutModel);
-			
 			if( ! transparentSpinner.hasBeenDrawn ) { 
 				transparentSpinner.draw(layoutModel);
 			}

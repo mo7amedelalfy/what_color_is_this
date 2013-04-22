@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!-- Created with TexturePacker http://texturepacker.com-->
-<!-- $TexturePacker:SmartUpdate:c8c215636768f6223483c020ae69d381$ -->
-<TextureAtlas imagePath="atlas.png">
-    <SubTexture name="button_down" x="4" y="4" width="140" height="80"/>
-    <SubTexture name="button_up" x="148" y="4" width="140" height="80"/>
-</TextureAtlas>

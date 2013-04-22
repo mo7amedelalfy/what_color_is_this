@@ -1,6 +1,6 @@
 package com.nicotroia.whatcoloristhis.view.overlays
 {
-	import com.feathers.themes.WhatColorIsThisTheme;
+	import com.nicotroia.whatcoloristhis.view.feathers.WhatColorIsThisTheme;
 	import com.greensock.TweenLite;
 	import com.greensock.easing.Circ;
 	import com.nicotroia.whatcoloristhis.model.CameraModel;
@@ -28,12 +28,14 @@ package com.nicotroia.whatcoloristhis.view.overlays
 			header = new Header();
 			header.leftItems = new <DisplayObject>[];
 			header.rightItems = new <DisplayObject>[];
+			header.titleProperties.htmlText = true;
 			
 			super();
 		}
 		
 		public function changeTitle(title:String):void
 		{
+			header.titleProperties.htmlText = true;
 			header.title = title;
 			header.validate();
 			//header.titleProperties.textFormat = _textFormat;
@@ -87,6 +89,7 @@ package com.nicotroia.whatcoloristhis.view.overlays
 			header.height = layoutModel.navBarHeight;
 		}
 		
+		/*
 		override protected function removedFromStageHandler(event:Event):void
 		{
 			super.removedFromStageHandler(event);
@@ -96,5 +99,6 @@ package com.nicotroia.whatcoloristhis.view.overlays
 			
 			removeDrawnVector( header );
 		}
+		*/
 	}
 }

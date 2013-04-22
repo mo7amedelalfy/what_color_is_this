@@ -8,19 +8,26 @@ package com.nicotroia.whatcoloristhis.controller.utils
 
 	public class ResultLoader
 	{
+		public static const SIMPLE:String = "Simple";
+		public static const SIMPLE_API:String = "what-color-is-this";
+		public static const NAME_THAT_COLOR:String = "Name That Color";
+		public static const NAME_THAT_COLOR_API:String = "what-ntc-is-this";
 		public static const CRAYOLA:String = "Crayola";
-		public static const PANTONE:String = "Pantone";
 		public static const CRAYOLA_API:String = "what-crayola-is-this";
+		public static const PANTONE:String = "Pantone";
 		public static const PANTONE_API:String = "what-pantone-is-this";
 		
-		private var _resultType:String;
-		private var _resultAPI:String;
-		private var _callback:Function;
+		public var resultType:String;
 		
-		public function ResultLoader(resultType:String, queryHex:String, callback:Function = null)
+		private var _resultAPI:String;
+		private var _onSuccess:Function;
+		private var _onError:Function;
+		
+		public function ResultLoader(resultType:String, queryHex:String, onSuccess:Function = null, onError:Function = null)
 		{
-			_resultType = resultType;
-			_callback = callback;
+			this.resultType = resultType;
+			_onSuccess = onSuccess;
+			_onError = onError;
 			
 			var urlLoader:URLLoader = new URLLoader();
 			
@@ -28,7 +35,9 @@ package com.nicotroia.whatcoloristhis.controller.utils
 			urlLoader.addEventListener(IOErrorEvent.IO_ERROR, urlLoaderIOErrorHandler);
 			urlLoader.addEventListener(SecurityErrorEvent.SECURITY_ERROR, urlLoaderSecurityErrorHandler);
 			
-			if( resultType == CRAYOLA ) _resultAPI = CRAYOLA_API;
+			if( resultType == SIMPLE ) _resultAPI = SIMPLE_API;
+			else if( resultType == NAME_THAT_COLOR ) _resultAPI = NAME_THAT_COLOR_API;
+			else if( resultType == CRAYOLA ) _resultAPI = CRAYOLA_API;
 			else if( resultType == PANTONE ) _resultAPI = PANTONE_API;
 			
 			var url:String = "http://nicotroia.com/api/"+ _resultAPI +"/"+ queryHex;
@@ -47,51 +56,19 @@ package com.nicotroia.whatcoloristhis.controller.utils
 			urlLoader.removeEventListener(SecurityErrorEvent.SECURITY_ERROR, urlLoaderSecurityErrorHandler);
 			
 			var json:Object = JSON.parse(urlLoader.data);
-			json.result_type = _resultType;
+			json.result_type = resultType;
 			
-			if( _resultType == PANTONE ) { 
+			if( resultType == PANTONE ) { 
 				json.color_name = "Pantone #" + json.pantone_id;
 			}
 			
-			trace("Ding! " + _resultType, json.color_name);
+			trace("Ding! " + resultType, json.color_name);
 			
-			if( _callback != null ) { 
-				_callback(json, this);
+			if( _onSuccess != null ) { 
+				_onSuccess(json, this);
 			}
 			
 			urlLoader = null;
-			
-			//cameraModel.resultName = json.color_name; //"";
-			//cameraModel.closestMatchHex = json.closest_match;
-			
-			/*
-			for each(var n:String in json.color_names) { 
-			name += n + " / ";
-			}
-			name = name.substr(0,-3);
-			*/
-			
-			//trace("ding. " + cameraModel.resultName);
-			//trace("closest_match: " + cameraModel.closestMatchHex);
-			
-			/*
-			resultPage.vectorPage.thisThingTF.text = getRandomComment(); 
-			resultPage.vectorPage.colorNameTF.text = cameraModel.resultName;
-			resultPage.vectorPage.closestMatchHexTF.text = "(0x" + cameraModel.closestMatchHex + ")";
-			
-			if(uint("0x"+cameraModel.chosenWinnerHex) > 0xAAAAAA) { 
-			_textFormat.color = 0x2b2b2b;
-			}
-			else { 
-			_textFormat.color = 0xffffff;
-			}
-			
-			resultPage.vectorPage.thisThingTF.setTextFormat(_textFormat);
-			resultPage.vectorPage.colorNameTF.setTextFormat(_textFormat);
-			resultPage.vectorPage.closestMatchHexTF.setTextFormat(_textFormat);
-			*/
-			//colorBackground();
-			//resultPage.drawResultTexts();
 		}
 		
 		protected function urlLoaderIOErrorHandler(event:IOErrorEvent):void
@@ -105,6 +82,8 @@ package com.nicotroia.whatcoloristhis.controller.utils
 			urlLoader.removeEventListener(SecurityErrorEvent.SECURITY_ERROR, urlLoaderSecurityErrorHandler);
 			
 			trace("IOError: " + event.errorID);
+			
+			_onError(this);
 		}
 		
 		protected function urlLoaderSecurityErrorHandler(event:SecurityErrorEvent):void
@@ -118,6 +97,8 @@ package com.nicotroia.whatcoloristhis.controller.utils
 			urlLoader.removeEventListener(SecurityErrorEvent.SECURITY_ERROR, urlLoaderSecurityErrorHandler);
 			
 			trace("SecurityError: " + event.errorID);
+			
+			_onError(this);
 		}
 	}
 }

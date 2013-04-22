@@ -254,7 +254,6 @@ Khaki,CDC673
 Khaki,8B864E
 Dark Olive Green,4F4F2F
 Green Yellow,D19275
-Hunter Green,8E2323
 Forest Green,238E23
 Medium Forest Green,DBDB70
 Medium Sea Green,426F42

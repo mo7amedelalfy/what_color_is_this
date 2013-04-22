@@ -4,7 +4,9 @@ package com.nicotroia.whatcoloristhis.model
 	
 	import feathers.system.DeviceCapabilities;
 	
+	import flash.display.Screen;
 	import flash.display.StageOrientation;
+	import flash.system.Capabilities;
 	
 	import org.robotlegs.mvcs.Actor;
 	
@@ -18,7 +20,9 @@ package com.nicotroia.whatcoloristhis.model
 		public var navBarHeight:Number = 1;
 		public var scale:Number = 1;
 		public var infoDispBold:InfoDispBold;
+		public var infoDispMedium:InfoDispMedium;
 		public var shadowBoxColor:uint;
+		public var lightThreshold:uint = 0xffff00; //0x808080;
 		
 		private var _orientation:String;
 		private var _appWidth:Number;
@@ -29,6 +33,8 @@ package com.nicotroia.whatcoloristhis.model
 		public function LayoutModel()
 		{
 			infoDispBold = new InfoDispBold();
+			infoDispMedium = new InfoDispMedium();
+			
 			_scaleToDPI = true;
 			const scaledDPI:int = DeviceCapabilities.dpi / Starling.contentScaleFactor;
 			this._originalDPI = scaledDPI;
@@ -47,15 +53,24 @@ package com.nicotroia.whatcoloristhis.model
 			this.scale = scaledDPI / this._originalDPI;
 			
 			_orientation = StageOrientation.UNKNOWN;
-			_appWidth = Starling.current.nativeStage.fullScreenWidth;
-			_appHeight = Starling.current.nativeStage.fullScreenHeight;
+			
+			
+			//These initial values will be changed in LayoutPageCommand
+			if( Capabilities.version.substr(0,3).toUpperCase() == "AND" ) { //android device
+				_appWidth = Starling.current.nativeStage.stageWidth;
+				_appHeight = Starling.current.nativeStage.stageHeight;
+			}
+			else { 
+				_appWidth = Starling.current.nativeStage.fullScreenWidth;
+				_appHeight = Starling.current.nativeStage.fullScreenHeight;
+			}
 			
 			navBarHeight = 140 * this.scale * Starling.contentScaleFactor;
 			
 			trace("LayoutModel init");
 		}
 		
-		public function layoutApp($orientation:String, $appWidth:Number, $appHeight:Number):void
+		public function changeAppLayout($orientation:String, $appWidth:Number, $appHeight:Number):void
 		{
 			_orientation = $orientation;
 			_appWidth = $appWidth;

@@ -31,8 +31,17 @@ package com.nicotroia.whatcoloristhis.view.pages
 		
 		override public function onRegister():void
 		{
-			//trace("pagebase onRegister");
+			trace("pagebase mediator onRegister " + view);
 			
+			if( ! view.isBeingMediated ) { 
+				view.addEventListener(Event.ADDED_TO_STAGE, pageAddedToStageHandler);
+			}
+			
+			view.isBeingMediated = true; 
+		}
+		
+		protected function pageAddedToStageHandler(event:Event = null):void
+		{
 			//This shit's expensive... Resize only the first time it's added
 			if( ! view.reflowed ) { 
 				callAppResizedHandler();
@@ -79,7 +88,7 @@ package com.nicotroia.whatcoloristhis.view.pages
 			super.onRemove();
 			
 			//we have to make sure somehow that overlays don't accidentally trigger pages "successful removal"
-			sequenceModel.lastPageRemovedSuccessfully = true;
+			//sequenceModel.lastPageRemovedSuccessfully = true;
 		}
 	}
 }

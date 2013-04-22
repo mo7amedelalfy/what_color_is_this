@@ -28,13 +28,16 @@ package com.nicotroia.whatcoloristhis.view.overlays
 		public function TransparentSpinner()
 		{
 			_vector = new TransparentSpinnerVector();
+			_textFormat = new TextFormat();
 			
 			super();
 		}
 		
 		public function setTextFormat(layoutModel:LayoutModel):void
 		{
-			_textFormat = new TextFormat(layoutModel.infoDispBold.fontName, (32 * layoutModel.scale) * Starling.contentScaleFactor, 0xffffff);
+			_textFormat.font = layoutModel.infoDispBold.fontName;
+			_textFormat.size = 34 * layoutModel.scale * Starling.contentScaleFactor;
+			//_textFormat.color = 0xffffff;
 		}
 		
 		public function changeText(text:String, layoutModel:LayoutModel):void
@@ -50,6 +53,7 @@ package com.nicotroia.whatcoloristhis.view.overlays
 			_vector.notificationTF.x = ((layoutModel.appWidth - _vector.notificationTF.width) * 0.5) * Starling.contentScaleFactor;
 			_vector.notificationTF.y = (layoutModel.appHeight * 0.5) - ((120 * layoutModel.scale)) * Starling.contentScaleFactor;
 			
+			setTextFormat(layoutModel);
 			drawText(layoutModel);
 			drawSpinner(layoutModel);
 			
@@ -62,11 +66,9 @@ package com.nicotroia.whatcoloristhis.view.overlays
 		{
 			removeDrawnVector(_notification);
 			
-			if( _textFormat ) { 
-				_textFormat.color = (( layoutModel.shadowBoxColor >= 0x808080 ) ? 0x2b2b2b : 0xffffff);
-				
-				_vector.notificationTF.setTextFormat(_textFormat);
-			}
+			_textFormat.color = (( layoutModel.shadowBoxColor >= layoutModel.lightThreshold ) ? 0x2b2b2b : 0xffffff); 
+			
+			_vector.notificationTF.setTextFormat(_textFormat);
 			
 			_notification = createImageFromDisplayObject(_vector.notificationTF);
 			addChild(_notification);
@@ -77,11 +79,11 @@ package com.nicotroia.whatcoloristhis.view.overlays
 			var textureName:String;
 			
 			if( Assets.roundedScaleFactor == 2 ) { 
-				if( layoutModel.shadowBoxColor >= 0x808080 ) textureName = "spinner_dark_large";
+				if( layoutModel.shadowBoxColor >= layoutModel.lightThreshold ) textureName = "spinner_dark_large";
 				else textureName = "spinner_light_large";
 			}
 			else { 
-				if( layoutModel.shadowBoxColor >= 0x808080 ) textureName = "spinner_dark_small";
+				if( layoutModel.shadowBoxColor >= layoutModel.lightThreshold ) textureName = "spinner_dark_small";
 				else textureName = "spinner_light_small";
 			}
 				
@@ -90,7 +92,7 @@ package com.nicotroia.whatcoloristhis.view.overlays
 				removeDrawnVector(_spinner);
 			}
 			
-			_spinner = new MovieClip(Assets.getSpinnerAtlas().getTextures(textureName), 20);
+			_spinner = new MovieClip(Assets.getSpinnerAtlas().getTextures(textureName), 30);
 			_spinner.x = (layoutModel.appWidth * 0.5) - ((_spinner.width/Starling.contentScaleFactor) * 0.5);
 			_spinner.y = (layoutModel.appHeight * 0.5) - ((_spinner.height/Starling.contentScaleFactor) * 0.5);
 			

@@ -22,7 +22,7 @@ package com.nicotroia.whatcoloristhis.model
 		public var assetWaitingList:Dictionary;
 		public var overlayWaitingList:Dictionary;
 		public var isTransitioning:Boolean = false;
-		public var lastPageRemovedSuccessfully:Boolean = true;
+		public var cancelLoadingOncePageFullyLoads:Boolean = false;
 		
 		//PAGE Constants
 		public static const PAGE_Welcome:Class = WelcomePage;

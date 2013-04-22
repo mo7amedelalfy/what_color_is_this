@@ -1,6 +1,6 @@
 package com.nicotroia.whatcoloristhis.view.pages
 {
-	import com.feathers.themes.WhatColorIsThisTheme;
+	import com.nicotroia.whatcoloristhis.view.feathers.WhatColorIsThisTheme;
 	import com.greensock.TweenLite;
 	import com.greensock.easing.Quart;
 	import com.nicotroia.whatcoloristhis.Assets;
@@ -29,6 +29,7 @@ package com.nicotroia.whatcoloristhis.view.pages
 	{
 		public var vectorPage:MovieClip;
 		public var reflowed:Boolean;
+		public var isBeingMediated:Boolean;
 		
 		protected var _feathersTheme:WhatColorIsThisTheme;
 		protected var _background:Quad;
@@ -37,17 +38,20 @@ package com.nicotroia.whatcoloristhis.view.pages
 		{
 			this.alpha = 0.0;
 			this._feathersTheme = new WhatColorIsThisTheme(this, true);
-			
-			//this.addEventListener(Event.ADDED_TO_STAGE, addedToStageHandler);
 		}
 		
+		/*
 		protected function addedToStageHandler(event:Event):void
 		{
+			trace("pagebase addedToStage " + this);
+			//this.dispatchEventWith(NavigationEvent.PAGE_ADDED);
+			
 			//trace("pagebase added to stage");
 			//this.addEventListener(Event.REMOVED_FROM_STAGE, removedFromStageHandler);
 			
 			//override
 		}
+		*/
 		
 		public function reflowVectors(layoutModel:LayoutModel = null, cameraModel:CameraModel = null):void
 		{
@@ -59,11 +63,23 @@ package com.nicotroia.whatcoloristhis.view.pages
 			
 		}
 		
+		protected function drawVector(target:flash.display.DisplayObject):BitmapData
+		{
+			var bounds:Rectangle = target.getBounds(Starling.current.nativeStage);
+			var bmd:BitmapData = new BitmapData(bounds.width + 4, bounds.height + 4, true, 0);
+			
+			bmd.drawWithQuality(target, 
+				new Matrix(target.transform.matrix.a, 0, 0, target.transform.matrix.d, 2, 2),
+				null, null, null, true, StageQuality.HIGH);
+			
+			return bmd;
+		}
+		
 		protected function createImageFromDisplayObject(target:flash.display.DisplayObject):Image
 		{
 			var bmd:BitmapData = drawVector(target);
 			
-			var image:Image = Image.fromBitmap(new Bitmap(bmd), true, Starling.contentScaleFactor); //Assets.scaleFactor);
+			var image:Image = Image.fromBitmap(new Bitmap(bmd), true, Starling.contentScaleFactor); 
 			image.x = target.x;
 			image.y = target.y;
 			
@@ -94,18 +110,6 @@ package com.nicotroia.whatcoloristhis.view.pages
 			}
 			
 			return button;
-		}
-		
-		protected function drawVector(target:flash.display.DisplayObject):BitmapData
-		{
-			var bounds:Rectangle = target.getBounds(Starling.current.nativeStage);
-			var bmd:BitmapData = new BitmapData(bounds.width + 4, bounds.height + 4, true, 0);
-			
-			bmd.drawWithQuality(target, 
-				new Matrix(target.transform.matrix.a, 0, 0, target.transform.matrix.d, 2, 2),
-				null, null, null, true, StageQuality.HIGH);
-			
-			return bmd;
 		}
 		
 		protected function drawBackgroundQuad(color:uint = 0xf5f5f5):Quad
@@ -153,9 +157,10 @@ package com.nicotroia.whatcoloristhis.view.pages
 			img.setTexCoords(3, new Point(horizontally, vertically));
 		}
 		
+		/*
 		protected function removedFromStageHandler(event:Event):void
 		{
-			//pages will never need to remove everything
+			//pages should stick around and hide, not needing to get initialized every single time
 			
 			//trace("pagebase removed from stage");
 			
@@ -164,5 +169,6 @@ package com.nicotroia.whatcoloristhis.view.pages
 			
 			//override
 		}
+		*/
 	}
 }

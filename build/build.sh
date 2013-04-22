@@ -41,8 +41,8 @@ else
 fi
 
 #For some reason I get "Initial window content is invalid" when I remove "-debug"...
-#-compress=false 
-"$AIR_SDK/bin/amxmlc" -debug=$DEBUG -library-path+=$PROJECT_PATH/libs $FILENAME.as -output $PROJECT_PATH/bin-debug/$FILENAME.swf
+#-compress=false required for ios simulator
+"$AIR_SDK/bin/amxmlc" -compress=false -debug=$DEBUG -library-path+=$PROJECT_PATH/libs $FILENAME.as -output $PROJECT_PATH/bin-debug/$FILENAME.swf
 
 # Read the exit static of mxmlc to determine if there was an error
 STATUS=$?
@@ -60,22 +60,29 @@ then
 		
 		mkdir -p $PROJECT_PATH/bin-android
 		
+		LISTEN=""
+		
 		if [ $2 == "-release" ]
 		then
-			ANDROID_TARGET="apk"
+			# apk or apk-captive-runtime for release builds
+			# Starting AIR 3.7, packaging AIR applications for Android in any target will embed the AIR runtime in the application itself.
+			ANDROID_TARGET="apk-captive-runtime" 
 		elif [ $2 == "-debug" ]
 		then
 			ANDROID_TARGET="apk-debug"
+			LISTEN="-listen 7936"
 		elif [ $2 == "-emulator" ]
 		then
-			ANDROID_TARGET="apk-emulator"
+			#apk-emulator 
+			ANDROID_TARGET="apk-captive-runtime"
 		else 
 			ANDROID_TARGET="apk-debug"
+			LISTEN="-listen 7936"
 		fi
 		
 		# -connect wifi debug
 		# -listen usb debug
-		"$AIR_SDK/bin/adt" -package -target $ANDROID_TARGET -listen 7936 -storetype pkcs12 -keystore $PROJECT_PATH/build/android/cert.p12 -storepass 12345 $PROJECT_PATH/bin-android/$FILENAME.apk $PROJECT_PATH/src/$FILENAME-app.xml $FILENAME.swf assets/
+		"$AIR_SDK/bin/adt" -package -target $ANDROID_TARGET $LISTEN -storetype pkcs12 -keystore $PROJECT_PATH/build/android/cert.p12 -storepass 12345 $PROJECT_PATH/bin-android/$FILENAME.apk $PROJECT_PATH/src/$FILENAME-app.xml $FILENAME.swf assets/
 	
 	elif [ $1 == "-ios" ]
 	then
@@ -86,6 +93,8 @@ then
 		
 		LISTEN=""
 		EXTRA=""
+		KEYSTORE=""
+		PROVISIONING_PROFILE=""
 		
 		if [ $2 == "-debug" ] 
 		then
@@ -94,21 +103,31 @@ then
 		
 			IOS_TARGET="ipa-debug"
 			LISTEN="-listen 7936"
+			KEYSTORE="$PROJECT_PATH/build/ios/cert.p12"
+			PROVISIONING_PROFILE="$PROJECT_PATH/build/ios/what_color_is_this_development.mobileprovision"
 		elif [ $2 == "-simulator" ]
 		then
 			IOS_TARGET="ipa-debug-interpreter-simulator"
 			EXTRA="-platformsdk $IPHONE_SDK"
+			KEYSTORE="$PROJECT_PATH/build/ios/cert.p12"
+			PROVISIONING_PROFILE="$PROJECT_PATH/build/ios/what_color_is_this_development.mobileprovision"
 		elif [ $2 == "-adhoc" ]
 		then
 			IOS_TARGET="ipa-ad-hoc"
+			KEYSTORE="$PROJECT_PATH/build/ios/distribution.p12"
+			PROVISIONING_PROFILE="$PROJECT_PATH/build/ios/what_color_is_this_distribution.mobileprovision"
 		elif [ $2 == "-appstore" ]
 		then
 			IOS_TARGET="ipa-app-store"
+			KEYSTORE="$PROJECT_PATH/build/ios/distribution.p12"
+			PROVISIONING_PROFILE="$PROJECT_PATH/build/ios/what_color_is_this_distribution.mobileprovision"
 		else
 			IOS_TARGET="ipa-debug"
+			KEYSTORE="$PROJECT_PATH/build/ios/cert.p12"
+			PROVISIONING_PROFILE="$PROJECT_PATH/build/ios/what_color_is_this_development.mobileprovision"
 		fi
 		
-		"$AIR_SDK/bin/adt" -package -target $IOS_TARGET $LISTEN -storetype pkcs12 -keystore $PROJECT_PATH/build/ios/cert.p12 -provisioning-profile $PROJECT_PATH/build/ios/what_color_is_this_development.mobileprovision $PROJECT_PATH/bin-ios/$FILENAME.ipa $PROJECT_PATH/src/$FILENAME-app.xml $FILENAME.swf assets/ $EXTRA
+		"$AIR_SDK/bin/adt" -package -target $IOS_TARGET $LISTEN -storetype pkcs12 -keystore $KEYSTORE -provisioning-profile $PROVISIONING_PROFILE $PROJECT_PATH/bin-ios/$FILENAME.ipa $PROJECT_PATH/src/$FILENAME-app.xml Default-568h@2x.png $FILENAME.swf assets/ $EXTRA
 	else
 		echo "Error. Invalid target."
 		exit 1
@@ -122,6 +141,12 @@ then
 		echo ;
 		echo "...Installing package..."
 		echo ;
+		
+		if [ $3 == "-none" ]
+		then
+			echo "Not installing to a device."
+			exit 1
+		fi 
 	
 		if [ $1 == "-android" ] 
 		then
@@ -129,10 +154,19 @@ then
 			
 			cd $PROJECT_PATH/bin-android
 			
+			TARGET=""
+			
+			if [ -z "$3" ]
+			then
+				TARGET="-d"
+			else
+				TARGET=$3
+			fi
+			
 			# -e emulator -d device -s serial
 			# -r reinstall 
 			# -t allow test apks
-			adb -d install -r $FILENAME.apk
+			adb $TARGET install -r $FILENAME.apk
 			
 			# Read status again
 			STATUS=$?

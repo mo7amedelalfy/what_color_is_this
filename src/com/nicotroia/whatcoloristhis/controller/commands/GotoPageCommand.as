@@ -1,5 +1,6 @@
 package com.nicotroia.whatcoloristhis.controller.commands
 {	
+	import com.nicotroia.whatcoloristhis.controller.events.LoadingEvent;
 	import com.nicotroia.whatcoloristhis.controller.events.NavigationEvent;
 	import com.nicotroia.whatcoloristhis.model.SequenceModel;
 	import com.nicotroia.whatcoloristhis.view.pages.PageBase;
@@ -7,6 +8,7 @@ package com.nicotroia.whatcoloristhis.controller.commands
 	import flash.events.Event;
 	import flash.system.System;
 	import flash.utils.getQualifiedClassName;
+	import flash.utils.setTimeout;
 	
 	import org.robotlegs.mvcs.StarlingCommand;
 	
@@ -34,9 +36,9 @@ package com.nicotroia.whatcoloristhis.controller.commands
 		
 		override public function execute():void
 		{
-			if( event.type != NavigationEvent.NAVIGATE_TO_PAGE || 
-				sequenceModel.isTransitioning || 
-				sequenceModel.lastPageRemovedSuccessfully == false ) return;
+			if( event.type != NavigationEvent.NAVIGATE_TO_PAGE 
+				|| sequenceModel.isTransitioning 
+			) return;
 			else trace("GotoPageCommand " + NavigationEvent(event).pageConstant) + " via " + event.type;
 			
 			sequenceModel.isTransitioning = true;
@@ -50,8 +52,11 @@ package com.nicotroia.whatcoloristhis.controller.commands
 			if( _newPage == _lastPage ) { 
 				//Just display the show animation and stop
 				sequenceModel.isTransitioning = true;
+				//_newPage.disableButtons();
 				_newPage.show(pageSpeed, delay, direction, function():void { 
 					sequenceModel.isTransitioning = false;
+					
+					end();
 				});
 				
 				return;
@@ -67,7 +72,6 @@ package com.nicotroia.whatcoloristhis.controller.commands
 			if( _lastPage != null && pageContainer.contains(_lastPage) ) { 
 				_lastPage.hide(pageSpeed, 0, direction, function():void { 
 					trace(" ---- removing " + _lastPage);
-					sequenceModel.lastPageRemovedSuccessfully = false;
 					pageContainer.removeChild(_lastPage);
 					
 					if( System.pauseForGCIfCollectionImminent != null ) { 
@@ -140,10 +144,28 @@ package com.nicotroia.whatcoloristhis.controller.commands
 			
 			//Add the new page
 			pageContainer.addChild(_newPage);
-			_newPage.show(pageSpeed, delay, direction, function():void { 
+			
+			//_newPage.disableButtons();
+			_newPage.show(pageSpeed * 0.5, delay, direction, function():void { 
 				//finally... finish.
 				sequenceModel.isTransitioning = false;
+				
+				end();
 			});
+		}
+		
+		protected function end():void
+		{
+			//_newPage.enableButtons();
+			
+			if( sequenceModel.cancelLoadingOncePageFullyLoads ) { 
+				sequenceModel.cancelLoadingOncePageFullyLoads = false;
+				
+				setTimeout( function():void { 
+					trace("ok. page loaded. cancelling loading spinner because something said so.");
+					eventDispatcher.dispatchEvent(new LoadingEvent(LoadingEvent.LOADING_FINISHED));
+				}, 1);
+			}
 		}
 		
 		protected function safeRemove(obj:DisplayObject):void

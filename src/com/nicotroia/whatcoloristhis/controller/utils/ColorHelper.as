@@ -1,6 +1,5 @@
 package com.nicotroia.whatcoloristhis.controller.utils
 {
-	import flash.utils.Dictionary;
 	
 	public class ColorHelper
 	{
@@ -8,7 +7,7 @@ package com.nicotroia.whatcoloristhis.controller.utils
 		public static var GREEN:String = "g";
 		public static var BLUE:String = "b";
 		
-		public static var rgb:Dictionary = new Dictionary();
+		public static var rgb:Object = {};
 		public static var palatte:Vector.<uint> = new <uint>[0xf02973, 0x0099ff, 0x333333, 0x2b2b2b, 0x444444, 0x60cccc, 0xffffcc, 0xf0f0f0];
 		
 		public static function colorBounds(color:uint):uint { return (color > 255) ? 255 : color; }
@@ -19,7 +18,7 @@ package com.nicotroia.whatcoloristhis.controller.utils
 		
 		public static function getRandomColorInRange(color:uint, range:Number = 50):uint
 		{
-			var rgb:Dictionary = getRGB(color);
+			var rgb:Object = getRGB(color);
 			var scale:int = (Math.random()*(range*2))-range;
 			var newColor:uint = (checkBounds(rgb["r"] + scale) << 16) | (checkBounds(rgb["g"] + scale) << 8) | (checkBounds(rgb["b"] + scale));
 			
@@ -53,7 +52,7 @@ package com.nicotroia.whatcoloristhis.controller.utils
 			return ((r<<16)|(g<<8))|(b);
 		}
 		
-		public static function getRGB(color:uint):Dictionary
+		public static function getRGB(color:uint):Object
 		{
 			rgb["r"] = (color & 0xFF0000) >> 16;
 			rgb["g"] = (color & 0x00FF00) >> 8;
@@ -62,7 +61,7 @@ package com.nicotroia.whatcoloristhis.controller.utils
 			return rgb;
 		}
 		
-		public static function getARGB(color:uint):Dictionary
+		public static function getARGB(color:uint):Object
 		{
 			rgb["a"] = (color & 0xFF000000) >> 24;
 			rgb["r"] = (color & 0x00FF0000) >> 16;
@@ -72,8 +71,14 @@ package com.nicotroia.whatcoloristhis.controller.utils
 			return rgb;
 		}
 		
-		public static function colorToHexString(color:uint):String
+		public static function colorToHex24String(color:uint):String
 		{
+			var str:String = color.toString(16);
+			if( str.length == 8 ) str = str.substr(2); //remove transparency
+			
+			return str;
+			
+			//omg slow...
 			var r:String = getRed(color).toString(16).toUpperCase();
 			var g:String = getGreen(color).toString(16).toUpperCase();
 			var b:String = getBlue(color).toString(16).toUpperCase();
@@ -84,6 +89,17 @@ package com.nicotroia.whatcoloristhis.controller.utils
 			if( b.length == 1 ) b = zero.concat(b);
 			
 			return r+g+b;
+		}
+		
+		public static function colorToHex32String(color:uint):String
+		{
+			var str:String = color.toString(16);
+			
+			while( str.length < 8 ) { 
+				str = "0" + str;
+			}
+			
+			return str;
 		}
 		
 		private static function checkBounds(color:int):uint

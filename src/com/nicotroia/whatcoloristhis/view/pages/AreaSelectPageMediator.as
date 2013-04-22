@@ -7,8 +7,9 @@ package com.nicotroia.whatcoloristhis.view.pages
 	import com.nicotroia.whatcoloristhis.controller.events.LoadingEvent;
 	import com.nicotroia.whatcoloristhis.controller.events.NavigationEvent;
 	import com.nicotroia.whatcoloristhis.controller.events.NotificationEvent;
-	import com.nicotroia.whatcoloristhis.controller.utils.ColorHelper;
 	import com.nicotroia.whatcoloristhis.model.CameraModel;
+	import com.nicotroia.whatcoloristhis.model.ColorLinkedList;
+	import com.nicotroia.whatcoloristhis.model.ColorNode;
 	import com.nicotroia.whatcoloristhis.model.LayoutModel;
 	import com.nicotroia.whatcoloristhis.model.SequenceModel;
 	
@@ -20,6 +21,7 @@ package com.nicotroia.whatcoloristhis.view.pages
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
 	import flash.utils.getTimer;
+	import flash.utils.setTimeout;
 	
 	import starling.display.DisplayObject;
 	import starling.display.Image;
@@ -52,27 +54,30 @@ package com.nicotroia.whatcoloristhis.view.pages
 		private var _isTransitioning:Boolean;
 		private var _currentX:uint;
 		private var _currentY:uint;
-		private var _top5:Array;
+		private var _top5:ColorLinkedList; //Vector.<String>;
 
 		private var _numberOfColorsToOrder:uint;
 		
-		override public function onRegister():void
+		override protected function pageAddedToStageHandler(event:Event=null):void
 		{
 			_target = areaSelectPage.vectorPage.target;
 			_image = areaSelectPage.image;
 			
-			super.onRegister();
+			super.pageAddedToStageHandler(event);
 			
-			trace("area select page registered");
+			trace("area select page addedToStage");
 			
 			eventDispatcher.dispatchEvent(new NotificationEvent(NotificationEvent.CHANGE_TOP_NAV_BAR_TITLE, "Select the area"));
 			eventDispatcher.dispatchEvent(new NavigationEvent(NavigationEvent.ADD_NAV_BUTTON_TO_HEADER_LEFT, null, areaSelectPage.backButton));
 			
-			areaSelectPage.drawCapturedImage(layoutModel, cameraModel);
-			
 			eventMap.mapStarlingListener(areaSelectPage, Event.TRIGGERED, areaSelectPageTriggeredHandler);
 			areaSelectPage.backButton.addEventListener(Event.TRIGGERED, backButtonTriggeredHandler);
-			areaSelectPage.image.addEventListener(TouchEvent.TOUCH, imageTouchHandler);
+			
+			setTimeout( function():void { 
+				areaSelectPage.drawCapturedImage(layoutModel, cameraModel);
+				
+				areaSelectPage.image.addEventListener(TouchEvent.TOUCH, imageTouchHandler);
+			}, 1);
 		}
 		
 		private function imageTouchHandler(event:TouchEvent):void
@@ -171,6 +176,13 @@ package com.nicotroia.whatcoloristhis.view.pages
 		
 		private function backButtonTriggeredHandler(event:Event):void
 		{
+			if( contextView.stage.hasEventListener(Event.ENTER_FRAME) ) 
+				contextView.stage.removeEventListener(Event.ENTER_FRAME, countPixelsOnEnterFrameHandler);
+			
+			_capturedPixels = new Object();
+			_top5 = new ColorLinkedList();
+			
+			eventDispatcher.dispatchEvent(new LoadingEvent(LoadingEvent.LOADING_FINISHED));
 			eventDispatcher.dispatchEvent(new NavigationEvent(NavigationEvent.NAVIGATE_TO_PAGE, SequenceModel.PAGE_Welcome, null, NavigationEvent.NAVIGATE_LEFT));
 		}
 		
@@ -181,11 +193,15 @@ package com.nicotroia.whatcoloristhis.view.pages
 			trace("area select page triggered: " + buttonTriggered);
 			
 			if( buttonTriggered == areaSelectPage.acceptButton ) { 
-				acceptButtonClickHandler();
+				setTimeout( function():void { 
+					acceptButtonClickHandler();
+				}, 1);
 			}
 			
 			if( buttonTriggered == areaSelectPage.cancelButton ) { 
-				cancelButtonClickHandler();
+				setTimeout( function():void { 
+					cancelButtonClickHandler();
+				}, 1);
 			}
 		}
 		
@@ -201,7 +217,7 @@ package com.nicotroia.whatcoloristhis.view.pages
 			_finishFlag = false;
 			_currentX = 0;
 			_currentY = 0;
-			_top5 = [];
+			_top5 = new ColorLinkedList(); 
 			
 			//how do we redraw the scaled bitmap? or just apply the transformations?
 			//var scaledBitmapData:BitmapData = areaSelectPage.drawScaledImage();
@@ -210,14 +226,17 @@ package com.nicotroia.whatcoloristhis.view.pages
 			_targetRect = areaSelectPage.target.getBounds(areaSelectPage.image); 
 			trace("target: " + _targetRect);
 			
-			//we should also copy pixels from the scaled bitmap...
-			_targetCopy = new BitmapData(uint(_targetRect.width), uint(_targetRect.height), true, 0);
+			//we should also copy pixels from the scaled bitmap... (keep it square)
+			_targetCopy = new BitmapData(uint(_targetRect.width), uint(_targetRect.width), true, 0);
 			_targetCopy.copyPixels(areaSelectPage.imageBitmap.bitmapData, _targetRect, new Point()); 
 			
-			_totalLoops = _targetCopy.width;
+			_currentLoopNumber = 0;
+			_totalLoops = _targetCopy.width * _targetCopy.height;
 			
 			//Fire up the engines...
-			contextView.stage.addEventListener(Event.ENTER_FRAME, countPixelsOnEnterFrameHandler);
+			setTimeout( function():void { 
+				contextView.stage.addEventListener(Event.ENTER_FRAME, countPixelsOnEnterFrameHandler);
+			}, 1);
 		}
 		
 		private function countPixelsOnEnterFrameHandler():void
@@ -228,8 +247,12 @@ package com.nicotroia.whatcoloristhis.view.pages
 				cameraModel.top5 = _top5;
 				cameraModel.targetedPixels = _targetCopy;
 				
-				//if iOS only... i think.
-				//cameraModel.saveImage(bmd);
+				var node:ColorNode = _top5.head;
+				var rank:uint = 0;
+				while( node ) { 
+					trace(rank++ +": "+ node.data + " with " + _capturedPixels[node.data]);
+					node = node.next;
+				}
 				
 				eventDispatcher.dispatchEvent(new LoadingEvent(LoadingEvent.LOADING_FINISHED));
 				eventDispatcher.dispatchEvent(new NavigationEvent(NavigationEvent.NAVIGATE_TO_PAGE, SequenceModel.PAGE_ConfirmColor));
@@ -237,91 +260,144 @@ package com.nicotroia.whatcoloristhis.view.pages
 				return;
 			}
 			
-			trace("start.");
+			//trace("start.");
 			
 			var color:uint;
 			var hex:String;
 			var loopsThisFrame:uint = 0;
+			var currentNode:ColorNode;
+			var currentNodeIndex:uint = 0;
+			var winner:ColorNode;
+			var fillerGap:uint = Math.floor(_totalLoops / 10); //add 10 spread-out fillers?
+			var gapLeftUntilFiller:int = fillerGap;
 			
 			_startEnterFrameTime = getTimer();
 			
-			for( _currentX; _currentX < _targetCopy.width; _currentX++ ) { 
-				for( _currentY; _currentY < _targetCopy.height; _currentY++ ) { 
+			xLoop: for( _currentX; _currentX < _targetCopy.width; _currentX++ ) { 
+				yLoop: for( _currentY; _currentY < _targetCopy.height; _currentY++ ) { 
 					
-					color = _targetCopy.getPixel(_currentX, _currentY);
+					color = _targetCopy.getPixel32(_currentX, _currentY);
 					
-					if( color === 0 ) continue;
+					//Ignore completely transparent (0x00000000) pixels
+					if( color === 0 ) { 
+						loopsThisFrame++;
+						_currentLoopNumber++;
+						continue;
+					}
 					
-					hex = ColorHelper.colorToHexString(color);
+					//convert to string and remove transparency bits
+					hex = color.toString(16);
+					hex = hex.substr(2); 
 					
+					//increment the instances of this color
 					_capturedPixels[hex] = (( _capturedPixels[hex] ) ? _capturedPixels[hex] + 1 : 1);
 					
-					//trace("PIXEL: "+ currentX, ",", currentY +" .... 0x"+ hex +", count: "+ _capturedPixels[hex]);
+					//trace("PIXEL: "+ _currentX, ",", _currentY +" .... 0x"+ hex +", count: "+ _capturedPixels[hex]);
 					
-					//Add current color to top5 where it belongs
+					currentNode = _top5.head;
 					
-					if( _top5.length == _numberOfColorsToOrder ) { 
-						for( var rank:int = 0; rank < _numberOfColorsToOrder; rank++ ) { 
-							//trace("top5 #"+ rank +" is " + top5[rank]);
+					if( currentNode ) { 
+						//Organize ColorNodes by rank
+						while( currentNode ) { 
 							
-							if( _capturedPixels[hex] > _capturedPixels[_top5[rank]] ) { 
-								var loserHex:String = _top5[rank];
+							//add the more used node above the lesser used node
+							if( _capturedPixels[hex] > _capturedPixels[currentNode.data] || _top5.length < _numberOfColorsToOrder) { 
 								
-								//remove the loser
-								_top5.splice(rank, 1);
+								//Use the existing colorNode, if possible
+								winner = findColorNodeInList(hex); //already exists, remove it first
 								
-								//add the winner at loser's old position
-								_top5.splice(rank, 0, hex);
-								
-								//add the loser back at rank+1
-								_top5.splice(rank + 1, 0, loserHex);
-								
-								//remove any winner duplicates, since it's most likely already on the list
-								var foundDupe:Boolean = false;
-								for( var testRank:uint = 0; testRank < _numberOfColorsToOrder; testRank++ ) { 
-									if( rank != testRank && _top5[testRank] == hex ) { 
-										_top5.splice(testRank, 1);
-										foundDupe = true;
+								if( winner == null ) { 
+									winner = new ColorNode(hex); 
+									
+									//Or possibly add it just to fill up the list
+									if( _top5.length < _numberOfColorsToOrder ) { 
+										if( --gapLeftUntilFiller == 0 ) { 
+											gapLeftUntilFiller = fillerGap;
+											
+											//trace(" adding filler color " + winner.data + "(" + _capturedPixels[winner.data] + ")");
+											_top5.push( winner );
+											
+											break;
+										}
 									}
 								}
 								
-								if( ! foundDupe ) { 
-									//or, since all items are unique, just pop() to keep 5 only
-									_top5.pop();
+								if( currentNode == _top5.head ) { 
+									//Add the winner to head and push the rest
+									//trace(" adding " + winner.data + "(" + _capturedPixels[winner.data] + ") to head");
+									_top5.unshift(winner);
+								}
+								else { 
+									//Add the winner in front of the loser
+									//trace(" adding " + winner.data + "(" + _capturedPixels[winner.data] + ") before " + currentNode.data + "(" + _capturedPixels[currentNode.data] +")");
+									_top5.addBefore(currentNode, winner);
 								}
 								
+								//it's faster to not even do this?...
+								///*
+								if( _top5.length > _numberOfColorsToOrder ) { 
+									//keep it under control
+									_top5.pop();
+									//trace("POP! length: " + _top5.length);
+									//_top5.iterate();
+								}
+								//*/
+								
+								//all sorted, continue to the next pixel
 								break;
-							}	
+							}
+							
+							currentNodeIndex++;
+							currentNode = currentNode.next;
+							
+							//Only compare color to the top ranked spots
+							if( currentNodeIndex > _numberOfColorsToOrder ) { 
+								break;
+							}
 						}
 					}
 					else { 
-						_top5[_top5.length] = hex;
+						_top5.push( new ColorNode(hex) );
+						//trace(" pushed the very first head: " + hex + "(" + _capturedPixels[hex] + ")");
+					}
+					
+					loopsThisFrame++;
+					_currentLoopNumber++;
+					
+					//Check for completion
+					if( _currentLoopNumber >= _totalLoops ) { 
+						//done
+						_finishFlag = true;
+						
+						break xLoop;
+					}
+					
+					if( (getTimer() - _startEnterFrameTime) > _maxEnterFrameTime ) { 
+						//that's enough for now...
+						break xLoop;
 					}
 				}
 				
-				loopsThisFrame++;
-				_currentLoopNumber++;
-				//trace("currentLoopNumber: " + _currentLoopNumber + "/" + _totalLoops + ", currentTime: " + (getTimer() - _startEnterFrameTime));
-				
-				if( _currentLoopNumber == _totalLoops ) { 
-					//done
-					_finishFlag = true;
-					
-					for( rank = 0; rank < _numberOfColorsToOrder; rank++ ) { 
-						trace(rank +": "+ _top5[rank] + " with " + _capturedPixels[_top5[rank]]);
-					}
-					
-					break;
-				}
-				
-				if( (getTimer() - _startEnterFrameTime) > _maxEnterFrameTime ) { 
-					//that's enough for now...
-					break;
-				}
-				
+				_currentY = 0;
 			}
 			
-			trace(" end. " + loopsThisFrame + "/" + _totalLoops + " px took: " + (getTimer() - _startEnterFrameTime) + "ms");
+			trace(" end. " + _currentLoopNumber + "/" + _totalLoops + " px. " + loopsThisFrame + " loops in " + (getTimer() - _startEnterFrameTime) + "ms");
+		}
+		
+		private function findColorNodeInList(hex:String):ColorNode
+		{
+			var current:ColorNode = _top5.head;
+			
+			while( current ) { 
+				if( current.data == hex ) { 
+					//trace("found it.");
+					return _top5.remove(current);
+				}
+				
+				current = current.next;
+			}
+			
+			return null;
 		}
 		
 		private function cancelButtonClickHandler():void
@@ -333,6 +409,9 @@ package com.nicotroia.whatcoloristhis.view.pages
 		
 		override public function onRemove():void
 		{
+			if( contextView.stage.hasEventListener(Event.ENTER_FRAME) ) 
+				contextView.stage.removeEventListener(Event.ENTER_FRAME, countPixelsOnEnterFrameHandler);
+			
 			eventMap.unmapStarlingListener(areaSelectPage, Event.TRIGGERED, areaSelectPageTriggeredHandler);
 			areaSelectPage.backButton.removeEventListener(Event.TRIGGERED, backButtonTriggeredHandler);
 			areaSelectPage.image.removeEventListener(TouchEvent.TOUCH, imageTouchHandler);

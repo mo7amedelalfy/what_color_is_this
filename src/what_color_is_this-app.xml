@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
-<application xmlns="http://ns.adobe.com/air/application/3.6">
+<application xmlns="http://ns.adobe.com/air/application/3.7">
 
 	<id>com.nicotroia.whatcoloristhis</id>
-	<versionNumber>0.1.0</versionNumber>
-	<supportedProfiles>mobileDevice desktop</supportedProfiles>
+	<versionNumber>1.0</versionNumber>
+	<supportedProfiles>mobileDevice</supportedProfiles>
 	<filename>What Color Is This</filename>
 	
-	<name>What Color Is This</name>
-	<description></description>
-	<copyright>nicotroia</copyright>
+	<name>What Color?</name>
+	<description>"What Color Is This" is a helpful color discovery tool. Take a photo or choose an existing one to analyze it and display matches from popular color databases.</description>
+	<copyright>Copyright © 2013 Nicholas Troia</copyright>
 
 	<initialWindow>
 		<content>what_color_is_this.swf</content>
@@ -21,19 +21,24 @@
 	</initialWindow>
 	
 	<icon>
-		<!-- 
-		<image29x29>icons/icon29.png</image29x29> This is the image used in Spotlight search results.
-		<image48x48>icons/icon48.png</image48x48> This is the image used in Spotlight search results on the iPad.
-		<image57x57>icons/icon57.png</image57x57> This is the image used on the iPhone and iPod Touch home screen.
-		<image72x72>icons/icon72.png</image72x72> This is the image used on the iPad home screen.
-		<image512x512>icons/icon512.png</image512x512> This is the image used in the iTunes application.
-		 -->
+		<!-- android -->
 		<image36x36>assets/icons/android/icon_36.png</image36x36>
 		<image48x48>assets/icons/android/icon_48.png</image48x48>
-		<image57x57>assets/icons/ios/icon_57.png</image57x57>
 		<image72x72>assets/icons/android/icon_72.png</image72x72>
-		<image114x114>assets/icons/android/icon_114.png</image114x114>
-		<image512x512>assets/icons/android/icon_512.png</image512x512>
+		
+		<!-- ios  
+		<image29x29>assets/icons/ios/icon_29.png</image29x29>
+		<image48x48>assets/icons/ios/icon_48.png</image48x48>
+		<image50x50>assets/icons/ios/icon_50.png</image50x50>
+		<image57x57>assets/icons/ios/icon_57.png</image57x57>
+		<image58x58>assets/icons/ios/icon_58.png</image58x58>
+		<image72x72>assets/icons/ios/icon_72.png</image72x72>
+		<image100x100>assets/icons/ios/icon_100.png</image100x100>
+		<image114x114>assets/icons/ios/icon_114.png</image114x114>
+		<image144x144>assets/icons/ios/icon_144.png</image144x144>
+		<image512x512>assets/icons/ios/icon_512.png</image512x512>
+		<image1024x1024>assets/icons/ios/icon_1024.png</image1024x1024>
+		-->
 	</icon>
 	
 	<android> 
@@ -41,7 +46,6 @@
         	<![CDATA[ 
 	            <manifest> 
 	            	<uses-sdk android:minSdkVersion="8"/>
-	                <uses-permission android:name="android.permission.SET_DEBUG_APP" />
 	                <uses-permission android:name="android.permission.CAMERA" /> 
 	                <uses-permission android:name="android.permission.INTERNET" /> 
 	                <uses-feature android:name="android.hardware.camera.autofocus" />
@@ -62,6 +66,8 @@
 				    <string>1</string> 
 				    <string>2</string> 
 				</array>
+				<key>UIPrerenderedIcon</key> 
+        		<true/> 
 			]]>
 		</InfoAdditions>
 	</iPhone>

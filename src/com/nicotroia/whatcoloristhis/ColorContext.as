@@ -2,10 +2,14 @@ package com.nicotroia.whatcoloristhis
 {
 	import com.nicotroia.whatcoloristhis.controller.commands.AddTextToLoadingSpinnerCommand;
 	import com.nicotroia.whatcoloristhis.controller.commands.GotoPageCommand;
+	import com.nicotroia.whatcoloristhis.controller.commands.HideDisplayListLoadingSpinnerCommand;
 	import com.nicotroia.whatcoloristhis.controller.commands.HideLoadingSpinnerCommand;
 	import com.nicotroia.whatcoloristhis.controller.commands.ImageSelectFailedCommand;
 	import com.nicotroia.whatcoloristhis.controller.commands.ImageSelectedCommand;
 	import com.nicotroia.whatcoloristhis.controller.commands.LayoutPageCommand;
+	import com.nicotroia.whatcoloristhis.controller.commands.LoadSettingsCommand;
+	import com.nicotroia.whatcoloristhis.controller.commands.SaveSettingsCommand;
+	import com.nicotroia.whatcoloristhis.controller.commands.ShowDisplayListLoadingSpinnerCommand;
 	import com.nicotroia.whatcoloristhis.controller.commands.ShowLoadingSpinnerCommand;
 	import com.nicotroia.whatcoloristhis.controller.commands.StartupAnimationCommand;
 	import com.nicotroia.whatcoloristhis.controller.events.CameraEvent;
@@ -16,6 +20,7 @@ package com.nicotroia.whatcoloristhis
 	import com.nicotroia.whatcoloristhis.model.CameraModel;
 	import com.nicotroia.whatcoloristhis.model.LayoutModel;
 	import com.nicotroia.whatcoloristhis.model.SequenceModel;
+	import com.nicotroia.whatcoloristhis.model.SettingsModel;
 	import com.nicotroia.whatcoloristhis.view.buttons.AboutPageButtonMediator;
 	import com.nicotroia.whatcoloristhis.view.buttons.AcceptButtonMediator;
 	import com.nicotroia.whatcoloristhis.view.buttons.ButtonBase;
@@ -44,6 +49,8 @@ package com.nicotroia.whatcoloristhis
 	import com.nicotroia.whatcoloristhis.view.pages.WelcomePage;
 	import com.nicotroia.whatcoloristhis.view.pages.WelcomePageMediator;
 	
+	import flash.display.Bitmap;
+	import flash.display.Stage;
 	import flash.events.StageOrientationEvent;
 	import flash.geom.Rectangle;
 	
@@ -62,8 +69,10 @@ package com.nicotroia.whatcoloristhis
 		public var pageContainer:Sprite;
 		public var overlayContainer:Sprite;
 		public var backgroundSprite:Sprite;
-		public var loadingSpinner:TransparentSpinner;
 		public var shadowBox:ShadowBoxView;
+		public var loadingSpinner:TransparentSpinner;
+		public var loadingSpinnerVector:TransparentSpinnerVector;
+		public var colorSpectrum:Bitmap;
 		
 		private var _init:Boolean;
 		
@@ -78,10 +87,13 @@ package com.nicotroia.whatcoloristhis
 			injector.mapSingleton(SequenceModel);
 			injector.mapSingleton(CameraModel);
 			injector.mapSingleton(LayoutModel);
+			injector.mapSingleton(SettingsModel);
 			injector.mapValue(DisplayObjectContainer, contextView, "contextView");
 			
 			
 			//graphics
+			injector.mapValue(Stage, Starling.current.nativeStage);
+			
 			pageContainer = new Sprite();
 			injector.mapValue(Sprite, pageContainer, "pageContainer");
 			
@@ -91,16 +103,22 @@ package com.nicotroia.whatcoloristhis
 			backgroundSprite = new Sprite();
 			injector.mapValue(Sprite, backgroundSprite, "backgroundSprite");
 			
-			loadingSpinner = new TransparentSpinner();
-			injector.mapValue(TransparentSpinner, loadingSpinner);
-			
 			shadowBox = new ShadowBoxView(contextView.stage.stageWidth, contextView.stage.stageHeight);
 			injector.mapValue(ShadowBoxView, shadowBox);
 			
+			loadingSpinner = new TransparentSpinner();
+			injector.mapValue(TransparentSpinner, loadingSpinner);
+			
+			loadingSpinnerVector = new TransparentSpinnerVector();
+			injector.mapValue(TransparentSpinnerVector, loadingSpinnerVector);
+			
+			colorSpectrum = new Assets.SpectrumChart() as Bitmap;
+			injector.mapValue(Bitmap, colorSpectrum, "colorSpectrum");
+			
 			
 			//startup chain
+			commandMap.mapEvent(ContextEvent.STARTUP_COMPLETE, LoadSettingsCommand, ContextEvent);
 			commandMap.mapEvent(ContextEvent.STARTUP_COMPLETE, StartupAnimationCommand, ContextEvent);
-			
 			
 			//events
 			commandMap.mapEvent(LayoutEvent.RESIZE, LayoutPageCommand, LayoutEvent);
@@ -111,23 +129,30 @@ package com.nicotroia.whatcoloristhis
 			commandMap.mapEvent(CameraEvent.CAMERA_ROLL_IMAGE_SELECTED, ImageSelectedCommand, CameraEvent);
 			commandMap.mapEvent(CameraEvent.CAMERA_ROLL_IMAGE_FAILED, ImageSelectFailedCommand, CameraEvent);
 			commandMap.mapEvent(LoadingEvent.PAGE_LOADING, ShowLoadingSpinnerCommand, LoadingEvent);
-			commandMap.mapEvent(LoadingEvent.CAMERA_LOADING, ShowLoadingSpinnerCommand, LoadingEvent);
-			commandMap.mapEvent(LoadingEvent.CAMERA_ROLL_LOADING, ShowLoadingSpinnerCommand, LoadingEvent);
+			commandMap.mapEvent(LoadingEvent.CAMERA_LOADING, ShowDisplayListLoadingSpinnerCommand, LoadingEvent);
+			//commandMap.mapEvent(LoadingEvent.CAMERA_LOADING, ShowLoadingSpinnerCommand, LoadingEvent);
+			commandMap.mapEvent(LoadingEvent.CAMERA_ROLL_LOADING, ShowDisplayListLoadingSpinnerCommand, LoadingEvent);
+			//commandMap.mapEvent(LoadingEvent.CAMERA_ROLL_LOADING, ShowLoadingSpinnerCommand, LoadingEvent);
 			commandMap.mapEvent(LoadingEvent.COUNTING_PIXELS, ShowLoadingSpinnerCommand, LoadingEvent);
 			commandMap.mapEvent(LoadingEvent.COLOR_RESULT_LOADING, ShowLoadingSpinnerCommand, LoadingEvent);
 			commandMap.mapEvent(LoadingEvent.LOADING_FINISHED, HideLoadingSpinnerCommand, LoadingEvent);
+			commandMap.mapEvent(LoadingEvent.LOADING_FINISHED, HideDisplayListLoadingSpinnerCommand, LoadingEvent);
 			commandMap.mapEvent(NotificationEvent.ADD_TEXT_TO_LOADING_SPINNER, AddTextToLoadingSpinnerCommand, NotificationEvent);
+			commandMap.mapEvent(NavigationEvent.SETTINGS_PAGE_CONFIRMED, SaveSettingsCommand, NavigationEvent);
 			
 			
 			//pages
-			mediatorMap.mapView(PageBase, PageBaseMediator);
-			mediatorMap.mapView(HeaderOverlay, HeaderOverlayMediator, [PageBase, HeaderOverlay]);
-			mediatorMap.mapView(WelcomePage, WelcomePageMediator, [PageBase, WelcomePage]);
-			mediatorMap.mapView(SettingsPage, SettingsPageMediator, [PageBase, SettingsPage]);
-			mediatorMap.mapView(AboutPage, AboutPageMediator, [PageBase, AboutPage]);
-			mediatorMap.mapView(AreaSelectPage, AreaSelectPageMediator, [PageBase, AreaSelectPage]);
-			mediatorMap.mapView(ConfirmColorPage, ConfirmColorPageMediator, [PageBase, ConfirmColorPage]);
-			mediatorMap.mapView(ResultPage, ResultPageMediator, [PageBase, ResultPage]);
+			//If you'd like mediators to be created automatically, 
+			//but not to be removed when the view leaves the stage, 
+			//set autoRemove to false, but be sure to remove the mediator when you no longer need it.
+			mediatorMap.mapView(PageBase, PageBaseMediator, null, true, false);
+			mediatorMap.mapView(HeaderOverlay, HeaderOverlayMediator, [PageBase, HeaderOverlay], true, false);
+			mediatorMap.mapView(WelcomePage, WelcomePageMediator, [PageBase, WelcomePage], true, false);
+			mediatorMap.mapView(SettingsPage, SettingsPageMediator, [PageBase, SettingsPage], true, false);
+			mediatorMap.mapView(AboutPage, AboutPageMediator, [PageBase, AboutPage], true, false);
+			mediatorMap.mapView(AreaSelectPage, AreaSelectPageMediator, [PageBase, AreaSelectPage], true, false);
+			mediatorMap.mapView(ConfirmColorPage, ConfirmColorPageMediator, [PageBase, ConfirmColorPage], true, false);
+			mediatorMap.mapView(ResultPage, ResultPageMediator, [PageBase, ResultPage], true, false);
 			
 			
 			//buttons

@@ -2,8 +2,10 @@ package com.nicotroia.whatcoloristhis.controller.commands
 {
 	import com.nicotroia.whatcoloristhis.controller.events.LayoutEvent;
 	import com.nicotroia.whatcoloristhis.controller.events.NavigationEvent;
+	import com.nicotroia.whatcoloristhis.model.CameraModel;
 	import com.nicotroia.whatcoloristhis.model.LayoutModel;
 	import com.nicotroia.whatcoloristhis.model.SequenceModel;
+	import com.nicotroia.whatcoloristhis.view.pages.PageBase;
 	
 	import flash.events.Event;
 	
@@ -26,7 +28,13 @@ package com.nicotroia.whatcoloristhis.controller.commands
 		public var backgroundSprite:Sprite;
 		
 		[Inject]
+		public var cameraModel:CameraModel;
+		
+		[Inject]
 		public var layoutModel:LayoutModel;
+		
+		[Inject]
+		public var sequenceModel:SequenceModel;
 		
 		override public function execute():void
 		{
@@ -36,6 +44,16 @@ package com.nicotroia.whatcoloristhis.controller.commands
 			contextView.addChild( overlayContainer );
 			
 			pageContainer.addChild( backgroundSprite );
+			
+			//lets trigger a reflow for all the pages so there isn't a lag on button presses
+			for each( var PageClass:Class in sequenceModel.pageList ) { 
+				var view:PageBase = sequenceModel.getPage(PageClass);
+				
+				view.reflowVectors(layoutModel, cameraModel);
+				view.drawVectors(layoutModel, cameraModel);
+				
+				view.reflowed = true;
+			}
 			
 			eventDispatcher.addEventListener(LayoutEvent.UPDATE_LAYOUT, appResizedHandler);
 		}

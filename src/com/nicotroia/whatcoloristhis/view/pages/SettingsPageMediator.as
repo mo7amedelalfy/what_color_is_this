@@ -12,17 +12,17 @@ package com.nicotroia.whatcoloristhis.view.pages
 		[Inject]
 		public var settingsPage:SettingsPage;
 		
-		override public function onRegister():void
+		override protected function pageAddedToStageHandler(event:Event = null):void
 		{
-			super.onRegister();
+			super.pageAddedToStageHandler(event);
 			
-			trace("settings page registered");
+			//trace("settings page addedToStage");
 			
 			eventDispatcher.dispatchEvent(new NotificationEvent(NotificationEvent.CHANGE_TOP_NAV_BAR_TITLE, "Settings"));
 			eventDispatcher.dispatchEvent(new NavigationEvent(NavigationEvent.ADD_NAV_BUTTON_TO_HEADER_LEFT, null, settingsPage.backButton));
 			
-			eventMap.mapStarlingListener(settingsPage, Event.TRIGGERED, settingsPageTriggeredHandler); 
 			settingsPage.backButton.addEventListener(Event.TRIGGERED, backButtonTriggeredHandler);
+			settingsPage.fetchNtcToggle.addEventListener(Event.CHANGE, fetchNtcToggleChangeHandler);
 			settingsPage.fetchCrayolaToggle.addEventListener(Event.CHANGE, fetchCrayolaToggleChangeHandler);
 			settingsPage.fetchPantoneToggle.addEventListener(Event.CHANGE, fetchPantoneToggleChangeHandler);
 			settingsPage.numberOfChoicesSlider.addEventListener(Event.CHANGE, numberOfChoicesSliderChangeHandler);
@@ -33,9 +33,9 @@ package com.nicotroia.whatcoloristhis.view.pages
 			Settings.colorChoicesGivenToUser = settingsPage.numberOfChoicesSlider.value;
 		}
 		
-		private function fetchPantoneToggleChangeHandler(event:Event):void
+		private function fetchNtcToggleChangeHandler(event:Event):void
 		{
-			Settings.fetchPantoneResults = settingsPage.fetchPantoneToggle.isSelected;
+			Settings.fetchNtcResults = settingsPage.fetchNtcToggle.isSelected;
 		}
 		
 		private function fetchCrayolaToggleChangeHandler(event:Event):void
@@ -43,23 +43,25 @@ package com.nicotroia.whatcoloristhis.view.pages
 			Settings.fetchCrayolaResults = settingsPage.fetchCrayolaToggle.isSelected;
 		}
 		
-		private function backButtonTriggeredHandler():void
+		private function fetchPantoneToggleChangeHandler(event:Event):void
 		{
-			eventDispatcher.dispatchEvent(new NavigationEvent(NavigationEvent.NAVIGATE_TO_PAGE, SequenceModel.PAGE_Welcome, null, NavigationEvent.NAVIGATE_LEFT));
+			Settings.fetchPantoneResults = settingsPage.fetchPantoneToggle.isSelected;
 		}
 		
-		private function settingsPageTriggeredHandler(event:Event):void
+		private function backButtonTriggeredHandler():void
 		{
-			// TODO Auto Generated method stub
+			//will trigger SaveSettingsCommand
+			eventDispatcher.dispatchEvent(new NavigationEvent(NavigationEvent.SETTINGS_PAGE_CONFIRMED ));
 			
+			eventDispatcher.dispatchEvent(new NavigationEvent(NavigationEvent.NAVIGATE_TO_PAGE, SequenceModel.PAGE_Welcome, null, NavigationEvent.NAVIGATE_RIGHT));
 		}
 		
 		override public function onRemove():void
 		{
 			trace("settings page removed");
 			
-			eventMap.unmapStarlingListener(settingsPage, Event.TRIGGERED, settingsPageTriggeredHandler); 
 			settingsPage.backButton.removeEventListener(Event.TRIGGERED, backButtonTriggeredHandler);
+			settingsPage.fetchNtcToggle.removeEventListener(Event.CHANGE, fetchNtcToggleChangeHandler);
 			settingsPage.fetchCrayolaToggle.removeEventListener(Event.CHANGE, fetchCrayolaToggleChangeHandler);
 			settingsPage.fetchPantoneToggle.removeEventListener(Event.CHANGE, fetchPantoneToggleChangeHandler);
 			settingsPage.numberOfChoicesSlider.removeEventListener(Event.CHANGE, numberOfChoicesSliderChangeHandler);

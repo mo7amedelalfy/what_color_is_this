@@ -37,12 +37,21 @@ package com.nicotroia.whatcoloristhis.view.pages
 		public var cancelButton:starling.display.Button;
 		
 		private var _actionBar:Image;
+		private var _helpTitleImage:Image;
+		private var _helpTitleTextFormat:TextFormat;
 		
 		public function AreaSelectPage()
 		{
 			vectorPage = new AreaSelectPageVector();
+			_helpTitleTextFormat = new TextFormat();
 			
 			super();
+		}
+		
+		public function setTextFormat(layoutModel:LayoutModel):void
+		{
+			_helpTitleTextFormat.font = layoutModel.infoDispMedium.fontName;
+			_helpTitleTextFormat.size = (30 * layoutModel.scale);
 		}
 		
 		public function drawCapturedImage(layoutModel:LayoutModel, cameraModel:CameraModel):void
@@ -69,6 +78,7 @@ package com.nicotroia.whatcoloristhis.view.pages
 			addChild( _actionBar );
 			addChild( acceptButton );
 			addChild( cancelButton );
+			addChild( _helpTitleImage );
 		}
 		
 		public function drawScaledImage():BitmapData
@@ -85,6 +95,8 @@ package com.nicotroia.whatcoloristhis.view.pages
 		
 		override public function reflowVectors(layoutModel:LayoutModel=null, cameraModel:CameraModel=null):void
 		{
+			setTextFormat(layoutModel);
+			
 			trace("area select page reflowing vectors");
 			
 			vectorPage.x = 0;
@@ -98,20 +110,37 @@ package com.nicotroia.whatcoloristhis.view.pages
 			vectorPage.actionBar.x = -2;
 			vectorPage.actionBar.y = layoutModel.appHeight - (114 * layoutModel.scale);
 			
-			vectorPage.cancelButton.height = vectorPage.actionBar.height * 0.70;
+			vectorPage.cancelButton.height = vectorPage.actionBar.height * 0.5;
 			vectorPage.cancelButton.scaleX = vectorPage.cancelButton.scaleY;
-			vectorPage.cancelButton.x = (layoutModel.appWidth * 0.20) - (vectorPage.cancelButton.width * 0.5);
+			vectorPage.cancelButton.x = (layoutModel.appWidth * 0.3) - (vectorPage.cancelButton.width * 0.5);
 			vectorPage.cancelButton.y = vectorPage.actionBar.y + ((vectorPage.actionBar.height - vectorPage.cancelButton.height) * 0.5);
 			
-			vectorPage.acceptButton.height = vectorPage.actionBar.height * 0.70;
+			vectorPage.acceptButton.height = vectorPage.actionBar.height * 0.5;
 			vectorPage.acceptButton.scaleX = vectorPage.acceptButton.scaleY;
-			vectorPage.acceptButton.x = (layoutModel.appWidth * 0.80) - (vectorPage.acceptButton.width * 0.5);
+			vectorPage.acceptButton.x = (layoutModel.appWidth * 0.7) - (vectorPage.acceptButton.width * 0.5);
 			vectorPage.acceptButton.y = vectorPage.actionBar.y + ((vectorPage.actionBar.height - vectorPage.acceptButton.height) * 0.5);
 			
 			vectorPage.target.width = (layoutModel.appHeight - layoutModel.navBarHeight) * 0.21;
 			vectorPage.target.scaleY = vectorPage.target.scaleX;
 			vectorPage.target.x = (layoutModel.appWidth * 0.5) - (vectorPage.target.width * 0.5);
 			vectorPage.target.y = layoutModel.navBarHeight + (((layoutModel.appHeight - layoutModel.navBarHeight - vectorPage.actionBar.height) * 0.5) - (vectorPage.target.height * 0.5));	
+			
+			//helper title
+			vectorPage.listTitle.x = 0;
+			vectorPage.listTitle.y = (layoutModel.navBarHeight/Starling.contentScaleFactor) - (3 * layoutModel.scale * Starling.contentScaleFactor);
+			
+			vectorPage.listTitle.bar.width = layoutModel.appWidth + 4;
+			vectorPage.listTitle.bar.height = 50 * layoutModel.scale * Starling.contentScaleFactor;
+			vectorPage.listTitle.bar.x = -2;
+			vectorPage.listTitle.bar.y = 0;
+			
+			vectorPage.listTitle.labelTF.width = layoutModel.appWidth;
+			vectorPage.listTitle.labelTF.height = 50 * layoutModel.scale * Starling.contentScaleFactor;
+			vectorPage.listTitle.labelTF.x = 0;
+			vectorPage.listTitle.labelTF.y = 10 * layoutModel.scale * Starling.contentScaleFactor;
+			
+			vectorPage.listTitle.labelTF.text = "Double-tap or pinch to zoom.";
+			vectorPage.listTitle.labelTF.setTextFormat( _helpTitleTextFormat );
 		}
 		
 		override public function drawVectors(layoutModel:LayoutModel = null, cameraModel:CameraModel = null):void
@@ -124,6 +153,7 @@ package com.nicotroia.whatcoloristhis.view.pages
 			removeDrawnVector( _actionBar );
 			removeDrawnVector( acceptButton );
 			removeDrawnVector( cancelButton );
+			removeDrawnVector( _helpTitleImage );
 			
 			_background = drawBackgroundQuad();
 			backButton = new feathers.controls.Button();
@@ -131,6 +161,7 @@ package com.nicotroia.whatcoloristhis.view.pages
 			_actionBar = createImageFromDisplayObject(vectorPage.actionBar);
 			acceptButton = createButtonFromMovieClip(vectorPage.acceptButton);
 			cancelButton = createButtonFromMovieClip(vectorPage.cancelButton);
+			_helpTitleImage = createImageFromDisplayObject(vectorPage.listTitle);
 			
 			//Now add
 			addChildAt( _background, 0 );
@@ -138,6 +169,7 @@ package com.nicotroia.whatcoloristhis.view.pages
 			addChild( _actionBar );
 			addChild( acceptButton );
 			addChild( cancelButton );
+			addChild( _helpTitleImage );
 			
 			//Settings
 			backButton.label = "Cancel";

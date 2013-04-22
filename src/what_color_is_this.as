@@ -49,9 +49,9 @@ package
 		{
 			removeEventListener(flash.events.Event.ADDED_TO_STAGE, addedToStageHandler);
 			
-			_stats = new Stats();
-			_stats.y = 100;
-			addChild(_stats);
+			//_stats = new Stats();
+			//_stats.y = 100;
+			//addChild(_stats);
 			
 			//I have no idea what these numbers are for, but the app will scale to the full width/height
 			var stageWidth:int = 320; 
@@ -93,7 +93,7 @@ package
 			_startupBackground = Assets.createRandomColorShape(stage.fullScreenWidth, stage.fullScreenHeight);
 			_startupImage = new StartupImage();
 			
-			var greetings:Vector.<String> = new <String>["Hello", "Ciao", "Hej", "Hallo", "Hola", "Shalom", "Bonjour", "Namaste"];
+			var greetings:Vector.<String> = new <String>["Hello", "Hey", "Hi", "Ciao", "Hej", "Hallo", "Hola", "Shalom", "Bonjour", "Namaste"];
 			var tf:TextField = _startupImage.greetingTF;
 			var textFormat:TextFormat = tf.defaultTextFormat;
 			tf.width = stage.fullScreenWidth;
@@ -139,10 +139,16 @@ package
 			// would report a very long 'passedTime' when the app is reactivated. 
 			
 			NativeApplication.nativeApplication.addEventListener(
-				flash.events.Event.ACTIVATE, function (e:*):void { _starling.start(); });
+				flash.events.Event.ACTIVATE, function (e:*):void { 
+					trace("native app ACTIVATE");
+					_starling.start(); 
+				});
 			
 			NativeApplication.nativeApplication.addEventListener(
-				flash.events.Event.DEACTIVATE, function (e:*):void { _starling.stop(); });
+				flash.events.Event.DEACTIVATE, function (e:*):void { 
+					trace("native app DEACTIVATE");
+					_starling.stop(); 
+				});
 		}
 	}
 }

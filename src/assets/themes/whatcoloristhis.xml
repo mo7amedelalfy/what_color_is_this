@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with TexturePacker http://texturepacker.com-->
-<!-- $TexturePacker:SmartUpdate:026c3842163b4ec55de464728529a4ee$ -->
+<!-- $TexturePacker:SmartUpdate:49b8782437b31091295a691171f2705d$ -->
 <TextureAtlas imagePath="whatcoloristhis.png">
     <SubTexture name="background-disabled-skin" x="359" y="59" width="32" height="32"/>
     <SubTexture name="background-down-skin" x="323" y="59" width="32" height="32"/>

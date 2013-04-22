@@ -4,6 +4,7 @@ package com.nicotroia.whatcoloristhis.model
 	import com.nicotroia.whatcoloristhis.controller.events.CameraEvent;
 	import com.nicotroia.whatcoloristhis.controller.events.LoadingEvent;
 	import com.nicotroia.whatcoloristhis.controller.events.NavigationEvent;
+	import com.nicotroia.whatcoloristhis.controller.utils.ExifUtils;
 	
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
@@ -21,9 +22,14 @@ package com.nicotroia.whatcoloristhis.model
 	import flash.media.CameraUI;
 	import flash.media.MediaPromise;
 	import flash.media.MediaType;
+	import flash.net.URLRequest;
 	import flash.utils.ByteArray;
 	import flash.utils.IDataInput;
 	import flash.utils.getTimer;
+	
+	import jp.shichiseki.exif.ExifInfo;
+	import jp.shichiseki.exif.ExifLoader;
+	import jp.shichiseki.exif.IFD;
 	
 	import org.robotlegs.mvcs.Actor;
 
@@ -31,7 +37,7 @@ package com.nicotroia.whatcoloristhis.model
 	{
 		public var photoData:BitmapData;
 		public var targetedPixels:BitmapData;
-		public var top5:Array;
+		public var top5:ColorLinkedList; //Vector.<String>;
 		public var chosenWinnerHex:String;
 		//public var closestMatchHex:String;
 		//public var resultName:String;
@@ -40,6 +46,9 @@ package com.nicotroia.whatcoloristhis.model
 		protected var _cameraRoll:CameraRoll;
 		protected var _imageLoader:Loader;
 		protected var _dataSource:IDataInput;
+		protected var _exifLoader:ExifLoader;
+		protected var _mediaPromise:MediaPromise;
+		protected var _exif:ExifInfo;
 		
 		public function CameraModel()
 		{
@@ -67,9 +76,12 @@ package com.nicotroia.whatcoloristhis.model
 		{	
 			trace("init camera.");
 			
+			reset();
+			
 			eventDispatcher.dispatchEvent(new LoadingEvent(LoadingEvent.CAMERA_LOADING));
 			
 			if( CameraUI.isSupported ) { 
+				_imageLoader = new Loader();
 				_cameraUI = new CameraUI();
 				
 				_cameraUI.addEventListener(MediaEvent.COMPLETE, cameraPhotoCompleteHandler); 
@@ -80,10 +92,6 @@ package com.nicotroia.whatcoloristhis.model
 			}
 			else { 
 				trace("This device does not have Camera support");
-				
-				//force random
-				//photoData = generateRandomBitmapData();
-				//eventDispatcher.dispatchEvent(new CameraEvent(CameraEvent.CAMERA_IMAGE_TAKEN));
 				
 				eventDispatcher.dispatchEvent(new CameraEvent(CameraEvent.CAMERA_IMAGE_FAILED));
 			}
@@ -117,44 +125,123 @@ package com.nicotroia.whatcoloristhis.model
 			_cameraUI.removeEventListener(Event.CANCEL, cameraCancelHandler); 
 			_cameraUI.removeEventListener(ErrorEvent.ERROR, cameraErrorHandler); 
 			
-			var promise:MediaPromise = event.data;
+			_mediaPromise = event.data;
 			
-			if( promise.file ) { 
+			if( _mediaPromise.file ) { 
+				trace("There is a mediaPromise.file. This is an android?");
+				//android
+				_exifLoader = new ExifLoader();
+				_exifLoader.addEventListener(Event.COMPLETE, cameraExifLoadCompleteHandler );
+				_exifLoader.load( new URLRequest( _mediaPromise.file.url ) );
+			}
+			else { 
+				trace("No mediaPromise.file. iOS?");
 				//iOS does not actually create a file but keeps it in memory, so these would be null.
-				trace(promise.file);
-				trace(promise.file.name, promise.file.url);
+				
+				//starts to load raw file data
+				_dataSource = _mediaPromise.open();
+				
+				if( _mediaPromise.isAsync )
+				{
+					trace("Asynchronous media promise." );
+					var eventSource:IEventDispatcher = _dataSource as IEventDispatcher;
+					eventSource.addEventListener( Event.COMPLETE, cameraUIMediaLoadCompleteHandler );
+				}
+				else
+				{
+					trace("Synchronous media promise." );
+					//data is immediately available
+					cameraUIMediaLoadCompleteHandler(null);
+				}
 			}
 			
-			var loader:Loader = new Loader();
-			loader.contentLoaderInfo.addEventListener(Event.COMPLETE, filePromiseLoadedHandler);
-			loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, filePromiseLoadErrorHandler);
-			
-			loader.loadFilePromise(promise);
 		}
 		
-		protected function filePromiseLoadErrorHandler(event:IOErrorEvent):void
+		private function cameraExifLoadCompleteHandler(event:Event):void
 		{
-			var loaderInfo:LoaderInfo = event.target as LoaderInfo;
+			//android
+			_exifLoader.removeEventListener(Event.COMPLETE, cameraExifLoadCompleteHandler );
 			
-			loaderInfo.removeEventListener(Event.COMPLETE, filePromiseLoadedHandler);
-			loaderInfo.removeEventListener(IOErrorEvent.IO_ERROR, filePromiseLoadErrorHandler);
+			_imageLoader.unload();
 			
-			trace("IOError! " + event.errorID );
+			_imageLoader.contentLoaderInfo.addEventListener( Event.COMPLETE, cameraUIBytesLoadComplete );
+			_imageLoader.contentLoaderInfo.addEventListener( IOErrorEvent.IO_ERROR, cameraUIBytesLoadFailHandler );
+			
+			_imageLoader.loadFilePromise( _mediaPromise );
+		}
+		
+		private function cameraUIMediaLoadCompleteHandler(event:Event):void
+		{
+			if( event ) { 
+				//was asynch..
+				var eventSource:IEventDispatcher = event.target as IEventDispatcher;           
+				eventSource.removeEventListener( Event.COMPLETE, cameraUIMediaLoadCompleteHandler );  
+			}
+			
+			trace("media promise load complete.");
+			
+			var data:ByteArray = new ByteArray();
+			
+			_dataSource.readBytes(data);
+			
+			_exif = new ExifInfo(data);
+			
+			_imageLoader.contentLoaderInfo.addEventListener( Event.COMPLETE, cameraUIBytesLoadComplete );
+			_imageLoader.contentLoaderInfo.addEventListener( IOErrorEvent.IO_ERROR, cameraUIBytesLoadFailHandler );
+			
+			_imageLoader.loadBytes(data);
+		}
+		
+		protected function cameraUIBytesLoadFailHandler(event:IOErrorEvent):void
+		{
+			_imageLoader.contentLoaderInfo.removeEventListener( Event.COMPLETE, cameraUIBytesLoadComplete );
+			_imageLoader.contentLoaderInfo.removeEventListener( IOErrorEvent.IO_ERROR, cameraUIBytesLoadFailHandler );
+			
+			trace("load bytes IOError: " + event.errorID);
 			
 			eventDispatcher.dispatchEvent(new CameraEvent(CameraEvent.CAMERA_IMAGE_FAILED));
 		}
 		
-		protected function filePromiseLoadedHandler(event:Event):void
+		private function cameraUIBytesLoadComplete(event:Event):void
 		{
-			var loaderInfo:LoaderInfo = event.target as LoaderInfo;
+			_imageLoader.contentLoaderInfo.removeEventListener( Event.COMPLETE, cameraUIBytesLoadComplete );
+			_imageLoader.contentLoaderInfo.removeEventListener( IOErrorEvent.IO_ERROR, cameraUIBytesLoadFailHandler );
 			
-			loaderInfo.removeEventListener(Event.COMPLETE, filePromiseLoadedHandler);
-			loaderInfo.removeEventListener(IOErrorEvent.IO_ERROR, filePromiseLoadErrorHandler);
+			trace("load bytes complete!");
 			
-			photoData = Bitmap(event.target.content).bitmapData;
+			var loaderInfo:LoaderInfo = LoaderInfo(event.target);
+			//var bitmapData:BitmapData = new BitmapData(loaderInfo.width, loaderInfo.height, false, 0xFFFFFF);
+			//bitmapData.draw(loaderInfo.loader);
+			
+			if( ! _exif ) { 
+				//android
+				_exif = _exifLoader.exif;
+			}
+			
+			var bitmap:Bitmap;
+			if( ! _exif.ifds ) { 
+				trace("Exif validation failed :( something wrong with the image?");
+				//validation failed... happens to some photos on android incredible...
+				bitmap = Bitmap(loaderInfo.content);
+			}
+			else { 
+				//wonderful.
+				bitmap = ExifUtils.getEyeOrientedBitmap( Bitmap(loaderInfo.content), _exif.ifds );
+			}
+			
+			photoData = bitmap.bitmapData;
+			
+			//only on ios...?
+			trace("SAVING BITMAPDATA!!!!!!");
+			saveImage(photoData);
+			
+			_imageLoader.unload();
+			loaderInfo = null;
+			//bitmapData = null;
 			
 			eventDispatcher.dispatchEvent(new CameraEvent(CameraEvent.CAMERA_IMAGE_TAKEN));
 		}
+		
 		
 		/*
 		*
@@ -166,19 +253,15 @@ package com.nicotroia.whatcoloristhis.model
 		{
 			trace("init camera roll.");
 			
+			reset();
+			
 			eventDispatcher.dispatchEvent(new LoadingEvent(LoadingEvent.CAMERA_ROLL_LOADING));
 			
-			//force goat
-			var bitmap:Bitmap = new Assets.ScreamingGoat() as Bitmap;
-			
-			photoData = bitmap.bitmapData;
-			
-			eventDispatcher.dispatchEvent(new CameraEvent(CameraEvent.CAMERA_ROLL_IMAGE_SELECTED));
-			
-			return;
-			
 			if( CameraRoll.supportsBrowseForImage ) { 
+				_imageLoader = new Loader();
+				
 				_cameraRoll = new CameraRoll();
+				
 				var options:CameraRollBrowseOptions = new CameraRollBrowseOptions();
 				
 				_cameraRoll.addEventListener(Event.CANCEL, cameraRollCancelHandler);
@@ -189,13 +272,7 @@ package com.nicotroia.whatcoloristhis.model
 			else { 
 				trace("This device does not have Camera Roll support");
 				
-				//force goat
-				var bitmap:Bitmap = new Assets.ScreamingGoat() as Bitmap;
-				
-				photoData = bitmap.bitmapData;
-				
-				eventDispatcher.dispatchEvent(new CameraEvent(CameraEvent.CAMERA_ROLL_IMAGE_SELECTED));
-				//eventDispatcher.dispatchEvent(new CameraEvent(CameraEvent.CAMERA_ROLL_IMAGE_FAILED));
+				eventDispatcher.dispatchEvent(new CameraEvent(CameraEvent.CAMERA_ROLL_IMAGE_FAILED));
 			}
 		}
 		
@@ -214,52 +291,127 @@ package com.nicotroia.whatcoloristhis.model
 			_cameraRoll.removeEventListener(Event.CANCEL, cameraRollCancelHandler);
 			_cameraRoll.removeEventListener(MediaEvent.SELECT, mediaSelectHandler);
 			
-			trace("selected.");
+			trace("Selected.");
 			
-			var promise:MediaPromise = event.data;
+			_mediaPromise = event.data;
 			
-			_imageLoader = new Loader();
-			
-			if( promise.isAsync )
-			{
-				trace("Asynchronous media promise." );
-				_imageLoader.contentLoaderInfo.addEventListener( Event.COMPLETE, mediaLoadCompleteHandler );
-				_imageLoader.contentLoaderInfo.addEventListener( IOErrorEvent.IO_ERROR, mediaLoadFailHandler );
-				
-				_imageLoader.loadFilePromise( promise );
+			if( _mediaPromise.file ) { 
+				trace("There is a mediaPromise.file. This is an android?");
+				//android
+				_exifLoader = new ExifLoader();
+				_exifLoader.addEventListener(Event.COMPLETE, cameraRollExifLoadCompleteHandler );
+				_exifLoader.load( new URLRequest( _mediaPromise.file.url ) );
 			}
-			else
-			{
-				trace("Synchronous media promise." );
-				_imageLoader.loadFilePromise( promise );
+			else { 
+				trace("No mediaPromise.file. iOS?");
 				
-				var bitmap:Bitmap = _imageLoader.contentLoaderInfo.content as Bitmap;
+				//starts to load raw file data
+				_dataSource = _mediaPromise.open();
 				
-				photoData = bitmap.bitmapData;
-				
-				eventDispatcher.dispatchEvent(new CameraEvent(CameraEvent.CAMERA_ROLL_IMAGE_SELECTED));
+				if( _mediaPromise.isAsync )
+				{
+					trace("Asynchronous media promise." );
+					var eventSource:IEventDispatcher = _dataSource as IEventDispatcher;
+					eventSource.addEventListener( Event.COMPLETE, cameraRollMediaLoadCompleteHandler );
+				}
+				else
+				{
+					trace("Synchronous media promise." );
+					//data is immediately available
+					cameraRollMediaLoadCompleteHandler(null);
+				}
 			}
 		}
 		
-		protected function mediaLoadFailHandler(event:IOErrorEvent):void
+		private function cameraRollExifLoadCompleteHandler(event:Event):void
 		{
-			_imageLoader.contentLoaderInfo.removeEventListener( Event.COMPLETE, mediaLoadCompleteHandler );
-			_imageLoader.contentLoaderInfo.removeEventListener( IOErrorEvent.IO_ERROR, mediaLoadFailHandler );
+			//android
+			_exifLoader.removeEventListener(Event.COMPLETE, cameraRollExifLoadCompleteHandler );
 			
-			trace("image load fail. Error " + event.errorID);
+			_imageLoader.unload();
+			
+			_imageLoader.contentLoaderInfo.addEventListener( Event.COMPLETE, cameraRollBytesLoadComplete );
+			_imageLoader.contentLoaderInfo.addEventListener( IOErrorEvent.IO_ERROR, cameraRollBytesLoadFailHandler );
+			
+			_imageLoader.loadFilePromise( _mediaPromise );
+		}
+		
+		private function cameraRollMediaLoadCompleteHandler(event:Event):void
+		{
+			if( event ) { 
+				//was asynch..
+				var eventSource:IEventDispatcher = event.target as IEventDispatcher;           
+				eventSource.removeEventListener( Event.COMPLETE, cameraRollMediaLoadCompleteHandler );  
+			}
+			
+			trace("media promise load complete.");
+			
+			var data:ByteArray = new ByteArray();
+			
+			_dataSource.readBytes(data);
+			
+			_exif = new ExifInfo(data);
+
+			_imageLoader.contentLoaderInfo.addEventListener( Event.COMPLETE, cameraRollBytesLoadComplete );
+			_imageLoader.contentLoaderInfo.addEventListener( IOErrorEvent.IO_ERROR, cameraRollBytesLoadFailHandler );
+			
+			_imageLoader.loadBytes(data);
+		}
+		
+		protected function cameraRollBytesLoadFailHandler(event:IOErrorEvent):void
+		{
+			_imageLoader.contentLoaderInfo.removeEventListener( Event.COMPLETE, cameraRollBytesLoadComplete );
+			_imageLoader.contentLoaderInfo.removeEventListener( IOErrorEvent.IO_ERROR, cameraRollBytesLoadFailHandler );
+			
+			trace("load bytes IOError: " + event.errorID);
 			
 			eventDispatcher.dispatchEvent(new CameraEvent(CameraEvent.CAMERA_ROLL_IMAGE_FAILED));
 		}
 		
-		private function mediaLoadCompleteHandler(event:Event):void
+		private function cameraRollBytesLoadComplete(event:Event):void
 		{
-			_imageLoader.contentLoaderInfo.removeEventListener( Event.COMPLETE, mediaLoadCompleteHandler );
-			_imageLoader.contentLoaderInfo.removeEventListener( IOErrorEvent.IO_ERROR, mediaLoadFailHandler );
+			_imageLoader.contentLoaderInfo.removeEventListener( Event.COMPLETE, cameraRollBytesLoadComplete );
+			_imageLoader.contentLoaderInfo.removeEventListener( IOErrorEvent.IO_ERROR, cameraRollBytesLoadFailHandler );
 			
-			trace("load complete.");
+			trace("load bytes complete!");
 			
-			var bitmap:Bitmap = event.target.content as Bitmap;
+			var loaderInfo:LoaderInfo = LoaderInfo(event.target);
+			//var bitmapData:BitmapData = new BitmapData(loaderInfo.width, loaderInfo.height, false, 0xFFFFFF);
+			//bitmapData.draw(loaderInfo.loader);
 			
+			if( ! _exif ) { 
+				//android
+				_exif = _exifLoader.exif;
+			}
+			
+			var bitmap:Bitmap;
+			if( ! _exif.ifds ) { 
+				trace("Exif validation failed :( something wrong with the image?");
+				//validation failed... happens to some photos on android incredible...
+				bitmap = Bitmap(loaderInfo.content);
+			}
+			else { 
+				//wonderful.
+				bitmap = ExifUtils.getEyeOrientedBitmap( Bitmap(loaderInfo.content), _exif.ifds );
+			}
+			
+			photoData = bitmap.bitmapData;
+			
+			_imageLoader.unload();
+			loaderInfo = null;
+			//bitmapData = null;
+			
+			eventDispatcher.dispatchEvent(new CameraEvent(CameraEvent.CAMERA_ROLL_IMAGE_SELECTED));
+		}
+		
+		/*
+		*
+		* COLOR SPECTRUM CHART
+		*
+		*/
+		
+		public function initColorSpectrum(bitmap:Bitmap):void
+		{
 			photoData = bitmap.bitmapData;
 			
 			eventDispatcher.dispatchEvent(new CameraEvent(CameraEvent.CAMERA_ROLL_IMAGE_SELECTED));
@@ -276,9 +428,17 @@ package com.nicotroia.whatcoloristhis.model
 			var bmd:BitmapData = new BitmapData(480, 320); //640, 480);
 			var seed:Number = Math.floor(Math.random()*100);
 			
-			bmd.perlinNoise(100, 100, 8, seed, true, true, 7, false, null);
+			bmd.perlinNoise(200, 200, 6, seed, true, true, 7, false, null);
 			
 			return bmd;
+		}
+		
+		public function reset():void
+		{
+			_exif = null;
+			_exifLoader = null;
+			_mediaPromise = null;
+			_dataSource = null;
 		}
 	}
 }
