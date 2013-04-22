@@ -1,8 +1,8 @@
 # What Color Is This
 
-[project home](http://nicotroia.com/what-color-is-this)
+[Project home](http://nicotroia.com/what-color-is-this)
 
-This is a mobile AIR app designed to help identify color names. It utilizes CameraUI and CameraRoll to count the most common colors from a target image and fetch color matches from a popular databases.
+This is a mobile AIR app designed to help identify color names. It utilizes CameraUI and CameraRoll capture an image. The user selects a target area and the program counts the most common colors and fetches color matches from popular databases.
 
 
 Technology & Frameworks
