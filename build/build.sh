@@ -1,5 +1,6 @@
 ANDROID_SDK="/Users/nicotroia/Development/android-sdk"
 AIR_SDK="/Users/nicotroia/Development/air-sdk"
+BB_SDK="/Users/nicotroia/Development/blackberry-tablet-sdk-3.1.2"
 IPHONE_SDK="/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator6.1.sdk"
 PROJECT_PATH="/Users/nicotroia/PROJECTS/what_color_is_this"
 SRC_PATH="$PROJECT_PATH/src"
@@ -44,7 +45,7 @@ fi
 #-compress=false required for ios simulator
 "$AIR_SDK/bin/amxmlc" -compress=false -debug=$DEBUG -library-path+=$PROJECT_PATH/libs $FILENAME.as -output $PROJECT_PATH/bin-debug/$FILENAME.swf
 
-# Read the exit static of mxmlc to determine if there was an error
+# Read the exit static of amxmlc to determine if there was an error
 STATUS=$?
 if [ $STATUS -eq 0 ] 
 then
@@ -128,6 +129,20 @@ then
 		fi
 		
 		"$AIR_SDK/bin/adt" -package -target $IOS_TARGET $LISTEN -storetype pkcs12 -keystore $KEYSTORE -provisioning-profile $PROVISIONING_PROFILE $PROJECT_PATH/bin-ios/$FILENAME.ipa $PROJECT_PATH/src/$FILENAME-app.xml Default-568h@2x.png $FILENAME.swf assets/ $EXTRA
+	
+	elif [ $1 == "-bb" ]
+	then
+		echo "...Building blackberry BAR..."
+		echo ;
+		
+		mkdir -p $PROJECT_PATH/bin-bb
+		
+		# blackberry-airpackager -package [project_name].bar -installApp -launchApp [project_name]-app.xml [project_name].swf [ANE files][icon file][other_project_files] -device [Simulator_IP_address] -password password -forceAirVersion 3.1
+		# -installApp -launchApp 
+		# -device [Simulator_IP_address] -forceAirVersion 3.1
+		
+		"$BB_SDK/bin/blackberry-airpackager" -package $PROJECT_PATH/bin-bb/$FILENAME.bar $PROJECT_PATH/src/$FILENAME-app.xml $FILENAME.swf assets/ -forceAirVersion 3.1
+	
 	else
 		echo "Error. Invalid target."
 		exit 1
@@ -142,10 +157,10 @@ then
 		echo "...Installing package..."
 		echo ;
 		
-		if [ $3 == "-none" ]
+		if [ "$3" == "-none" ]
 		then
 			echo "Not installing to a device."
-			exit 1
+			exit 0
 		fi 
 	
 		if [ $1 == "-android" ] 
@@ -239,6 +254,47 @@ then
 				echo "Install failed"
 				echo ;
 			fi
+		elif [ $1 == "-bb" ]
+		then
+			# Install bb package
+			
+			cd $PROJECT_PATH/bin-bb
+			
+			if [ $2 == "-simulator" ] 
+			then
+				# -z string length > 0
+				if [ -z "$3" ]
+				then
+					echo "Error: simulator ip argument missing. Example: build.sh -bb -simulator 192.168.2.1"
+					exit 1
+				fi
+				
+				# /blackberry-deploy -installApp -password <simulator password> -device <simulator IP address> -package <BAR file path>
+				
+				"$BB_SDK/bin/blackberry-deploy" -installApp -device $3 -package $FILENAME.bar
+				
+			else
+			 	echo "Not installing."
+			 	echo ;
+			 	echo "If you want to sign your application..."
+			 	echo ;
+			 	echo "$BB_SDK/bin/blackberry-signer -storepass <KeystorePassword> <BAR_file.bar>"
+			 	echo ;
+			 	
+			 	exit 0
+			fi
+			
+			# Read status again
+			STATUS=$?
+			if [ $STATUS -eq 0 ]
+			then
+				echo "Install success"
+				echo ;
+			else
+				echo "Install failed"
+				echo ;
+			fi
+			
 		else
 			echo "Error. Invalid target."
 			exit 1
