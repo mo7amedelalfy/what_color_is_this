@@ -136,7 +136,7 @@ package com.nicotroia.whatcoloristhis
 			//startup chain
 			commandMap.mapEvent(ContextEvent.STARTUP_COMPLETE, LoadSettingsCommand, ContextEvent);
 			commandMap.mapEvent(ContextEvent.STARTUP_COMPLETE, StartupAnimationCommand, ContextEvent);
-			//commandMap.mapEvent(ContextEvent.STARTUP_COMPLETE, InitApplicationRaterCommand, ContextEvent);
+			commandMap.mapEvent(ContextEvent.STARTUP_COMPLETE, InitApplicationRaterCommand, ContextEvent);
 			commandMap.mapEvent(ContextEvent.STARTUP_COMPLETE, SendErrorsToServerCommand, ContextEvent); //hopefully crash errors will be recorded and sent on the following startup
 			
 			//events
