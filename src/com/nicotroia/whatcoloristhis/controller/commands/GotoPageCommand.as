@@ -81,7 +81,7 @@ package com.nicotroia.whatcoloristhis.controller.commands
 				});
 			}
 			
-			var delay:Number = 0.15; //_lastPage tween duration
+			var delay:Number = 0; //0.15; //_lastPage tween duration
 			
 			//Add any assets that belong on this page and remove those that don't
 			for each( var AssetPage:Class in sequenceModel.assetList ) { 
@@ -146,7 +146,7 @@ package com.nicotroia.whatcoloristhis.controller.commands
 			pageContainer.addChild(_newPage);
 			
 			//_newPage.disableButtons();
-			_newPage.show(pageSpeed * 0.5, delay, direction, function():void { 
+			_newPage.show(pageSpeed, delay, direction, function():void { 
 				//finally... finish.
 				sequenceModel.isTransitioning = false;
 				

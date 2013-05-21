@@ -1,12 +1,12 @@
 package com.nicotroia.whatcoloristhis.view.pages
 {
-	import com.nicotroia.whatcoloristhis.view.feathers.WhatColorIsThisTheme;
 	import com.greensock.TweenLite;
 	import com.greensock.easing.Quart;
 	import com.nicotroia.whatcoloristhis.Assets;
 	import com.nicotroia.whatcoloristhis.controller.events.NavigationEvent;
 	import com.nicotroia.whatcoloristhis.model.CameraModel;
 	import com.nicotroia.whatcoloristhis.model.LayoutModel;
+	import com.nicotroia.whatcoloristhis.view.feathers.WhatColorIsThisTheme;
 	
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
@@ -78,8 +78,9 @@ package com.nicotroia.whatcoloristhis.view.pages
 		protected function createImageFromDisplayObject(target:flash.display.DisplayObject):Image
 		{
 			var bmd:BitmapData = drawVector(target);
+			var bitmap:Bitmap = new Bitmap(bmd);
 			
-			var image:Image = Image.fromBitmap(new Bitmap(bmd), true, Starling.contentScaleFactor); 
+			var image:Image = Image.fromBitmap(bitmap, true, Starling.contentScaleFactor); 
 			image.x = target.x;
 			image.y = target.y;
 			

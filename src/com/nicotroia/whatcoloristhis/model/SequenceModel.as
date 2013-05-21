@@ -4,9 +4,11 @@ package com.nicotroia.whatcoloristhis.model
 	import com.nicotroia.whatcoloristhis.view.pages.AboutPage;
 	import com.nicotroia.whatcoloristhis.view.pages.AreaSelectPage;
 	import com.nicotroia.whatcoloristhis.view.pages.ConfirmColorPage;
+	import com.nicotroia.whatcoloristhis.view.pages.FavoritesPage;
 	import com.nicotroia.whatcoloristhis.view.pages.PageBase;
 	import com.nicotroia.whatcoloristhis.view.pages.ResultPage;
 	import com.nicotroia.whatcoloristhis.view.pages.SettingsPage;
+	import com.nicotroia.whatcoloristhis.view.pages.SuggestionPage;
 	import com.nicotroia.whatcoloristhis.view.pages.WelcomePage;
 	
 	import flash.utils.Dictionary;
@@ -31,6 +33,8 @@ package com.nicotroia.whatcoloristhis.model
 		public static const PAGE_AreaSelect:Class = AreaSelectPage;
 		public static const PAGE_ConfirmColor:Class = ConfirmColorPage;
 		public static const PAGE_Result:Class = ResultPage;
+		public static const PAGE_Suggest:Class = SuggestionPage;
+		public static const PAGE_Favorites:Class = FavoritesPage;
 		
 		//ASSET Constants
 		//public static const ASSET_Background:Class = BackgroundAsset;
@@ -62,7 +66,7 @@ package com.nicotroia.whatcoloristhis.model
 			overlayWaitingList = new Dictionary();
 			
 			//Define everything that will be created and used.
-			_pageList = new <Class>[PAGE_Welcome, PAGE_Settings, PAGE_About, PAGE_AreaSelect, PAGE_ConfirmColor, PAGE_Result];
+			_pageList = new <Class>[PAGE_Welcome, PAGE_Settings, PAGE_About, PAGE_AreaSelect, PAGE_ConfirmColor, PAGE_Result, PAGE_Suggest, PAGE_Favorites];
 			_assetList = new <Class>[]; //ASSET_Background];
 			_overlayList = new <Class>[OVERLAY_Header]; //OVERLAY_NavBar, OVERLAY_BackButton];
 			
@@ -70,7 +74,7 @@ package com.nicotroia.whatcoloristhis.model
 			//assetWaitingList[ASSET_Background] = new <Class>[ PAGE_Welcome, PAGE_About, PAGE_AreaSelect, PAGE_Result ];
 			
 			//Each overlay will be added to the following pages
-			overlayWaitingList[OVERLAY_Header] = new <Class>[ PAGE_Welcome, PAGE_Settings, PAGE_About, PAGE_AreaSelect, PAGE_ConfirmColor, PAGE_Result ];
+			overlayWaitingList[OVERLAY_Header] = new <Class>[ PAGE_Welcome, PAGE_Settings, PAGE_About, PAGE_AreaSelect, PAGE_ConfirmColor, PAGE_Result, PAGE_Suggest, PAGE_Favorites ];
 			
 			//Preallocate Pages
 			for each( var PageConstant:Class in _pageList ) { 
@@ -96,6 +100,7 @@ package com.nicotroia.whatcoloristhis.model
 		public function getPage(PageConstant:Class):PageBase
 		{
 			if( _currentClass ) _lastPageClass = _currentClass;
+			
 			_currentClass = PageConstant;
 			_currentPage = pages[PageConstant];
 			

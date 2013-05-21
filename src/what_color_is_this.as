@@ -11,7 +11,9 @@ package
 	import flash.display.StageAlign;
 	import flash.display.StageQuality;
 	import flash.display.StageScaleMode;
+	import flash.events.ErrorEvent;
 	import flash.events.Event;
+	import flash.events.UncaughtErrorEvent;
 	import flash.geom.Rectangle;
 	import flash.system.Capabilities;
 	import flash.text.TextField;
@@ -43,6 +45,29 @@ package
 			trace("hello world");
 			
 			addEventListener(flash.events.Event.ADDED_TO_STAGE, addedToStageHandler);
+			
+			//UncaughtErrorEvent handling only works here, not inside ColorContext
+			loaderInfo.uncaughtErrorEvents.addEventListener(UncaughtErrorEvent.UNCAUGHT_ERROR, handleGlobalErrors);
+		}
+		
+		protected function handleGlobalErrors(event:UncaughtErrorEvent):void
+		{
+			event.preventDefault(); //ensure no runtime errors.
+			
+			var message:String; 
+			if (event.error is Error) { 
+				message = Error(event.error).message; 
+			} else if (event.error is ErrorEvent) { 
+				message = ErrorEvent(event.error).text; 
+			} else { 
+				message = event.error.toString(); 
+			}
+			
+			trace("UNCAUGHT ERROR!!!!!! " + message);
+			
+			if( _starling && _starling.root ) { 
+				Application(_starling.root).logError(message);
+			}
 		}
 		
 		protected function addedToStageHandler(event:flash.events.Event):void
@@ -116,11 +141,12 @@ package
 			
 			// launch Starling
 			
-			_starling = new Starling(Application, stage, viewPort);
+			_starling = new Starling(Application, stage, viewPort, null, "auto", "baseline");
 			_starling.stage.stageWidth  = stageWidth;  // <- same size on all devices!
 			_starling.stage.stageHeight = stageHeight; // <- same size on all devices!
 			_starling.simulateMultitouch  = false;
 			_starling.enableErrorChecking = false;
+			
 			
 			trace("stage: " + stage.stageWidth, ",", stage.stageHeight);
 			trace("screen: " + stage.fullScreenWidth, ",", stage.fullScreenHeight);

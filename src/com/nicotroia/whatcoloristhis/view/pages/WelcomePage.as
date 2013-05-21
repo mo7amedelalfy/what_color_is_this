@@ -32,6 +32,7 @@ package com.nicotroia.whatcoloristhis.view.pages
 		public var takePhotoButton:starling.display.Button;
 		public var choosePhotoButton:starling.display.Button;
 		public var colorSpectrumButton:starling.display.Button;
+		public var favoritesButton:starling.display.Button;
 		
 		private var _actionBar:Image;
 		private var _spectrumIcon:Image;
@@ -78,7 +79,7 @@ package com.nicotroia.whatcoloristhis.view.pages
 			vectorPage.actionBar.x = -2;
 			vectorPage.actionBar.y = layoutModel.appHeight - (114 * layoutModel.scale);
 			
-			vectorPage.takePhotoButton.width = (200 * layoutModel.scale) * Starling.contentScaleFactor; 
+			vectorPage.takePhotoButton.width = (180 * layoutModel.scale) * Starling.contentScaleFactor; 
 			vectorPage.takePhotoButton.scaleY = vectorPage.takePhotoButton.scaleX;
 			vectorPage.takePhotoButton.x = (layoutModel.appWidth * 0.5) - ((vectorPage.takePhotoButton.width/Starling.contentScaleFactor) * 0.5);
 			vectorPage.takePhotoButton.y = layoutModel.appHeight - (vectorPage.takePhotoButton.height/Starling.contentScaleFactor) - 10;
@@ -116,10 +117,17 @@ package com.nicotroia.whatcoloristhis.view.pages
 			vectorPage.directionsTF.htmlText = "To start, you can <font color='#0099ff'>take a photo</font> or select an existing one from an <font color='#5E68E7'>album</font>.\n\rIf you're looking for a specific color, play with the " + colorSpectrumText + ".";
 			vectorPage.directionsTF.setTextFormat(_directionsTextFormat);
 			
+			vectorPage.favoritesButton.height = vectorPage.actionBar.height * 0.6;
+			vectorPage.favoritesButton.scaleX = vectorPage.favoritesButton.scaleY;
+			vectorPage.favoritesButton.x = layoutModel.appWidth - vectorPage.favoritesButton.width - (24 * layoutModel.scale);
+			vectorPage.favoritesButton.y = vectorPage.actionBar.y - vectorPage.favoritesButton.height - (24 * layoutModel.scale);
+			
+			/*
 			vectorPage.arrows.width = layoutModel.appWidth * 0.8;
 			vectorPage.arrows.scaleY = vectorPage.arrows.scaleX;
 			vectorPage.arrows.x = layoutModel.appWidth * 0.1;
 			vectorPage.arrows.y = vectorPage.actionBar.y - vectorPage.arrows.height - (7 * layoutModel.scale);
+			*/
 		}
 		
 		override public function drawVectors(layoutModel:LayoutModel=null, cameraModel:CameraModel = null):void 
@@ -130,13 +138,15 @@ package com.nicotroia.whatcoloristhis.view.pages
 			removeDrawnVector( _background );
 			removeDrawnVector( _welcomeTextImage );
 			removeDrawnVector( _directionsTextImage );
-			removeDrawnVector( _arrowsImage );
+			//removeDrawnVector( _arrowsImage );
 			removeDrawnVector( _actionBar );
 			removeDrawnVector( aboutPageButton );
 			removeDrawnVector( takePhotoButton );
 			removeDrawnVector( choosePhotoButton );
 			removeDrawnVector( settingsButton );
 			removeDrawnVector( colorSpectrumButton );
+			removeDrawnVector( favoritesButton );
+			
 			
 			//Make things
 			_background = drawBackgroundQuad();
@@ -147,9 +157,10 @@ package com.nicotroia.whatcoloristhis.view.pages
 			settingsButton = createButtonFromMovieClip( vectorPage.settingsButton );
 			_spectrumIcon = createImageFromDisplayObject( vectorPage.spectrumIcon );
 			colorSpectrumButton = createButtonFromMovieClip( vectorPage.spectrumIcon ); 
-			_arrowsImage = createImageFromDisplayObject( vectorPage.arrows);
+			//_arrowsImage = createImageFromDisplayObject( vectorPage.arrows);
 			_welcomeTextImage = createImageFromDisplayObject( vectorPage.welcomeTF );
 			_directionsTextImage = createImageFromDisplayObject( vectorPage.directionsTF );
+			favoritesButton = createButtonFromMovieClip( vectorPage.favoritesButton ); //new feathers.controls.Button();
 			
 			
 			//Add
@@ -161,8 +172,11 @@ package com.nicotroia.whatcoloristhis.view.pages
 			addChild( takePhotoButton );
 			addChild( choosePhotoButton );
 			addChild( colorSpectrumButton );
+			addChild( favoritesButton );
+			
 			
 			//Settings
+			
 		}
 	}
 }

@@ -16,6 +16,11 @@ package com.nicotroia.whatcoloristhis
 			addEventListener(Event.ADDED_TO_STAGE, addedToStageHandler);
 		}
 		
+		public function logError(message:String):void
+		{
+			_context.handleGlobalError(message);
+		}
+		
 		private function addedToStageHandler(event:Event):void
 		{
 			trace("Application added to stage");

@@ -381,6 +381,12 @@ package com.nicotroia.whatcoloristhis.view.pages
 				_currentY = 0;
 			}
 			
+			//Just to make sure we didnt skip empty pixels didn't perform a check
+			if( _currentLoopNumber >= _totalLoops ) { 
+				//done
+				_finishFlag = true;
+			}
+			
 			trace(" end. " + _currentLoopNumber + "/" + _totalLoops + " px. " + loopsThisFrame + " loops in " + (getTimer() - _startEnterFrameTime) + "ms");
 		}
 		

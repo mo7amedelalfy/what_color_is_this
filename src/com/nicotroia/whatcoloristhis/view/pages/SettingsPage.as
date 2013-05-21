@@ -48,7 +48,7 @@ package com.nicotroia.whatcoloristhis.view.pages
 			_textFormat.size = uint(24 * layoutModel.scale);
 			_textFormat.color = 0x444444;
 			
-			trace("settings page drawing vectors");
+			//trace("settings page drawing vectors");
 			
 			removeDrawnVector(_background);
 			removeDrawnVector(fetchNtcToggle);

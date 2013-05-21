@@ -14,6 +14,7 @@ package com.nicotroia.whatcoloristhis.controller.events
 		public static const ADD_NAV_BUTTON_TO_HEADER_RIGHT:String = "AddNavButtonToHeaderRight";
 		public static const REMOVE_HEADER_NAV_BUTTONS:String = "RemoveHeaderNavButtons";
 		public static const SETTINGS_PAGE_CONFIRMED:String = "SettingsPageConfirmed";
+		public static const FAVORITE_COLOR_CONFIRMED:String = "FavoriteColorConfirmed";
 		
 		public var pageConstant:Class;
 		public var button:DisplayObject;

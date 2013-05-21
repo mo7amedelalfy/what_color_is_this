@@ -39,8 +39,7 @@ package com.nicotroia.whatcoloristhis.model
 		public var targetedPixels:BitmapData;
 		public var top5:ColorLinkedList; //Vector.<String>;
 		public var chosenWinnerHex:String;
-		//public var closestMatchHex:String;
-		//public var resultName:String;
+		public var simpleResult:Object;
 		
 		protected var _cameraUI:CameraUI;
 		protected var _cameraRoll:CameraRoll;

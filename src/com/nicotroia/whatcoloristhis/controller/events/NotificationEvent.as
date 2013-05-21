@@ -6,6 +6,7 @@ package com.nicotroia.whatcoloristhis.controller.events
 	{
 		public static const CHANGE_TOP_NAV_BAR_TITLE:String = "ChangeTopNavBarTitle";
 		public static const ADD_TEXT_TO_LOADING_SPINNER:String = "AddTextToLoadingSpinner";
+		public static const UNCAUGHT_ERROR_OCCURRED:String = "UncaughtErrorOccurred";
 		
 		public var text:String;
 		

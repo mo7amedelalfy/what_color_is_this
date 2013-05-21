@@ -19,7 +19,7 @@ package com.nicotroia.whatcoloristhis.view.pages
 		{
 			super.pageAddedToStageHandler(event);
 			
-			trace("about page addedToStage");
+			//trace("about page addedToStage");
 			
 			eventDispatcher.dispatchEvent(new NavigationEvent(NavigationEvent.ADD_NAV_BUTTON_TO_HEADER_LEFT, null, aboutPage.backButton));
 			eventDispatcher.dispatchEvent(new NotificationEvent(NotificationEvent.CHANGE_TOP_NAV_BAR_TITLE, "About"));
@@ -38,7 +38,7 @@ package com.nicotroia.whatcoloristhis.view.pages
 			
 			super.onRemove();
 			
-			trace("about page onRemove");
+			//trace("about page onRemove");
 		}
 	}
 }

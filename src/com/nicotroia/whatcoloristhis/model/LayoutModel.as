@@ -54,7 +54,6 @@ package com.nicotroia.whatcoloristhis.model
 			
 			_orientation = StageOrientation.UNKNOWN;
 			
-			
 			//These initial values will be changed in LayoutPageCommand
 			if( Capabilities.version.substr(0,3).toUpperCase() == "AND" ) { //android device
 				_appWidth = Starling.current.nativeStage.stageWidth;

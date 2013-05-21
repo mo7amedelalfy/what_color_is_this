@@ -1,23 +1,32 @@
 package com.nicotroia.whatcoloristhis
 {
+	import com.distriqt.extension.applicationrater.ApplicationRater;
+	import com.distriqt.extension.applicationrater.events.ApplicationRaterEvent;
 	import com.nicotroia.whatcoloristhis.controller.commands.AddTextToLoadingSpinnerCommand;
 	import com.nicotroia.whatcoloristhis.controller.commands.GotoPageCommand;
 	import com.nicotroia.whatcoloristhis.controller.commands.HideDisplayListLoadingSpinnerCommand;
 	import com.nicotroia.whatcoloristhis.controller.commands.HideLoadingSpinnerCommand;
 	import com.nicotroia.whatcoloristhis.controller.commands.ImageSelectFailedCommand;
 	import com.nicotroia.whatcoloristhis.controller.commands.ImageSelectedCommand;
+	import com.nicotroia.whatcoloristhis.controller.commands.InitApplicationRaterCommand;
 	import com.nicotroia.whatcoloristhis.controller.commands.LayoutPageCommand;
 	import com.nicotroia.whatcoloristhis.controller.commands.LoadSettingsCommand;
+	import com.nicotroia.whatcoloristhis.controller.commands.SaveFavoritesCommand;
 	import com.nicotroia.whatcoloristhis.controller.commands.SaveSettingsCommand;
+	import com.nicotroia.whatcoloristhis.controller.commands.SendErrorsToServerCommand;
 	import com.nicotroia.whatcoloristhis.controller.commands.ShowDisplayListLoadingSpinnerCommand;
 	import com.nicotroia.whatcoloristhis.controller.commands.ShowLoadingSpinnerCommand;
 	import com.nicotroia.whatcoloristhis.controller.commands.StartupAnimationCommand;
+	import com.nicotroia.whatcoloristhis.controller.commands.WriteErrorToFileCommand;
 	import com.nicotroia.whatcoloristhis.controller.events.CameraEvent;
 	import com.nicotroia.whatcoloristhis.controller.events.LayoutEvent;
 	import com.nicotroia.whatcoloristhis.controller.events.LoadingEvent;
 	import com.nicotroia.whatcoloristhis.controller.events.NavigationEvent;
 	import com.nicotroia.whatcoloristhis.controller.events.NotificationEvent;
 	import com.nicotroia.whatcoloristhis.model.CameraModel;
+	import com.nicotroia.whatcoloristhis.model.ColorModel;
+	import com.nicotroia.whatcoloristhis.model.ErrorModel;
+	import com.nicotroia.whatcoloristhis.model.FavoritesModel;
 	import com.nicotroia.whatcoloristhis.model.LayoutModel;
 	import com.nicotroia.whatcoloristhis.model.SequenceModel;
 	import com.nicotroia.whatcoloristhis.model.SettingsModel;
@@ -40,17 +49,22 @@ package com.nicotroia.whatcoloristhis
 	import com.nicotroia.whatcoloristhis.view.pages.AreaSelectPageMediator;
 	import com.nicotroia.whatcoloristhis.view.pages.ConfirmColorPage;
 	import com.nicotroia.whatcoloristhis.view.pages.ConfirmColorPageMediator;
+	import com.nicotroia.whatcoloristhis.view.pages.FavoritesPage;
+	import com.nicotroia.whatcoloristhis.view.pages.FavoritesPageMediator;
 	import com.nicotroia.whatcoloristhis.view.pages.PageBase;
 	import com.nicotroia.whatcoloristhis.view.pages.PageBaseMediator;
 	import com.nicotroia.whatcoloristhis.view.pages.ResultPage;
 	import com.nicotroia.whatcoloristhis.view.pages.ResultPageMediator;
 	import com.nicotroia.whatcoloristhis.view.pages.SettingsPage;
 	import com.nicotroia.whatcoloristhis.view.pages.SettingsPageMediator;
+	import com.nicotroia.whatcoloristhis.view.pages.SuggestionPage;
+	import com.nicotroia.whatcoloristhis.view.pages.SuggestionPageMediator;
 	import com.nicotroia.whatcoloristhis.view.pages.WelcomePage;
 	import com.nicotroia.whatcoloristhis.view.pages.WelcomePageMediator;
 	
 	import flash.display.Bitmap;
 	import flash.display.Stage;
+	import flash.events.ErrorEvent;
 	import flash.events.StageOrientationEvent;
 	import flash.geom.Rectangle;
 	
@@ -88,6 +102,9 @@ package com.nicotroia.whatcoloristhis
 			injector.mapSingleton(CameraModel);
 			injector.mapSingleton(LayoutModel);
 			injector.mapSingleton(SettingsModel);
+			injector.mapSingleton(ColorModel);
+			injector.mapSingleton(FavoritesModel);
+			injector.mapSingleton(ErrorModel);
 			injector.mapValue(DisplayObjectContainer, contextView, "contextView");
 			
 			
@@ -119,6 +136,8 @@ package com.nicotroia.whatcoloristhis
 			//startup chain
 			commandMap.mapEvent(ContextEvent.STARTUP_COMPLETE, LoadSettingsCommand, ContextEvent);
 			commandMap.mapEvent(ContextEvent.STARTUP_COMPLETE, StartupAnimationCommand, ContextEvent);
+			//commandMap.mapEvent(ContextEvent.STARTUP_COMPLETE, InitApplicationRaterCommand, ContextEvent);
+			commandMap.mapEvent(ContextEvent.STARTUP_COMPLETE, SendErrorsToServerCommand, ContextEvent); //hopefully crash errors will be recorded and sent on the following startup
 			
 			//events
 			commandMap.mapEvent(LayoutEvent.RESIZE, LayoutPageCommand, LayoutEvent);
@@ -139,6 +158,9 @@ package com.nicotroia.whatcoloristhis
 			commandMap.mapEvent(LoadingEvent.LOADING_FINISHED, HideDisplayListLoadingSpinnerCommand, LoadingEvent);
 			commandMap.mapEvent(NotificationEvent.ADD_TEXT_TO_LOADING_SPINNER, AddTextToLoadingSpinnerCommand, NotificationEvent);
 			commandMap.mapEvent(NavigationEvent.SETTINGS_PAGE_CONFIRMED, SaveSettingsCommand, NavigationEvent);
+			commandMap.mapEvent(NavigationEvent.FAVORITE_COLOR_CONFIRMED, SaveFavoritesCommand, NavigationEvent);
+			commandMap.mapEvent(NotificationEvent.UNCAUGHT_ERROR_OCCURRED, WriteErrorToFileCommand, NotificationEvent);
+			commandMap.mapEvent(NotificationEvent.UNCAUGHT_ERROR_OCCURRED, SendErrorsToServerCommand, NotificationEvent);
 			
 			
 			//pages
@@ -153,6 +175,8 @@ package com.nicotroia.whatcoloristhis
 			mediatorMap.mapView(AreaSelectPage, AreaSelectPageMediator, [PageBase, AreaSelectPage], true, false);
 			mediatorMap.mapView(ConfirmColorPage, ConfirmColorPageMediator, [PageBase, ConfirmColorPage], true, false);
 			mediatorMap.mapView(ResultPage, ResultPageMediator, [PageBase, ResultPage], true, false);
+			mediatorMap.mapView(SuggestionPage, SuggestionPageMediator, [PageBase, SuggestionPage], true, false);
+			mediatorMap.mapView(FavoritesPage, FavoritesPageMediator, [PageBase, FavoritesPage], true, false);
 			
 			
 			//buttons
@@ -168,9 +192,12 @@ package com.nicotroia.whatcoloristhis
 			
 			//finally
 			//super.startup();
-			
-			
 			appResizeHandler(new ResizeEvent(ResizeEvent.RESIZE, Starling.current.nativeStage.fullScreenWidth, Starling.current.nativeStage.fullScreenHeight)); //hmm
+		}
+		
+		public function handleGlobalError(message:String):void
+		{
+			eventDispatcher.dispatchEvent(new NotificationEvent(NotificationEvent.UNCAUGHT_ERROR_OCCURRED, message));
 		}
 		
 		protected function appResizeHandler(event:ResizeEvent = null):void

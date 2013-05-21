@@ -22,10 +22,11 @@ package com.nicotroia.whatcoloristhis.controller.commands
 			var array:Array = settingsModel.readSettings();
 			
 			if( array != null ) { 
-				Settings.fetchCrayolaResults = array[0];
-				Settings.fetchPantoneResults = array[1];
-				Settings.fetchNtcResults = array[2];
-				Settings.colorChoicesGivenToUser = array[3];
+				Settings.userHasSettingsForVersion = array[0];
+				Settings.fetchCrayolaResults = array[1];
+				Settings.fetchPantoneResults = array[2];
+				Settings.fetchNtcResults = array[3];
+				Settings.colorChoicesGivenToUser = array[4];
 			}
 		}
 	}
